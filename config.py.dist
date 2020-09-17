@@ -1,0 +1,7 @@
+# %%
+
+login = ''
+password = ''
+company_id = -1
+
+log_dir = 'logs'
