@@ -78,8 +78,8 @@ if not units:
     logger.info('nothing to repair, exiting')
     exit(0)
 
-print(f'Prepared units dict with {len(units)} quality levels:')
-print(units.keys())
+logger.info(f'Prepared units dict with {len(units)} quality levels:')
+logger.info(units.keys())
 
 
 # %%
@@ -164,28 +164,24 @@ def repair(session, supplier_id):
 
 # %%
 def repair_by_quality(quality, params):
-    print(f'Repairing items of quality {quality} (from {len(params)-1} units)...')
+    logger.info(f'Repairing items of quality {quality} (from {len(params)-1} units)...')
     
-    print(f'getting suppliers page...')
     suppliers_page = get_suppliers_page(s, params) # lxml page
-    print(f'\t: {suppliers_page}')
-    
-    print(f'creating pandas dataframe...')
+    logger.info(f'got suppliers page...')
+
     suppliers = get_suppliers_df(suppliers_page) # pandas dataframe
-    #print(f'{suppliers}')
-    
-    print(f'getting quantity to repair...')
+    logger.info(f'created pandas dataframe...')
+
     quantity_to_repair = get_quantity_to_repair(suppliers_page)
-    print(f'\t{quantity_to_repair}')
-    
-    print(f'getting supplier id for quality of {quality}...')
+    logger.info(f'{quantity_to_repair} pieces to repair...')
+
     supplier_id = get_supplier_id(suppliers, quality, quantity_to_repair)
-    print(f'\t{supplier_id}')
- 
-    print(f'waiting for 3 seconds...')
+    logger.info(f'got supplier {supplier_id} for quality of {quality}...')
+
+    logger.info(f'waiting for 3 seconds...')
     time.sleep(3)
 
-    print(f'repairing...')
+    logger.info(f'repairing...')
     repair(s, supplier_id) # s = session
 
 
@@ -193,14 +189,9 @@ def repair_by_quality(quality, params):
 def repair_all(rep_params):
     for (quality, params) in rep_params.items():
         repair_by_quality(quality, params)
-        print(f'waiting for 3 seconds...')
-        time.sleep(3)
 
 
 # %%
 # qual = '36.22'
 # repair_one(qual, rep_params[qual])
 repair_all(build_repair_params(units))
-
-##
-

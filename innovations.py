@@ -39,10 +39,9 @@ def attach_artefact(name, unit_id):
                 'artefact_id': artefact['id'],
                 'token': token,
             }
-            print(f'artefact: {artefact["name"]}')
-            print(f'params: {params}')
+            logger.info(f'renewing: ({unit_id}) {name}')
             r = s.post(url, params)
-            print(r)
+            logger.info(r)
             break
 
 
@@ -79,7 +78,7 @@ def delete_innovations_renewal_messages(messages):
             url = f'https://virtonomica.ru/api/' \
                   f'?action=user/message/del&app=virtonomica&' \
                   f'message_id={mid}&box=system&token={token}'
-            print(url)
+            logger.info(f'deleting message: {mid}')
             time.sleep(3)
             s.get(url)
 
