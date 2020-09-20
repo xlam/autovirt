@@ -22,8 +22,9 @@ def get_logger(name: str):
     logger.propagate = False
 
     if not logger.hasHandlers():
+        filename = f'{name}.log'
         c_handler = logging.StreamHandler()
-        f_handler = logging.FileHandler(os.path.join(get_log_dir(), name))
+        f_handler = logging.FileHandler(os.path.join(get_log_dir(), filename))
 
         c_formatter = logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s')
