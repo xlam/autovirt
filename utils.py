@@ -1,9 +1,17 @@
 # %%
+import os
 import json
 import logging
 import requests
 
 import config
+
+
+# %%
+def get_log_dir():
+    log_dir = os.path.join(os.path.normpath(os.getcwd()), config.log_dir)
+    os.makedirs(log_dir, exist_ok=True)
+    return log_dir
 
 
 # %%
@@ -15,7 +23,7 @@ def get_logger(name: str):
 
     if not logger.hasHandlers():
         c_handler = logging.StreamHandler()
-        f_handler = logging.FileHandler(f'{name}.log')
+        f_handler = logging.FileHandler(os.path.join(get_log_dir(), name))
 
         c_formatter = logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s')
