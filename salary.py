@@ -67,7 +67,7 @@ for unit in units:
     data = json.loads(r.content)
     # set salary to required plus 5$ for sure
     salary = round(data['salary_required']) + 5
-    logger.info(f"updating salary in unit {unit[0]} from "
+    logger.info(f"updating salary at unit {unit[0]} from "
                 f"{data['employee_salary']} to {salary}")
     s.post(f'https://virtonomica.ru/api/vera/main/unit/employee/update',
            {
