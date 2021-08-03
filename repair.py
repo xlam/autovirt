@@ -32,7 +32,7 @@ s.get('https://virtonomica.ru/vera/window/common/util/setpaging/dbunitsman/equip
 
 # %%
 # set filter to machine tools (id=1529)
-s.post('https://virtonomica.ru/vera/main/common/util/setfiltering/dbunit/unitListWithEquipment/country=/region=/city=/product=1529/understaffed=/wear_percent=/low_quality=/animal_food_not_enough=/animal_food_low_quality=/type=0')
+s.post('https://virtonomica.ru/vera/main/common/util/setfiltering/dbunit/unitListWithEquipment/product=1529')
 
 # %%
 # get units list
@@ -135,22 +135,23 @@ def get_suppliers_df(root):
     df = pd.DataFrame(suppliers, columns=['id', 'price', 'quality', 'quantity'])
     df = df.apply(pd.to_numeric)
     df.sort_values(['quality'], ascending=False, inplace=True)
-    
+    logger.info(df.values)
     return df
 
 
 # %%
 # find best supplier. this part is a bit tricky and needs better selection algorithm
-def get_supplier_id(df, quality, quantity):
+def get_supplier(df, quality, quantity):
     quality = float(quality)
     quantity = int(quantity)
     # select units in range [quality-2 ... quality+3] and having enough repair parts
     sup = df[(df['quality'] > quality-2) & (df['quality'] < quality+3) & (df['quantity'] > quantity)].copy()
     # calculate price/quality ratio
     sup['p/q'] = sup['price'] / sup['quality']
+    logger.info(sup)
     # select one with lowest p/r ratio (mostly cheaper one)
-    val = sup['id'][sup['p/q'] == sup.min()['p/q']]
-    return val.values[0]
+    val = sup[sup['p/q'] == sup.min()['p/q']]
+    return val.values
 
 
 # %%
@@ -163,7 +164,7 @@ def repair(session, supplier_id):
 
 
 # %%
-def repair_by_quality(quality, params):
+def repair_by_quality(quality, params, fake=False):
     logger.info(f'Repairing items of quality {quality} (from {len(params)-1} units)...')
     
     suppliers_page = get_suppliers_page(s, params) # lxml page
@@ -171,18 +172,23 @@ def repair_by_quality(quality, params):
 
     suppliers = get_suppliers_df(suppliers_page) # pandas dataframe
     logger.info(f'created pandas dataframe...')
+    logger.info(suppliers)
 
     quantity_to_repair = get_quantity_to_repair(suppliers_page)
     logger.info(f'{quantity_to_repair} pieces to repair...')
 
-    supplier_id = get_supplier_id(suppliers, quality, quantity_to_repair)
-    logger.info(f'got supplier {supplier_id} for quality of {quality}...')
+    supplier = get_supplier(suppliers, quality, quantity_to_repair)
+    (sup_id, sup_price, sup_quality, sup_quantity) = supplier.values[0]
+    logger.info(f'got supplier {sup_id} for quality of {quality} (quality={sup_quality}, price={sup_price})...')
 
     logger.info(f'waiting for 3 seconds...')
     time.sleep(3)
 
-    logger.info(f'repairing...')
-    repair(s, supplier_id) # s = session
+    if fake:
+        logger.info(f'fake repairing...')
+    else:
+        logger.info(f'repairing...')
+        repair(s, sup_id) # s = session
 
 
 # %%
