@@ -135,7 +135,7 @@ def get_suppliers_df(root):
     df = pd.DataFrame(suppliers, columns=['id', 'price', 'quality', 'quantity'])
     df = df.apply(pd.to_numeric)
     df.sort_values(['quality'], ascending=False, inplace=True)
-    logger.info(df.values)
+
     return df
 
 
@@ -148,10 +148,11 @@ def get_supplier(df, quality, quantity):
     sup = df[(df['quality'] > quality-2) & (df['quality'] < quality+3) & (df['quantity'] > quantity)].copy()
     # calculate price/quality ratio
     sup['p/q'] = sup['price'] / sup['quality']
+    logger.info("listing filtered suppliers:")
     logger.info(sup)
     # select one with lowest p/r ratio (mostly cheaper one)
     val = sup[sup['p/q'] == sup.min()['p/q']]
-    return val.values
+    return val.values[0]
 
 
 # %%
@@ -172,13 +173,12 @@ def repair_by_quality(quality, params, fake=False):
 
     suppliers = get_suppliers_df(suppliers_page) # pandas dataframe
     logger.info(f'created pandas dataframe...')
-    logger.info(suppliers)
 
     quantity_to_repair = get_quantity_to_repair(suppliers_page)
     logger.info(f'{quantity_to_repair} pieces to repair...')
 
     supplier = get_supplier(suppliers, quality, quantity_to_repair)
-    (sup_id, sup_price, sup_quality, sup_quantity) = supplier.values[0]
+    (sup_id, sup_price, sup_quality, sup_quantity, sup_pl_ratio) = supplier
     logger.info(f'got supplier {sup_id} for quality of {quality} (quality={sup_quality}, price={sup_price})...')
 
     logger.info(f'waiting for 3 seconds...')
@@ -201,3 +201,4 @@ def repair_all(rep_params):
 # qual = '36.22'
 # repair_one(qual, rep_params[qual])
 repair_all(build_repair_params(units))
+logger.info("repairing finished")
