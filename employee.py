@@ -22,6 +22,8 @@ def get_system_messages():
 
 
 def build_salary_rise_list(messages):
+    if not messages['data']:
+        return False
     subj_string = 'Недовольство заработной платой'
     units = []
     for (_, message) in messages['data'].items():

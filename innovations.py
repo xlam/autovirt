@@ -61,6 +61,8 @@ def get_system_messages():
 
 
 def build_innovations_renewal_list(messages):
+    if not messages['data']:
+        return False
     subj_string = 'Время жизни инноваций на предприятиях подошло к концу!'
     renewal = []
     for (_, message) in messages['data'].items():
