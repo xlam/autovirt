@@ -153,5 +153,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-
+# Project specific
 config.py
+*.dat
+test/

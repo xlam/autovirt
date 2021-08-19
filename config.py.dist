@@ -1,5 +1,7 @@
 # %%
 
+session_file = 'session.dat'
+session_timeout = 60 * 30
 login = ''
 password = ''
 company_id = -1
