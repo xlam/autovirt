@@ -2,24 +2,28 @@
 
 # autovirt dispatcher
 
+function log() {
+    echo "$(date "+%Y-%m-%d %T"): $1"
+}
+
 echo ""
-echo "Activating environment..."
+log "Activating environment..."
 source ./env/bin/activate
-echo "Using python executable: $(which python)"
+log "Using python executable: $(which python)"
 
 if [ -n "$1" ]
 then
   SCRIPT="${1}.py"
   if [ -f "$SCRIPT" ]
     then
-      echo "Running script: ${SCRIPT} ${*:2}"
+      log "Running script: ${SCRIPT} ${*:2}"
       python "$SCRIPT" "${@:2}"
       wait $!
     else
-      echo "Script \"${SCRIPT}\" not found!"
+      log "Script \"${SCRIPT}\" not found!"
   fi
 else
-  echo "No parameters found, exiting."
+  log "No parameters found, exiting."
 fi
 
 deactivate
