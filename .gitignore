@@ -11,6 +11,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+env[12345]/
 build/
 develop-eggs/
 dist/
@@ -157,3 +158,4 @@ fabric.properties
 config.py
 *.dat
 test/
+notes
