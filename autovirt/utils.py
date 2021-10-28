@@ -1,9 +1,9 @@
 import os
-import json
 import pickle
 import logging
 import requests
 import datetime
+from typing import Union
 
 import config
 
@@ -57,6 +57,24 @@ def get_logger(name: str):
     return logger
 
 
+def modification_date(filename):
+    t = os.path.getmtime(filename)
+    return datetime.datetime.fromtimestamp(t)
+
+
+def get_cached_session() -> Union[VirtSession, None]:
+    logger = get_logger("utils_session")
+    if not os.path.exists(config.session_file):
+        return None
+    time = modification_date(config.session_file)
+    last_mod_time = (datetime.datetime.now() - time).seconds
+    if last_mod_time < config.session_timeout:
+        with open(config.session_file, "rb") as f:
+            s = pickle.load(f)
+            logger.info(f"Cached session loaded")
+            return s
+
+
 def get_logged_session() -> VirtSession:
     logger = get_logger("utils_session")
     s = get_cached_session()
@@ -74,24 +92,7 @@ def get_logged_session() -> VirtSession:
     return s
 
 
-def modification_date(filename):
-    t = os.path.getmtime(filename)
-    return datetime.datetime.fromtimestamp(t)
-
-
-def get_cached_session() -> VirtSession:
-    logger = get_logger("utils_session")
-    if not os.path.exists(config.session_file):
-        return False
-    time = modification_date(config.session_file)
-    last_mod_time = (datetime.datetime.now() - time).seconds
-    if last_mod_time < config.session_timeout:
-        with open(config.session_file, "rb") as f:
-            s = pickle.load(f)
-            logger.info(f"Cached session loaded")
-            return s
-
-
 def get_token(s: requests.Session):
-    r = s.get("https://virtonomica.ru/api/?app=system&action=token&format=json")
-    return json.loads(r.content)
+    r = s.get("https://virtonomica.ru/api/vera/main/token")
+    # return json.loads(r.content)
+    return r.json()

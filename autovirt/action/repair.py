@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 import sys
 from math import ceil
 
@@ -76,6 +73,10 @@ def split_by_quality(
 
 
 def run(config_name):
+    if not config_name or config_name not in config.repair.keys():
+        logger.error(f"config '{config_name}' does not exist, exiting")
+        sys.exit(1)
+
     repair_config = config.repair[config_name]
     options = repair_config.keys()
     equipment_id = repair_config[config.Option.equip_id]

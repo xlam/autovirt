@@ -1,12 +1,12 @@
 import argparse
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", type=str)
-    parser.add_argument("config", type=str, default="none")
+    parser.add_argument("-c, --config", type=str, dest="config", default=None)
     return parser.parse_args()
 
 
@@ -15,6 +15,7 @@ if __name__ == "__main__":
     print("args: ", args)
     action_name = args.action
     action_config = args.config
+
     if action_name == "repair":
         import autovirt.action.repair as action
     if action_name == "salary":
@@ -23,4 +24,5 @@ if __name__ == "__main__":
         import autovirt.action.employee as action
     if action_name == "innovations":
         import autovirt.action.innovations as action
+
     action.run(action_config)

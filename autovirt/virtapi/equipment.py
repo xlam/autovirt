@@ -8,7 +8,6 @@ import config
 
 s = utils.get_logged_session()
 logger = utils.get_logger("virtapi.equipment")
-pagesize = 1000
 
 
 def get_units(equipment_id: int) -> list[UnitEquipment]:
@@ -17,6 +16,7 @@ def get_units(equipment_id: int) -> list[UnitEquipment]:
         f"https://virtonomica.ru/api/vera/main/company/equipment/units"
         f"?id={config.company_id}"
         f"&product_id={equipment_id}"
+        f"&pagesize={config.pagesize}"
     )
     data = json.loads(r.content)
     units = []
@@ -42,7 +42,7 @@ def get_offers(product_id: int) -> list[RepairOffer]:
         f"https://virtonomica.ru/api/vera/main/company/equipment/offers"
         f"?id={config.company_id}"
         f"&product_id={product_id}"
-        f"&pagesize={pagesize}"
+        f"&pagesize={config.pagesize}"
     )
     if not r.ok:  # todo: move this to VirtSession
         logger.error(f"could not get offers data, response code: {r.status_code}")
