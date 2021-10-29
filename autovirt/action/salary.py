@@ -3,8 +3,6 @@ from autovirt.virtapi import employee
 
 
 logger = utils.get_logger("salary")
-s = utils.get_logged_session()
-token = utils.get_token(s)
 
 
 def units_to_update_salary() -> list[dict]:

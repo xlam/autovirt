@@ -5,8 +5,6 @@ from autovirt.structs import Message
 
 
 logger = utils.get_logger("employee")
-s = utils.get_logged_session()
-token = utils.get_token(s)
 
 
 def units_to_rise_salary(messages: list[Message]) -> list:

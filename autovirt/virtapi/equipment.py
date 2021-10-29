@@ -1,12 +1,12 @@
 import json
 import sys
 
+import config
 from autovirt import utils
 from autovirt.structs import UnitEquipment, RepairOffer
-import config
+from autovirt.session import session as s
 
 
-s = utils.get_logged_session()
 logger = utils.get_logger("virtapi.equipment")
 
 

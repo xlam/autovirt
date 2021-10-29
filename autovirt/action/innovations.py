@@ -8,8 +8,6 @@ from autovirt.structs import Message
 
 
 logger = utils.get_logger("innovations")
-s = utils.get_logged_session()
-token = utils.get_token(s)
 
 
 def build_innovations_renewal_list(messages: list[Message]):

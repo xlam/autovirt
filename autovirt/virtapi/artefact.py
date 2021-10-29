@@ -1,9 +1,8 @@
 from autovirt import utils
+from autovirt.session import token, session as s
 
 
 logger = utils.get_logger("virtapi.artefact")
-s = utils.get_logged_session()
-token = utils.get_token(s)
 
 
 # this uses virtonomica's API and should work for any site design
