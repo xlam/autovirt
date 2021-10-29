@@ -1,4 +1,4 @@
-from datetime import time
+import time
 
 from autovirt import utils
 from autovirt.structs import Message
