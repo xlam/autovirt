@@ -1,6 +1,6 @@
 import argparse
-
-__version__ = "1.1.0"
+import importlib
+from autovirt import __version__ as version
 
 
 def parse_args():
@@ -11,18 +11,12 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    print(f"Running autovirt version {version}")
     args = parse_args()
     print("args: ", args)
     action_name = args.action
     action_config = args.config
 
-    if action_name == "repair":
-        import autovirt.action.repair as action
-    if action_name == "salary":
-        import autovirt.action.salary as action
-    if action_name == "employee":
-        import autovirt.action.employee as action
-    if action_name == "innovations":
-        import autovirt.action.innovations as action
-
+    action_module = ".".join(["autovirt.action", action_name])
+    action = importlib.import_module(action_module)
     action.run(action_config)

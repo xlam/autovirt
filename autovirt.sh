@@ -2,6 +2,8 @@
 
 # autovirt dispatcher
 
+SCRIPT="main.py"
+
 function log() {
     echo "$(date "+%Y-%m-%d %T"): $1"
 }
@@ -13,11 +15,10 @@ log "Using python executable: $(which python)"
 
 if [ -n "$1" ]
 then
-  SCRIPT="${1}.py"
   if [ -f "$SCRIPT" ]
     then
-      log "Running script: ${SCRIPT} ${*:2}"
-      python "$SCRIPT" "${@:2}"
+      log "Running script: ${SCRIPT} ${*:1}"
+      python "$SCRIPT" "${@:1}"
       wait $!
     else
       log "Script \"${SCRIPT}\" not found!"
