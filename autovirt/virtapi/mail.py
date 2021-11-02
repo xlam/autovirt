@@ -5,7 +5,7 @@ from autovirt.structs import Message
 from autovirt.session import token, session as s
 
 
-logger = utils.get_logger("virtapi.message")
+logger = utils.get_logger()
 
 
 def get_messages(box: str = "system", subject=None) -> list[Message]:

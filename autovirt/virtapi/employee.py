@@ -1,9 +1,5 @@
 import config
-from autovirt import utils
 from autovirt.session import token, session as s
-
-
-logger = utils.get_logger("virtapi.employee")
 
 
 def units():

@@ -2,7 +2,7 @@ from autovirt import utils
 from autovirt.virtapi import employee
 
 
-logger = utils.get_logger("salary")
+logger = utils.get_logger()
 
 
 def units_to_update_salary() -> list[dict]:
@@ -29,11 +29,15 @@ def run(config_name):
 
     for unit in units:
         unit_info = employee.unit_info(unit["id"])
+
         # set salary to required plus 5$ for sure
         salary = round(unit_info["salary_required"]) + 5
+
         logger.info(
             f"updating salary at unit "
             f"{unit['id']} ({unit['name']}, {unit['city_name']}) from "
             f"{unit['labor_salary']} to {salary}"
         )
         employee.set_salary(int(unit["id"]), int(unit_info["employee_max"]), salary)
+
+    logger.info("finished salary update")

@@ -1,6 +1,7 @@
 import argparse
 import importlib
 from autovirt import __version__ as version
+from autovirt.utils import init_logger
 
 
 def parse_args():
@@ -16,6 +17,9 @@ if __name__ == "__main__":
     print("args: ", args)
     action_name = args.action
     action_config = args.config
+
+    logger = init_logger(action_name)
+    logger.info(f"*** starting '{action_name}' action ***")
 
     action_module = ".".join(["autovirt.action", action_name])
     action = importlib.import_module(action_module)

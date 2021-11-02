@@ -7,7 +7,7 @@ from autovirt.structs import UnitEquipment, RepairOffer
 from autovirt.session import session as s
 
 
-logger = utils.get_logger("virtapi.equipment")
+logger = utils.get_logger()
 
 
 def get_units(equipment_id: int) -> list[UnitEquipment]:

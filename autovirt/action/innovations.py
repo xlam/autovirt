@@ -7,7 +7,7 @@ from autovirt.virtapi import artefact
 from autovirt.structs import Message
 
 
-logger = utils.get_logger("innovations")
+logger = utils.get_logger()
 
 
 def build_innovations_renewal_list(messages: list[Message]):

@@ -4,7 +4,7 @@ from autovirt.virtapi import employee
 from autovirt.structs import Message
 
 
-logger = utils.get_logger("employee")
+logger = utils.get_logger()
 
 
 def units_to_rise_salary(messages: list[Message]) -> list:

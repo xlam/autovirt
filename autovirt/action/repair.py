@@ -7,7 +7,7 @@ from autovirt.virtapi import equipment
 from autovirt.structs import UnitEquipment
 
 
-logger = utils.get_logger("repair")
+logger = utils.get_logger()
 logger.info("starting repair")
 
 
@@ -27,8 +27,7 @@ def get_offer(equipment_id: str, quality: str, quantity: int) -> str:
     quality = float(quality)
     quantity = quantity
 
-    # select units in range [quality-2 ... quality+3] and having enough
-    # repair parts
+    # select units in range [quality-2 ... quality+3] and having enough repair parts
     offers = filter(lambda x: int(x.quality) > quality - 2, offers)
     offers = filter(lambda x: int(x.quality) < quality + 3, offers)
     offers = filter(lambda x: int(x.quantity) > quantity, offers)
