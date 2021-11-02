@@ -33,6 +33,10 @@ class RepairOffer:
     quality: float
     quantity: int
 
+    @property
+    def qp_ratio(self) -> float:
+        return self.quality / self.quantity
+
 
 @dataclass
 class Message:

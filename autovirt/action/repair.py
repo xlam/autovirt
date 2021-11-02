@@ -34,7 +34,7 @@ def get_offer(equipment_id: str, quality: float, quantity: int) -> RepairOffer:
     # select one with highest quality/price ratio (mostly cheaper one)
     res = offers[0]
     for offer in offers:
-        if (offer.quality / offer.price) > (res.quality / res.price):
+        if offer.qp_ratio > res.qp_ratio:
             res = offer
 
     return res
