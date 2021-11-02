@@ -12,8 +12,8 @@ def get_log_dir():
 
 
 def init_logger(name: str) -> logging.Logger:
-    return Logger(name=name, log_dir=get_log_dir())
+    return Logger(name=name, log_dir=get_log_dir())  # type: ignore
 
 
 def get_logger() -> logging.Logger:
-    return Logger()
+    return Logger()  # type: ignore

@@ -1,10 +1,9 @@
 import sys
-from math import ceil
 
 import config
 from autovirt import utils
 from autovirt.virtapi import equipment
-from autovirt.structs import UnitEquipment
+from autovirt.structs import UnitEquipment, RepairOffer
 
 
 logger = utils.get_logger()
@@ -15,23 +14,18 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
     """Calculate total quantity of equipment to repair"""
     quantity = 0
     for unit in units:
-        installed_quantity = int(unit.qnt)
-        wear = float(unit.wear)
-        quantity += ceil(installed_quantity * wear * 0.01)
+        quantity += unit.wear_quantity
     return quantity
 
 
-def get_offer(equipment_id: str, quality: str, quantity: int) -> str:
+def get_offer(equipment_id: str, quality: float, quantity: int) -> RepairOffer:
     """Find best offer with required quality and enough quantity"""
     offers = equipment.get_offers(int(equipment_id))
-    quality = float(quality)
-    quantity = quantity
 
     # select units in range [quality-2 ... quality+3] and having enough repair parts
-    offers = filter(lambda x: int(x.quality) > quality - 2, offers)
-    offers = filter(lambda x: int(x.quality) < quality + 3, offers)
-    offers = filter(lambda x: int(x.quantity) > quantity, offers)
-    offers = list(offers)
+    offers = list(filter(lambda x: int(x.quality) > quality - 2, offers))
+    offers = list(filter(lambda x: int(x.quality) < quality + 3, offers))
+    offers = list(filter(lambda x: int(x.quantity) > quantity, offers))
 
     if not offers:
         logger.info("could not select supplier by criteria, exiting...")
@@ -43,12 +37,12 @@ def get_offer(equipment_id: str, quality: str, quantity: int) -> str:
         if (offer.quality / offer.price) > (res.quality / res.price):
             res = offer
 
-    return res.id
+    return res
 
 
 def get_offers_by_quality(
-    units: dict[str, list[UnitEquipment]], equipment_id: str
-) -> dict:
+    units: dict[float, list[UnitEquipment]], equipment_id: str
+) -> dict[RepairOffer, list[UnitEquipment]]:
     """Find best offers for groups of units by quality"""
     res = {}
     for (quality, units_list) in units.items():
@@ -60,9 +54,9 @@ def get_offers_by_quality(
 
 def split_by_quality(
     units: list[UnitEquipment], quality_type: str = "qual_req"
-) -> dict[str, list[UnitEquipment]]:
+) -> dict[float, list[UnitEquipment]]:
     """Split units by quality (required or installed)"""
-    res = {}
+    res: dict[float, list[UnitEquipment]] = {}
     for unit in units:
         quality = getattr(unit, quality_type)
         if quality not in res.keys():

@@ -24,13 +24,13 @@ def get_units(equipment_id: int) -> list[UnitEquipment]:
         if float(unit["equipment_wear"]) > 0:
             units.append(
                 UnitEquipment(
-                    unit["id"],
-                    unit["equipment_quantity"],
-                    unit["equipment_quantity_max"],
-                    unit["equipment_quality"],
-                    unit["equipment_quality_required"],
-                    unit["equipment_wear"],
-                    unit["equipment_product_id"],
+                    int(unit["id"]),
+                    int(unit["equipment_quantity"]),
+                    int(unit["equipment_quantity_max"]),
+                    float(unit["equipment_quality"]),
+                    float(unit["equipment_quality_required"]),
+                    float(unit["equipment_wear"]),
+                    int(unit["equipment_product_id"]),
                 )
             )
     return units
@@ -59,11 +59,11 @@ def get_offers(product_id: int) -> list[RepairOffer]:
     return offers
 
 
-def repair(units: list[UnitEquipment], offer_id: str):
+def repair(units: list[UnitEquipment], offer: RepairOffer):
     """Do repair of units equpment with offer provided"""
     params = [("units_ids[]", unit.id) for unit in units]
     params.append(("id", config.company_id))
-    params.append(("offer_id", offer_id))
+    params.append(("offer_id", offer.id))
     r = s.get(
         "https://virtonomica.ru/api/vera/main/company/equipment/repair", params=params
     )

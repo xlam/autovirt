@@ -44,6 +44,7 @@ def get_cached_session() -> Union[VirtSession, None]:
             s = pickle.load(f)
             logger.info("cached session loaded")
             return s
+    return None
 
 
 def get_logged_session() -> VirtSession:

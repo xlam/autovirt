@@ -1,15 +1,20 @@
 from dataclasses import dataclass
+from math import ceil
 
 
 @dataclass
 class UnitEquipment:
-    id: str
-    qnt: str
-    qnt_max: str
-    qual: str
-    qual_req: str
-    wear: str
-    equipment_id: str
+    id: int
+    qnt: int
+    qnt_max: int
+    qual: float
+    qual_req: float
+    wear: float
+    equipment_id: int
+
+    @property
+    def wear_quantity(self) -> int:
+        return ceil(self.qnt * self.wear * 0.01)
 
 
 @dataclass
@@ -23,7 +28,7 @@ class UnitEmployee:
 
 @dataclass
 class RepairOffer:
-    id: str
+    id: int
     price: float
     quality: float
     quantity: int
