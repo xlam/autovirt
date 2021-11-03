@@ -59,7 +59,7 @@ def get_logged_session() -> VirtSession:
                 "remember": 1,
             },
         )
-        logger.info("New session initialized")
+        logger.info("new session initialized")
     return s
 
 

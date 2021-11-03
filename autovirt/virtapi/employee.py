@@ -4,15 +4,17 @@ from autovirt.session import token, session as s
 
 def units():
     r = s.get(
-        f"https://virtonomica.ru/api/vera/main/company/employee/units?"
-        f"id={config.company_id}"
-        f"&pagesize={config.pagesize}"
+        "https://virtonomica.ru/api/vera/main/company/employee/units",
+        params={"id": config.company_id, "pagesize": config.pagesize},
     )
     return list(r.json()["data"].values())
 
 
 def unit_info(unit_id: int) -> dict:
-    r = s.get(f"https://virtonomica.ru/api/vera/main/unit/employee/info?id={unit_id}")
+    r = s.get(
+        "https://virtonomica.ru/api/vera/main/unit/employee/info",
+        params={"id": unit_id},
+    )
     return r.json()
 
 

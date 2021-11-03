@@ -26,7 +26,7 @@ class UnitEmployee:
     salary_required: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class RepairOffer:
     id: int
     price: float

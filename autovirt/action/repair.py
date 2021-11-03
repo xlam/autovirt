@@ -7,7 +7,6 @@ from autovirt.structs import UnitEquipment, RepairOffer
 
 
 logger = utils.get_logger()
-logger.info("starting repair")
 
 
 def quantity_to_repair(units: list[UnitEquipment]) -> int:
@@ -79,33 +78,55 @@ def run(config_name):
         logger.info("nothing to repair, exiting")
         sys.exit(0)
 
+    logger.info(f"starting repair equipment id {equipment_id}")
+
+    total_cost = 0
+
     if config.Option.exclude in options:
         excludes = repair_config[config.Option.exclude]
         units = [unit for unit in units for ex in excludes if int(unit.id) != ex]
     if config.Option.include in options:
         includes = repair_config[config.Option.include]
         units = [unit for unit in units for inc in includes if int(unit.id) == inc]
-    if config.Option.supplier in options:
+    if config.Option.offer_id in options:
         quantity = quantity_to_repair(units)
+        offers = equipment.get_offers(equipment_id)
+        offer_id = repair_config[config.Option.offer_id]
+        offer = [o for o in offers if o.id == offer_id][0]
+        total_cost = quantity * offer.price
+        logger.info(f"repairing {quantity} pieces on {len(units)} units")
         logger.info(
-            f"repairing {quantity} pieces (id: {equipment_id}) "
-            f"on {len(units)} units..."
+            f"using offer {offer.id} with quality {offer.quality} "
+            f"and price {offer.price} (repair cost: {total_cost})"
         )
-        equipment.repair(units, repair_config[config.Option.supplier])
+        equipment.repair(units, offer)
     else:
         quality_type = "qual_req"
         if config.Option.quality in options:
             quality_type = "qual"
         units = split_by_quality(units, quality_type=quality_type)
-        logger.info(f"prepared units dict with {len(units)} quality levels:")
-        logger.info(units.keys())
+        logger.info(
+            f"prepared units with {len(units)} quality levels: {list(units.keys())}"
+        )
         offers = get_offers_by_quality(units, equipment_id)
-        for (offer, units) in offers.items():
+
+        for offer, units in offers.items():
+            if quality_type == "qual_req":
+                quality = units[0].qual_req
+            else:
+                quality = units[0].qual
             quantity = quantity_to_repair(units)
+            repair_cost = quantity * offer.price
+            total_cost += repair_cost
             logger.info(
-                f"repairing {quantity} pieces (id: {equipment_id}) "
-                f"on {len(units)} units..."
+                f"repairing {quantity} pieces of quality {quality} "
+                f"on {len(units)} units"
+            )
+            logger.info(
+                f"using offer {offer.id} with quality {offer.quality} "
+                f"and price {offer.price} (repair cost: {repair_cost})"
             )
             equipment.repair(units, offer)
 
+    logger.info(f"total repair cost: {total_cost}")
     logger.info("repairing finished")
