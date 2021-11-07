@@ -17,29 +17,29 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
     return quantity
 
 
-def find_offer(
-    offers: list[RepairOffer], quality: float, quantity: int
-) -> RepairOffer:
+def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
     """Find best offer with required quality and enough quantity"""
 
     logger.info(f"filtering offers fo quality {quality} and quantity {quantity}")
 
     # select units in range [quality-2 ... quality+3] and having enough repair parts
-    filtered_offers = list(filter(lambda x: int(x.quality) > quality - 2, offers))
-    filtered_offers = list(filter(lambda x: int(x.quality) < quality + 3, filtered_offers))
-    filtered_offers = list(filter(lambda x: int(x.quantity) > quantity, filtered_offers))
+    filtered = list(filter(lambda x: x.quality > quality-2, offers))
+    filtered = list(filter(lambda x: x.quality < quality+3, filtered))
+    filtered = list(filter(lambda x: x.quantity > quantity, filtered))
 
-    if not filtered_offers:
+    if not filtered:
         logger.info("could not select supplier by criteria, exiting...")
         sys.exit(0)
 
     logger.info(f"listing filtered offers for quality of {quality}:")
-    for o in filtered_offers:
-        logger.info(f"id: {o.id}, quality: {o.quality}, price: {o.price}, quantity: {o.quantity}, qp: {o.qp_ratio}")
+    for o in filtered:
+        logger.info(
+            f"id: {o.id}, quality: {o.quality}, price: {o.price}, quantity: {o.quantity}, qp: {o.qp_ratio}"
+        )
 
     # select one with highest quality/price ratio (mostly cheaper one)
-    res = filtered_offers[0]
-    for offer in filtered_offers:
+    res = filtered[0]
+    for offer in filtered:
         if offer.qp_ratio > res.qp_ratio:
             res = offer
 
@@ -47,10 +47,9 @@ def find_offer(
 
 
 def get_offers_by_quality(
-    units: dict[float, list[UnitEquipment]], equipment_id: int
+    units: dict[float, list[UnitEquipment]], offers: list[RepairOffer]
 ) -> dict[RepairOffer, list[UnitEquipment]]:
     """Find best offers for groups of units by quality"""
-    offers = equipment.get_offers(equipment_id)
     res = {}
     logger.info(f"getting offers for qualities {list(units.keys())}")
     for (quality, units_list) in units.items():
@@ -120,7 +119,7 @@ def run(config_name):
         logger.info(
             f"prepared units with {len(units)} quality levels: {list(units.keys())}"
         )
-        offers = get_offers_by_quality(units, equipment_id)
+        offers = get_offers_by_quality(units, equipment.get_offers(equipment_id))
 
         for offer, units in offers.items():
             if quality_type == "qual_req":
