@@ -54,7 +54,7 @@ def get_offers_by_quality(
     res = {}
     logger.info(f"getting offers for qualities {list(units.keys())}")
     for (quality, units_list) in units.items():
-        logger.info(f"getting offer for quality {quality}...")
+        logger.info(f"getting offer for quality {quality} ({len(units_list)} units)")
         quantity = quantity_to_repair(units_list)
         offer = find_offer(offers, quality, quantity)
         logger.info(f"got offer: {offer.id}")
