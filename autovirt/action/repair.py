@@ -17,9 +17,9 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
     return quantity
 
 
-def get_offer(equipment_id: str, quality: float, quantity: int) -> RepairOffer:
+def get_offer(equipment_id: int, quality: float, quantity: int) -> RepairOffer:
     """Find best offer with required quality and enough quantity"""
-    offers = equipment.get_offers(int(equipment_id))
+    offers = equipment.get_offers(equipment_id)
 
     # select units in range [quality-2 ... quality+3] and having enough repair parts
     offers = list(filter(lambda x: int(x.quality) > quality - 2, offers))
@@ -40,7 +40,7 @@ def get_offer(equipment_id: str, quality: float, quantity: int) -> RepairOffer:
 
 
 def get_offers_by_quality(
-    units: dict[float, list[UnitEquipment]], equipment_id: str
+    units: dict[float, list[UnitEquipment]], equipment_id: int
 ) -> dict[RepairOffer, list[UnitEquipment]]:
     """Find best offers for groups of units by quality"""
     res = {}
@@ -72,8 +72,8 @@ def run(config_name):
     repair_config = config.repair[config_name]
     options = repair_config.keys()
     equipment_id = repair_config[config.Option.equip_id]
-    units = equipment.get_units(equipment_id)
 
+    units = equipment.get_units(equipment_id)
     if not units:
         logger.info("nothing to repair, exiting")
         sys.exit(0)
@@ -84,10 +84,11 @@ def run(config_name):
 
     if config.Option.exclude in options:
         excludes = repair_config[config.Option.exclude]
-        units = [unit for unit in units for ex in excludes if int(unit.id) != ex]
+        units = [unit for unit in units for ex in excludes if unit.id != ex]
     if config.Option.include in options:
         includes = repair_config[config.Option.include]
-        units = [unit for unit in units for inc in includes if int(unit.id) == inc]
+        units = [unit for unit in units for inc in includes if unit.id == inc]
+
     if config.Option.offer_id in options:
         quantity = quantity_to_repair(units)
         offers = equipment.get_offers(equipment_id)
