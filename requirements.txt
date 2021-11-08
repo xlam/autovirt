@@ -1,14 +1,21 @@
+attrs==21.2.0
 black==21.9b0
 certifi==2021.10.8
 chardet==4.0.0
 charset-normalizer==2.0.7
 click==8.0.3
 idna==3.3
+iniconfig==1.1.1
 mypy==0.910
 mypy-extensions==0.4.3
+packaging==21.2
 pathspec==0.9.0
 pip-autoremove==0.10.0
 platformdirs==2.4.0
+pluggy==1.0.0
+py==1.11.0
+pyparsing==2.4.7
+pytest==6.2.5
 regex==2021.10.23
 requests==2.26.0
 toml==0.10.2
@@ -16,3 +23,4 @@ tomli==1.2.2
 types-requests==2.25.11
 typing-extensions==3.10.0.2
 urllib3==1.26.7
+-e .

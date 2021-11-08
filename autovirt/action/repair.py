@@ -20,11 +20,11 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
 def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
     """Find best offer with required quality and enough quantity"""
 
-    logger.info(f"filtering offers fo quality {quality} and quantity {quantity}")
+    logger.info(f"filtering offers of quality {quality} and quantity {quantity}")
 
     # select units in range [quality-2 ... quality+3] and having enough repair parts
-    filtered = list(filter(lambda x: x.quality > quality-2, offers))
-    filtered = list(filter(lambda x: x.quality < quality+3, filtered))
+    filtered = list(filter(lambda x: x.quality > quality - 2, offers))
+    filtered = list(filter(lambda x: x.quality < quality + 3, filtered))
     filtered = list(filter(lambda x: x.quantity > quantity, filtered))
 
     if not filtered:
@@ -57,7 +57,10 @@ def get_offers_by_quality(
         quantity = quantity_to_repair(units_list)
         offer = find_offer(offers, quality, quantity)
         logger.info(f"got offer: {offer.id}")
-        res[offer] = units_list
+        if offer not in res:
+            res[offer] = units_list
+        else:
+            res[offer] = res[offer] + units_list
     return res
 
 
