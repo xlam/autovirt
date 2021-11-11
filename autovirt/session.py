@@ -14,13 +14,20 @@ class VirtSession(requests.Session):
     def __init__(self):
         requests.Session.__init__(self)
 
+    @staticmethod
+    def warn_status_not_ok(res: requests.Response):
+        if res.status_code != 200:
+            logger.warning(f"HTTP status code {res.status_code} for {res.url}")
+
     def get(self, *args, **kwargs):
         res = requests.Session.get(self, *args, **kwargs)
+        self.warn_status_not_ok(res)
         self.save_session()
         return res
 
     def post(self, *args, **kwargs):
         res = requests.Session.post(self, *args, **kwargs)
+        self.warn_status_not_ok(res)
         self.save_session()
         return res
 
