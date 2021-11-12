@@ -26,6 +26,7 @@ def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> Repa
     filtered = list(filter(lambda x: x.quality > quality - 2, offers))
     filtered = list(filter(lambda x: x.quality < quality + 3, filtered))
     filtered = list(filter(lambda x: x.quantity > quantity, filtered))
+    filtered = list(filter(lambda x: x.price < 100000, filtered))
 
     if not filtered:
         logger.info("could not select supplier by criteria, exiting...")
