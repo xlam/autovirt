@@ -29,6 +29,8 @@ class UnitEmployee:
 @dataclass(frozen=True)
 class RepairOffer:
     id: int
+    company_id: int
+    company_name: str
     price: float
     quality: float
     quantity: int

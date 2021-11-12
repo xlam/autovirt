@@ -9,9 +9,8 @@ from autovirt.session import session as s
 logger = utils.get_logger()
 
 
-def get_units(equipment_id: int) -> list[UnitEquipment]:
-    """Get units to repair by equipment"""
-
+def fetch_units(equipment_id: int) -> list[dict]:
+    """Fetch units equipment data"""
     r = s.get(
         "https://virtonomica.ru/api/vera/main/company/equipment/units",
         params={
@@ -20,9 +19,28 @@ def get_units(equipment_id: int) -> list[UnitEquipment]:
             "pagesize": config.pagesize,
         },
     )
+    return r.json()["data"].values()
 
+
+def fetch_offers(product_id: int) -> list[dict]:
+    """Fetch offers by product id"""
+    r = s.get(
+        "https://virtonomica.ru/api/vera/main/company/equipment/offers",
+        params={
+            "id": config.company_id,
+            "product_id": product_id,
+            "pagesize": config.pagesize,
+        },
+    )
+    return r.json()["data"].values()
+
+
+def get_units(equipment_id: int) -> list[UnitEquipment]:
+    """Get units to repair by equipment.
+    Only units whose equipment wear in greater then 0% will be returned
+    """
+    units_data = fetch_units(equipment_id)
     units = []
-    units_data = r.json()["data"].values()
     for unit in units_data:
         if float(unit["equipment_wear"]) > 0:
             units.append(
@@ -36,36 +54,24 @@ def get_units(equipment_id: int) -> list[UnitEquipment]:
                     int(unit["equipment_product_id"]),
                 )
             )
-
     return units
 
 
 def get_offers(product_id: int) -> list[RepairOffer]:
     """Get all offers for the product"""
-
-    r = s.get(
-        "https://virtonomica.ru/api/vera/main/company/equipment/offers",
-        params={
-            "id": config.company_id,
-            "product_id": product_id,
-            "pagesize": config.pagesize,
-        },
-    )
-    if not r.ok:  # todo: move this to VirtSession
-        logger.error(f"could not get offers data, response code: {r.status_code}")
-
+    offers_data = fetch_offers(product_id)
     offers = []
-    offers_data = r.json()["data"].values()
     for offer in offers_data:
         offers.append(
             RepairOffer(
                 int(offer["id"]),
+                int(offer["company_id"]),
+                str(offer["company_name"]),
                 float(offer["price"]),
                 float(offer["quality"]),
                 int(offer["quantity"]),
             )
         )
-
     return offers
 
 
