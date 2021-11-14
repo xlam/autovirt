@@ -81,9 +81,10 @@ def repair(units: list[UnitEquipment], offer: RepairOffer):
     params = [("units_ids[]", unit.id) for unit in units]
     params.append(("id", config.company_id))
     params.append(("offer_id", offer.id))
-    r = s.get(
+    r = s.post(
         "https://virtonomica.ru/api/vera/main/company/equipment/repair", params=params
     )
+    logger.info(f"Virtonomica API response: {r.json()}")
     if not r.ok:
         logger.error(f"could not repair, status code: {r.status_code}")
         sys.exit(0)
