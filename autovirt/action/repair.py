@@ -47,24 +47,6 @@ def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> Repa
     return res
 
 
-def get_offers_by_quality(
-    units: dict[float, list[UnitEquipment]], offers: list[RepairOffer]
-) -> dict[RepairOffer, list[UnitEquipment]]:
-    """Find best offers for groups of units by quality"""
-    res = {}
-    logger.info(f"getting offers for qualities {list(units.keys())}")
-    for (quality, units_list) in units.items():
-        logger.info(f"getting offer for quality {quality} ({len(units_list)} units)")
-        quantity = quantity_to_repair(units_list)
-        offer = find_offer(offers, quality, quantity)
-        logger.info(f"got offer: {offer.id}")
-        if offer not in res:
-            res[offer] = units_list
-        else:
-            res[offer] = res[offer] + units_list
-    return res
-
-
 def split_by_quality(
     units: list[UnitEquipment], quality_type: str = "qual_req"
 ) -> dict[float, list[UnitEquipment]]:
@@ -76,6 +58,24 @@ def split_by_quality(
             res[quality] = []
         res[quality].append(unit)
     return res
+
+
+def repair_with_quality(
+    units: list[UnitEquipment], equipment_id: int, quality: float
+) -> float:
+    quantity = quantity_to_repair(units)
+    offers = equipment.get_offers(equipment_id)
+    offer = find_offer(offers, quality, quantity)
+    repair_cost = quantity * offer.price
+    logger.info(
+        f"found offer {offer.id} with quality {offer.quality} "
+        f"and price {offer.price} (repair cost: {repair_cost})"
+    )
+    logger.info(
+        f"repairing {quantity} pieces of quality {quality} " f"on {len(units)} units"
+    )
+    equipment.repair(units, offer)
+    return repair_cost
 
 
 def run(config_name):
@@ -123,25 +123,9 @@ def run(config_name):
         logger.info(
             f"prepared units with {len(units)} quality levels: {list(units.keys())}"
         )
-        offers = get_offers_by_quality(units, equipment.get_offers(equipment_id))
-
-        for offer, units in offers.items():
-            if quality_type == "qual_req":
-                quality = units[0].qual_req
-            else:
-                quality = units[0].qual
-            quantity = quantity_to_repair(units)
-            repair_cost = quantity * offer.price
+        for quality, units_list in units.items():
+            repair_cost = repair_with_quality(units_list, equipment_id, quality)
             total_cost += repair_cost
-            logger.info(
-                f"repairing {quantity} pieces of quality {quality} "
-                f"on {len(units)} units"
-            )
-            logger.info(
-                f"using offer {offer.id} with quality {offer.quality} "
-                f"and price {offer.price} (repair cost: {repair_cost})"
-            )
-            equipment.repair(units, offer)
 
     logger.info(f"total repair cost: {total_cost}")
     logger.info("repairing finished")
