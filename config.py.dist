@@ -1,15 +1,15 @@
 import enum
 
-session_file = 'session.dat'
-session_timeout = 60 * 30
-login = ''
-password = ''
-company_id = -1
+session_file = 'session.dat'    # file to store logged session
+session_timeout = 60 * 30       # lifetime of stored session in seconds
+login = ''                      # your Virtonomica login
+password = ''                   # your Virtonomica password
+company_id = -1                 # your Virtonomica company id (look it up in browser url)
 
-log_dir = 'logs'
-pagesize = 1000
+log_dir = 'logs'                # directory to store logs
+pagesize = 1000                 # maximum returned item (i.e. units) per page
 
-
+# don't touch this
 class Option(enum.Enum):
     equip_id = enum.auto()
     exclude = enum.auto()
@@ -20,17 +20,23 @@ class Option(enum.Enum):
 
 # sample repair configuration
 repair = {
-    "comp": {  # configuration name to pass to main.py with --config option
+    "comp": {                   # configuration name to pass to main.py with --config option
         Option.equip_id: 1515,  # id of equipment to repair
-        Option.exclude: [-1],  # list of units ids to exclude from repair
-        Option.offer_id: -1,  # use this offer id to repair equipment
+        Option.exclude: [-1],   # list of units ids to exclude from repair
+        Option.offer_id: -1,    # use this offer id to repair equipment (i.e self offer)
     },
     "comp-hitech": {
         Option.equip_id: 1515,
-        Option.include: [-1],  # list of units ids to repair (only those will be repaired)
-        Option.quality: True,  # repair by installed quality
+        Option.include: [-1],   # list of units ids to repair (only those will be repaired)
+        Option.quality: True,   # repair by installed quality (not required)
     },
-    "mtools": {Option.equip_id: 1529},  # machine tools
-    "drill": {Option.equip_id: 12097},  # rock drills
-    "tractor": {Option.equip_id: 1530},  # tractor
+    "mtools": {
+        Option.equip_id: 1529   # machine tools
+    },
+    "drill": {
+        Option.equip_id: 12097  # rock drills
+    },
+    "tractor": {
+        Option.equip_id: 1530   # tractors
+    },
 }
