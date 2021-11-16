@@ -2,7 +2,7 @@
 # Autovirt
 
 Autovirt is an automatization tool for online turn-based economic game [Virtonomica](https://virtonomica.ru/).
-It uses the game API to communicate with the server. There is no any site-scraping doing by Autovirt.
+It uses the game API to communicate with the server. There is no any web-scraping doing by Autovirt.
 
 ## Features
 
@@ -16,7 +16,7 @@ It uses the game API to communicate with the server. There is no any site-scrapi
 
 - [Python 3.9](https://www.python.org/downloads/release/python-398/)
 
-Autovirt is being developed and tested with Python 3.9. It should work on Python 3.8 as well. Lower versions are not compatable because of built-in collections type-hinting.
+Autovirt is being developed and tested with Python 3.9. Lower versions are not compatible due to lacking built-in collections type-hinting.
 
 - [Poetry](https://python-poetry.org/) dependency manager
 
@@ -43,7 +43,7 @@ To exit poetry shell type ``exit`` in terminal. Also it is possible to run singl
 $ poetry run python --version
 ```
 
-After that python interpreter wiil be invoked from newly created virtual environment, so we can run the following Autovirt commands:
+After the poetry shell has started python interpreter will be invoked from newly created virtual environment, so we can run the following Autovirt commands:
 
 - repair
 - salary
@@ -126,7 +126,7 @@ repair = {
 
 ## Using Autovirt with crontab
 
-Crontab configuration is dependant on the operating system being used. The following configuration is an example for debian/ubuntu servers (need ``. ~/.profile`` to have poetry on system $PATH for crontab):
+Crontab configuration is dependent on the operating system being used. The following configuration is an example for debian/ubuntu servers (need ``. ~/.profile`` to have poetry on system $PATH for crontab):
 
 ```
 0 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c comp
