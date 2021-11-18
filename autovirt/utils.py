@@ -17,3 +17,10 @@ def init_logger(name: str) -> logging.Logger:
 
 def get_logger() -> logging.Logger:
     return Logger()  # type: ignore
+
+
+def normalize(value: float, min_value: float, max_value: float):
+    """Normalize value to the range 0..1"""
+    if not min_value <= value <= max_value:
+        raise ValueError(f"Value {value} is not in range [{min_value}; {max_value}]")
+    return (value - min_value) / (max_value - min_value)
