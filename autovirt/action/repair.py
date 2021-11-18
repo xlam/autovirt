@@ -1,4 +1,5 @@
 import sys
+from functools import reduce
 
 import config
 from autovirt import utils
@@ -10,22 +11,84 @@ logger = utils.get_logger()
 
 
 def quantity_to_repair(units: list[UnitEquipment]) -> int:
-    """Calculate total quantity of equipment to repair"""
-    quantity = 0
-    for unit in units:
-        quantity += unit.wear_quantity
-    return quantity
+    """Calculate total quantity of equipment to repair on given units"""
+    return reduce(lambda a, unit: a + unit.wear_quantity, units, 0)
+
+
+def quantity_total(units: list[UnitEquipment]) -> int:
+    """Calculate total equipment count on given units"""
+    return reduce(lambda a, unit: a + unit.qnt, units, 0)
+
+
+def get_max(objects: list[object], field: str):
+    return reduce(
+        lambda x, y: max([x, getattr(y, field)]), objects, getattr(objects[0], field)
+    )
+
+
+def get_min(objects: list[object], field: str):
+    return reduce(
+        lambda x, y: min([x, getattr(y, field)]), objects, getattr(objects[0], field)
+    )
 
 
 def filter_offers(
     offers: list[RepairOffer], quality: float, quantity: int
 ) -> list[RepairOffer]:
     # select units in range [quality-2 ... quality+3] and having enough repair parts
-    filtered = list(filter(lambda x: x.quality > quality - 2, offers))
+    filtered = list(filter(lambda x: x.quality > quality - 3, offers))
     filtered = list(filter(lambda x: x.quality < quality + 3, filtered))
     filtered = list(filter(lambda x: x.quantity > quantity, filtered))
     filtered = list(filter(lambda x: x.price < 100000, filtered))
     return filtered
+
+
+def expected_quality(
+    qual_rep: float, qual_inst: float, items_total: int, items_wear: int
+) -> float:
+    return (
+        qual_inst * (items_total - items_wear) + qual_rep * items_wear
+    ) / items_total
+
+
+def select_offer(
+    offers: list[RepairOffer], units: list[UnitEquipment], quality: float = None
+) -> RepairOffer:
+    if not quality:
+        quality = units[0].qual_req
+    qnt_rep = quantity_to_repair(units)
+    qnt_total = quantity_total(units)
+    offers = filter_offers(offers, quality, qnt_rep)
+
+    qual_min = get_min(units, "qual")
+    qual_exp = [
+        expected_quality(o.quality, qual_min, qnt_total, qnt_rep) for o in offers
+    ]
+    qual_diff = [abs(qual - quality) for qual in qual_exp]
+    diff_min = min(qual_diff)
+    diff_max = max(qual_diff)
+    diff_norm = [utils.normalize(diff, diff_min, diff_max) for diff in qual_diff]
+
+    price_min = get_min(offers, "price")
+    price_max = get_max(offers, "price")
+    price_norm = [utils.normalize(o.price, price_min, price_max) for o in offers]
+
+    qp_dist = [p + q for (p, q) in zip(price_norm, diff_norm)]
+
+    summary = [
+        [o, price_norm[i], qual_exp[i], qual_diff[i], diff_norm[i], qp_dist[i]]
+        for i, o in enumerate(offers)
+    ]
+
+    filtered = list(filter(lambda x: x[2] >= quality, summary))
+    offer = filtered[0][0]
+    qp = filtered[0][5]
+    for x in filtered:
+        if x[5] < qp:
+            qp = x[5]
+            offer = x[0]
+
+    return offer
 
 
 def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
@@ -70,7 +133,8 @@ def repair_with_quality(
 ) -> float:
     quantity = quantity_to_repair(units)
     offers = equipment.get_offers(equipment_id)
-    offer = find_offer(offers, quality, quantity)
+    # offer = find_offer(offers, quality, quantity)
+    offer = select_offer(offers, units, quality)
     repair_cost = quantity * offer.price
     logger.info(
         f"found offer {offer.id} with quality {offer.quality} "
