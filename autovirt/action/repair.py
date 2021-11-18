@@ -81,6 +81,14 @@ def select_offer(
     ]
 
     filtered = list(filter(lambda x: x[2] >= quality, summary))
+
+    logger.info(f"listing filtered offers for quality of {quality}:")
+    for o in filtered:
+        logger.info(
+            f"id: {o[0].id}, quality: {o[0].quality}, price: {o[0].price},"
+            f" quantity: {o[0].quantity}, qual_exp: {o[2]}, qp: {o[5]}"
+        )
+
     offer = filtered[0][0]
     qp = filtered[0][5]
     for x in filtered:
