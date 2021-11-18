@@ -17,17 +17,22 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
     return quantity
 
 
-def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
-    """Find best offer with required quality and enough quantity"""
-
-    logger.info(f"filtering offers of quality {quality} and quantity {quantity}")
-
+def filter_offers(
+    offers: list[RepairOffer], quality: float, quantity: int
+) -> list[RepairOffer]:
     # select units in range [quality-2 ... quality+3] and having enough repair parts
     filtered = list(filter(lambda x: x.quality > quality - 2, offers))
     filtered = list(filter(lambda x: x.quality < quality + 3, filtered))
     filtered = list(filter(lambda x: x.quantity > quantity, filtered))
     filtered = list(filter(lambda x: x.price < 100000, filtered))
+    return filtered
 
+
+def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
+    """Find best offer with required quality and enough quantity"""
+
+    logger.info(f"filtering offers of quality {quality} and quantity {quantity}")
+    filtered = filter_offers(offers, quality, quantity)
     if not filtered:
         logger.info("could not select supplier by criteria, exiting...")
         sys.exit(0)
