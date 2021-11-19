@@ -80,7 +80,7 @@ def select_offer(
         for i, o in enumerate(offers)
     ]
 
-    filtered = list(filter(lambda x: x[2] >= quality, summary))
+    filtered = list(filter(lambda item: item[2] >= quality, summary))
 
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in filtered:
@@ -97,30 +97,6 @@ def select_offer(
             offer = x[0]
 
     return offer
-
-
-def find_offer(offers: list[RepairOffer], quality: float, quantity: int) -> RepairOffer:
-    """Find best offer with required quality and enough quantity"""
-
-    logger.info(f"filtering offers of quality {quality} and quantity {quantity}")
-    filtered = filter_offers(offers, quality, quantity)
-    if not filtered:
-        logger.info("could not select supplier by criteria, exiting...")
-        sys.exit(0)
-
-    logger.info(f"listing filtered offers for quality of {quality}:")
-    for o in filtered:
-        logger.info(
-            f"id: {o.id}, quality: {o.quality}, price: {o.price}, quantity: {o.quantity}, qp: {o.qp_ratio}"
-        )
-
-    # select one with highest quality/price ratio (mostly cheaper one)
-    res = filtered[0]
-    for offer in filtered:
-        if offer.qp_ratio > res.qp_ratio:
-            res = offer
-
-    return res
 
 
 def split_by_quality(
@@ -162,7 +138,6 @@ def repair_with_quality(
         logger.info(units_mismatch)
     quantity = quantity_to_repair(units)
     offers = equipment.get_offers(equipment_id)
-    # offer = find_offer(offers, quality, quantity)
     offer = select_offer(offers, units_normal, quality)
     repair_cost = quantity * offer.price
     logger.info(
