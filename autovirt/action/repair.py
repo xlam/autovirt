@@ -136,13 +136,34 @@ def split_by_quality(
     return res
 
 
+def split_mismatch_quality_units(
+    units: list[UnitEquipment], quality: float
+) -> tuple[list[UnitEquipment], list[UnitEquipment]]:
+    """Split units into 'normal' and 'mismatch' groups.
+    Mismatched unit have installed equipment of lower quality then required.
+    We need to treat them in different manner then normal while repairing.
+    """
+    normal = []
+    mismatch = []
+    for unit in units:
+        if unit.qual < quality:
+            mismatch.append(unit)
+        else:
+            normal.append(unit)
+    return normal, mismatch
+
+
 def repair_with_quality(
     units: list[UnitEquipment], equipment_id: int, quality: float
 ) -> float:
+    units_normal, units_mismatch = split_mismatch_quality_units(units, quality)
+    if units_mismatch:
+        logger.info("mismatch units qualities found, skipping them:")
+        logger.info(units_mismatch)
     quantity = quantity_to_repair(units)
     offers = equipment.get_offers(equipment_id)
     # offer = find_offer(offers, quality, quantity)
-    offer = select_offer(offers, units, quality)
+    offer = select_offer(offers, units_normal, quality)
     repair_cost = quantity * offer.price
     logger.info(
         f"found offer {offer.id} with quality {offer.quality} "
@@ -151,7 +172,7 @@ def repair_with_quality(
     logger.info(
         f"repairing {quantity} pieces of quality {quality} " f"on {len(units)} units"
     )
-    equipment.repair(units, offer)
+    equipment.repair(units_normal, offer)
     return repair_cost
 
 
