@@ -136,7 +136,7 @@ def repair_with_quality(
     if units_mismatch:
         logger.info("mismatch units qualities found, skipping them:")
         logger.info(units_mismatch)
-    quantity = quantity_to_repair(units)
+    quantity = quantity_to_repair(units_normal)
     offers = equipment.get_offers(equipment_id)
     offer = select_offer(offers, units_normal, quality)
     repair_cost = quantity * offer.price
