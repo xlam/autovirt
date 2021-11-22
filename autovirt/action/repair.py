@@ -75,7 +75,7 @@ def select_offer(
     for o in filtered:
         logger.info(
             f"id: {o[0].id}, quality: {o[0].quality}, price: {o[0].price},"
-            f" quantity: {o[0].quantity}, qual_exp: {o[2]}, qp: {o[5]}"
+            f" quantity: {o[0].quantity}, qual_exp: {o[2]:.2f}, qp: {o[5]:.3f}"
         )
 
     offer = filtered[0][0]
@@ -144,16 +144,19 @@ def repair_with_quality(
     if units_mismatch:
         logger.info("mismatch units qualities found, skipping them:")
         logger.info(units_mismatch)
+    if not units_normal:
+        logger.info("nothing to repair, exiting")
+        sys.exit(0)
     quantity = quantity_to_repair(units_normal)
     offers = equipment.get_offers(equipment_id)
     offer = select_offer(offers, units_normal, quality)
     repair_cost = quantity * offer.price
     logger.info(
         f"found offer {offer.id} with quality {offer.quality} "
-        f"and price {offer.price} (repair cost: {repair_cost})"
+        f"and price {offer.price} (repair cost: {repair_cost:.0f})"
     )
     logger.info(
-        f"repairing {quantity} pieces of quality {quality} " f"on {len(units)} units"
+        f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
     )
     equipment.repair(units_normal, offer)
     return repair_cost
@@ -193,7 +196,7 @@ def run(config_name):
         logger.info(f"repairing {quantity} pieces on {len(units)} units")
         logger.info(
             f"using offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.price} (repair cost: {total_cost})"
+            f"and price {offer.price} (repair cost: {total_cost:.0f})"
         )
         equipment.repair(units, offer)
     else:
