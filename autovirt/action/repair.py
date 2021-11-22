@@ -20,18 +20,6 @@ def quantity_total(units: list[UnitEquipment]) -> int:
     return reduce(lambda a, unit: a + unit.qnt, units, 0)
 
 
-def get_max(objects: list[object], field: str):
-    return reduce(
-        lambda x, y: max([x, getattr(y, field)]), objects, getattr(objects[0], field)
-    )
-
-
-def get_min(objects: list[object], field: str):
-    return reduce(
-        lambda x, y: min([x, getattr(y, field)]), objects, getattr(objects[0], field)
-    )
-
-
 def filter_offers(
     offers: list[RepairOffer], quality: float, quantity: int
 ) -> list[RepairOffer]:
@@ -60,7 +48,7 @@ def select_offer(
     qnt_total = quantity_total(units)
     offers = filter_offers(offers, quality, qnt_rep)
 
-    qual_min = get_min(units, "qual")
+    qual_min = utils.get_min(units, "qual")
     qual_exp = [
         expected_quality(o.quality, qual_min, qnt_total, qnt_rep) for o in offers
     ]
@@ -69,8 +57,8 @@ def select_offer(
     diff_max = max(qual_diff)
     diff_norm = [utils.normalize(diff, diff_min, diff_max) for diff in qual_diff]
 
-    price_min = get_min(offers, "price")
-    price_max = get_max(offers, "price")
+    price_min = utils.get_min(offers, "price")
+    price_max = utils.get_max(offers, "price")
     price_norm = [utils.normalize(o.price, price_min, price_max) for o in offers]
 
     qp_dist = [p + q for (p, q) in zip(price_norm, diff_norm)]
