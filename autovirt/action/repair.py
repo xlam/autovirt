@@ -1,11 +1,12 @@
 import sys
 from functools import reduce
+from math import ceil
+from typing import Tuple, Optional
 
 import config
 from autovirt import utils
-from autovirt.virtapi import equipment
 from autovirt.structs import UnitEquipment, RepairOffer
-
+from autovirt.virtapi import equipment
 
 logger = utils.get_logger()
 
@@ -85,6 +86,25 @@ def select_offer(
             offer = x[0]
 
     return offer
+
+
+def select_offer_to_raise_quality(
+    unit: UnitEquipment, offers: list[RepairOffer]
+) -> Optional[Tuple[RepairOffer, int]]:
+    quality_coeff = unit.qnt * (unit.qual_req - unit.qual)
+    offers = list(filter(lambda o: o.quality >= unit.qual_req, offers))
+    if not offers:
+        return
+    offer = offers[0]
+    count_to_replace = ceil(quality_coeff / (offer.quality - unit.qual))
+    price = count_to_replace * offer.price
+    for offer_ in offers[1:]:
+        count = ceil(quality_coeff / (offer_.quality - unit.qual))
+        price_ = count * offer_.price
+        if price_ < price:
+            offer = offer_
+            count_to_replace = count
+    return offer, count_to_replace
 
 
 def split_by_quality(
