@@ -23,6 +23,12 @@ class UnitEquipment:
         self.qual = round(self.qual, FLOAT_PRECISION)
         self.qual_req = round(self.qual_req, FLOAT_PRECISION)
 
+    def expected_quality(self, repair_quality: float):
+        return (
+            self.qual * (self.qnt - self.wear_quantity)
+            + repair_quality * self.wear_quantity
+        ) / self.qnt
+
 
 @dataclass
 class UnitEmployee:

@@ -3,7 +3,7 @@ import sys
 import config
 from autovirt import utils
 from autovirt.structs import UnitEquipment, RepairOffer
-from autovirt.session import session as s
+from autovirt.session import token, session as s
 
 
 logger = utils.get_logger()
@@ -87,4 +87,34 @@ def repair(units: list[UnitEquipment], offer: RepairOffer):
     logger.info(f"Virtonomica API response: {r.json()}")
     if not r.ok:
         logger.error(f"could not repair, status code: {r.status_code}")
+        sys.exit(0)
+
+
+def terminate(unit: UnitEquipment, quantity: int):
+    r = s.post(
+        "https://virtonomica.ru/api/vera/main/unit/equipment/terminate",
+        {
+            "id": unit.id,
+            "token": token,
+            "qty": quantity,
+        },
+    )
+    if not r.ok:
+        logger.error(f"could not terminate equipment, status code: {r.status_code}")
+        sys.exit(0)
+
+
+def buy(unit: UnitEquipment, offer: RepairOffer, quantity: int):
+    r = s.post(
+        "https://virtonomica.ru/api/vera/main/unit/equipment/update",
+        {
+            "offer_id": offer.id,
+            "id": unit.id,
+            "token": token,
+            "operation_name": "buy",
+            "equipment_count": quantity,
+        },
+    )
+    if not r.ok:
+        logger.error(f"could not buy equipment, status code: {r.status_code}")
         sys.exit(0)
