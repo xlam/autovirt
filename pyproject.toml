@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autovirt"
-version = "1.2.2-dev"
+version = "1.2.2"
 description = "Virtonomica automation tool"
 authors = ["Sergey Sokolov <xlamserg@gmail.com>"]
 license = "MIT"
