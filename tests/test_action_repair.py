@@ -64,10 +64,3 @@ def test_select_offer_to_raise_quality(offers, unit, offer_id, count):
 def test_select_offer_to_raise_quality_none(offers):
     unit = UnitEquipment(0, 2000, 2000, 29.0, 36.0, 0.0, 1529)
     assert select_offer_to_raise_quality(unit, offers) is None
-
-
-@pytest.mark.skip(
-    reason="To be implemented when Virtonomica's API is fixed for remove equipment"
-)
-def test_raise_quality_to_required():
-    assert True

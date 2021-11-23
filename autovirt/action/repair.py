@@ -89,12 +89,13 @@ def select_offer(
 
 
 def select_offer_to_raise_quality(
-    unit: UnitEquipment, offers: list[RepairOffer]
+    unit: UnitEquipment, offers: list[RepairOffer], margin: float = 0
 ) -> Optional[Tuple[RepairOffer, int]]:
-    quality_coeff = unit.qnt * (unit.qual_req - unit.qual)
-    offers = list(filter(lambda o: o.quality >= unit.qual_req, offers))
+    required = unit.qual_req + margin
+    quality_coeff = unit.qnt * (required - unit.qual)
+    offers = list(filter(lambda o: o.quality >= required, offers))
     if not offers:
-        return
+        return None
     offer = offers[0]
     count_to_replace = ceil(quality_coeff / (offer.quality - unit.qual))
     price = count_to_replace * offer.price
@@ -137,13 +138,35 @@ def split_mismatch_quality_units(
     return normal, mismatch
 
 
+def fix_units_quality(units: list[UnitEquipment], margin: float = 0):
+    for unit in units:
+        # need to update offers before each operation
+        offers = equipment.get_offers(unit.equipment_id)
+        res = select_offer_to_raise_quality(unit, offers, margin)
+        if not res:
+            logger.info(
+                f"no offers found to fix unit {unit.id} "
+                f"(installed quality: {unit.qual}, required: {unit.qual_req}), skipping"
+            )
+            continue
+        (offer, quantity) = res
+        logger.info(
+            f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
+            f"to replace {quantity} items at unit {unit.id} "
+            f"(installed quality: {unit.qual}, required: {unit.qual_req})"
+        )
+        equipment.terminate(unit, quantity)
+        equipment.buy(unit, offer, quantity)
+
+
 def repair_with_quality(
     units: list[UnitEquipment], equipment_id: int, quality: float
 ) -> float:
     units_normal, units_mismatch = split_mismatch_quality_units(units, quality)
     if units_mismatch:
-        logger.info("mismatch units qualities found, skipping them:")
+        logger.info("mismatch units qualities found, fixing them:")
         logger.info(units_mismatch)
+        fix_units_quality(units_mismatch)
     if not units_normal:
         logger.info("nothing to repair, exiting")
         sys.exit(0)
