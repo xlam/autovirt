@@ -62,20 +62,19 @@ def select_offer(
     summary: list = [
         [o, price_norm[i], qual_exp[i], qual_diff[i], diff_norm[i], qp_dist[i]]
         for i, o in enumerate(offers)
+        if qual_exp[i] >= quality
     ]
 
-    filtered = list(filter(lambda item: item[2] >= quality, summary))
-
     logger.info(f"listing filtered offers for quality of {quality}:")
-    for o in filtered:
+    for o in summary:
         logger.info(
             f"id: {o[0].id}, quality: {o[0].quality}, price: {o[0].price},"
             f" quantity: {o[0].quantity}, qual_exp: {o[2]:.2f}, qp: {o[5]:.3f}"
         )
 
-    offer = filtered[0][0]
-    qp = filtered[0][5]
-    for x in filtered:
+    offer = summary[0][0]
+    qp = summary[0][5]
+    for x in summary:
         if x[5] < qp:
             qp = x[5]
             offer = x[0]
