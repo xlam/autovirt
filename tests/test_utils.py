@@ -1,6 +1,8 @@
-import pytest
 from dataclasses import dataclass
-from autovirt.utils import normalize, get_min, get_max
+
+import pytest
+
+from autovirt.utils import normalize, normalize_array, get_min, get_max
 
 
 @pytest.fixture
@@ -28,6 +30,23 @@ def test_normalize(x, xmin, xmax, res):
 def test_normalize_value_error():
     with pytest.raises(ValueError):
         normalize(20, 0, 10)
+
+
+def test_normalize_array_empty_error():
+    with pytest.raises(ValueError):
+        normalize_array([])
+
+
+@pytest.mark.parametrize(
+    "arr, res",
+    [
+        ((2, 7, 0, 4, 8, 10), [0.2, 0.7, 0.0, 0.4, 0.8, 1.0]),
+        ((1, 1), [0, 0]),
+        ((1,), [0]),
+    ],
+)
+def test_normalize_array(arr, res):
+    assert normalize_array(arr) == res
 
 
 @pytest.mark.parametrize("field, result", [("f1", 1), ("f2", 1.0), ("f3", "1")])

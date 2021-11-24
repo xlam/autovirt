@@ -54,17 +54,12 @@ def select_offer(
         expected_quality(o.quality, qual_min, qnt_total, qnt_rep) for o in offers
     ]
     qual_diff = [abs(qual - quality) for qual in qual_exp]
-    diff_min = min(qual_diff)
-    diff_max = max(qual_diff)
-    diff_norm = [utils.normalize(diff, diff_min, diff_max) for diff in qual_diff]
 
-    price_min = utils.get_min(offers, "price")
-    price_max = utils.get_max(offers, "price")
-    price_norm = [utils.normalize(o.price, price_min, price_max) for o in offers]
-
+    diff_norm = utils.normalize_array(qual_diff)
+    price_norm = utils.normalize_array([o.price for o in offers])
     qp_dist = [p + q for (p, q) in zip(price_norm, diff_norm)]
 
-    summary = [
+    summary: list = [
         [o, price_norm[i], qual_exp[i], qual_diff[i], diff_norm[i], qp_dist[i]]
         for i, o in enumerate(offers)
     ]
