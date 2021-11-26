@@ -19,6 +19,7 @@ if __name__ == "__main__":
     action_config = args.config
 
     logger = init_logger(action_name)
+    logger.info("")
     logger.info(f"*** starting '{action_name}' action ***")
 
     action_module = ".".join(["autovirt.action", action_name])

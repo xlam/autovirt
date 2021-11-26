@@ -179,54 +179,71 @@ def repair_with_quality(
     return repair_cost
 
 
-def run(config_name):
-    if not config_name or config_name not in config.repair.keys():
+def get_repair_config(config_name: str) -> dict:
+    repair_config = config.repair.get(config_name)
+    if not repair_config:
         logger.error(f"config '{config_name}' does not exist, exiting")
         sys.exit(1)
+    return repair_config  # type: ignore
 
-    repair_config = config.repair[config_name]
-    options = repair_config.keys()
+
+def filter_units_with_exclude_and_include_options(
+    units: list[UnitEquipment], repair_config: dict
+) -> list[UnitEquipment]:
+    if config.Option.exclude in repair_config.keys():
+        excludes = repair_config[config.Option.exclude]
+        units = [unit for unit in units for ex in excludes if unit.id != ex]
+    if config.Option.include in repair_config.keys():
+        includes = repair_config[config.Option.include]
+        units = [unit for unit in units for inc in includes if unit.id == inc]
+    return units
+
+
+def repair_by_quality(units: list[UnitEquipment], repair_config: dict):
+    quality_type = "qual_req"
+    if config.Option.quality in repair_config.keys():
+        quality_type = "qual"
+    units_ = split_by_quality(units, quality_type=quality_type)
+    logger.info(
+        f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
+    )
+    total_cost = 0.0
+    equipment_id = repair_config[config.Option.equip_id]
+    for quality, units_list in units_.items():
+        repair_cost = repair_with_quality(units_list, equipment_id, quality)
+        total_cost += repair_cost
+    logger.info(f"total repair cost: {total_cost:.0f}")
+
+
+def repair_with_config_offer(units: list[UnitEquipment], repair_config: dict):
+    quantity = quantity_to_repair(units)
+    offers = equipment.get_offers(repair_config[config.Option.equip_id])
+    offer_id = repair_config[config.Option.offer_id]
+    offer = [o for o in offers if o.id == offer_id][0]
+    total_cost = quantity * offer.price
+    logger.info(f"repairing {quantity} pieces on {len(units)} units")
+    logger.info(
+        f"using offer {offer.id} with quality {offer.quality} "
+        f"and price {offer.price} (repair cost: {total_cost:.0f})"
+    )
+    equipment.repair(units, offer)
+
+
+def run(config_name: str):
+    repair_config = get_repair_config(config_name)
     equipment_id = repair_config[config.Option.equip_id]
 
     units = equipment.get_units(equipment_id)
     if not units:
         logger.info("nothing to repair, exiting")
         sys.exit(0)
-
     logger.info(f"starting repair equipment id {equipment_id}")
 
-    total_cost = 0
+    units = filter_units_with_exclude_and_include_options(units, repair_config)
 
-    if config.Option.exclude in options:
-        excludes = repair_config[config.Option.exclude]
-        units = [unit for unit in units for ex in excludes if unit.id != ex]
-    if config.Option.include in options:
-        includes = repair_config[config.Option.include]
-        units = [unit for unit in units for inc in includes if unit.id == inc]
-
-    if config.Option.offer_id in options:
-        quantity = quantity_to_repair(units)
-        offers = equipment.get_offers(equipment_id)
-        offer_id = repair_config[config.Option.offer_id]
-        offer = [o for o in offers if o.id == offer_id][0]
-        total_cost = quantity * offer.price
-        logger.info(f"repairing {quantity} pieces on {len(units)} units")
-        logger.info(
-            f"using offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.price} (repair cost: {total_cost:.0f})"
-        )
-        equipment.repair(units, offer)
+    if config.Option.offer_id in repair_config.keys():
+        repair_with_config_offer(units, repair_config)
     else:
-        quality_type = "qual_req"
-        if config.Option.quality in options:
-            quality_type = "qual"
-        units = split_by_quality(units, quality_type=quality_type)
-        logger.info(
-            f"prepared units with {len(units)} quality levels: {list(units.keys())}"
-        )
-        for quality, units_list in units.items():
-            repair_cost = repair_with_quality(units_list, equipment_id, quality)
-            total_cost += repair_cost
+        repair_by_quality(units, repair_config)
 
-    logger.info(f"total repair cost: {total_cost}")
     logger.info("repairing finished")
