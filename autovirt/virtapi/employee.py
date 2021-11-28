@@ -1,9 +1,9 @@
 import config
-from autovirt.session import token, session as s
+from autovirt.session import get_logged_session as s
 
 
 def units():
-    r = s.get(
+    r = s().get(
         "https://virtonomica.ru/api/vera/main/company/employee/units",
         params={"id": config.company_id, "pagesize": config.pagesize},
     )
@@ -11,7 +11,7 @@ def units():
 
 
 def unit_info(unit_id: int) -> dict:
-    r = s.get(
+    r = s().get(
         "https://virtonomica.ru/api/vera/main/unit/employee/info",
         params={"id": unit_id},
     )
@@ -19,12 +19,12 @@ def unit_info(unit_id: int) -> dict:
 
 
 def set_salary(unit_id: int, employee_count: int, salary: float):
-    s.post(
+    s().post(
         f"https://virtonomica.ru/api/vera/main/unit/employee/update",
         {
             "id": unit_id,
             "employee_count": employee_count,
             "employee_salary": salary,
-            "token": token,
+            "token": s().token,
         },
     )

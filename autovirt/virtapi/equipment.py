@@ -2,16 +2,15 @@ import sys
 
 import config
 from autovirt import utils
+from autovirt.session import get_logged_session as s
 from autovirt.structs import UnitEquipment, RepairOffer
-from autovirt.session import token, session as s
-
 
 logger = utils.get_logger()
 
 
 def fetch_units(equipment_id: int) -> list[dict]:
     """Fetch units equipment data"""
-    r = s.get(
+    r = s().get(
         "https://virtonomica.ru/api/vera/main/company/equipment/units",
         params={
             "id": config.company_id,
@@ -24,7 +23,7 @@ def fetch_units(equipment_id: int) -> list[dict]:
 
 def fetch_offers(product_id: int) -> list[dict]:
     """Fetch offers by product id"""
-    r = s.get(
+    r = s().get(
         "https://virtonomica.ru/api/vera/main/company/equipment/offers",
         params={
             "id": config.company_id,
@@ -81,7 +80,7 @@ def repair(units: list[UnitEquipment], offer: RepairOffer):
     params = [("units_ids[]", unit.id) for unit in units]
     params.append(("id", config.company_id))
     params.append(("offer_id", offer.id))
-    r = s.post(
+    r = s().post(
         "https://virtonomica.ru/api/vera/main/company/equipment/repair", params=params
     )
     logger.info(f"Virtonomica API response: {r.json()}")
@@ -91,11 +90,11 @@ def repair(units: list[UnitEquipment], offer: RepairOffer):
 
 
 def terminate(unit: UnitEquipment, quantity: int):
-    r = s.post(
+    r = s().post(
         "https://virtonomica.ru/api/vera/main/unit/equipment/terminate",
         {
             "id": unit.id,
-            "token": token,
+            "token": s().token,
             "qty": quantity,
         },
     )
@@ -105,12 +104,12 @@ def terminate(unit: UnitEquipment, quantity: int):
 
 
 def buy(unit: UnitEquipment, offer: RepairOffer, quantity: int):
-    r = s.post(
+    r = s().post(
         "https://virtonomica.ru/api/vera/main/unit/equipment/update",
         {
             "offer_id": offer.id,
             "id": unit.id,
-            "token": token,
+            "token": s().token,
             "operation_name": "buy",
             "equipment_count": quantity,
         },

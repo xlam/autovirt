@@ -2,7 +2,7 @@ import os
 import pickle
 import requests
 import datetime
-from typing import Union
+from typing import Optional, Any
 
 import config
 from autovirt.utils import get_logger
@@ -11,8 +11,24 @@ logger = get_logger()
 
 
 class VirtSession(requests.Session):
+
+    session: Any = None
+
     def __init__(self):
         requests.Session.__init__(self)
+
+    def login(self):
+        r = self.post(
+            "https://virtonomica.ru/api/vera/user/login",
+            {
+                "email": config.login,
+                "password": config.password,
+            },
+        )
+        if r.status_code != 200:
+            raise RuntimeError(
+                f"Virtonomica login has failed (status code {r.status_code})"
+            )
 
     @staticmethod
     def warn_status_not_ok(res: requests.Response):
@@ -35,13 +51,18 @@ class VirtSession(requests.Session):
         with open(config.session_file, "wb") as f:
             pickle.dump(self, f)
 
+    @property
+    def token(self) -> str:
+        r = self.get("https://virtonomica.ru/api/vera/main/token")
+        return r.json()
+
 
 def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
 
-def get_cached_session() -> Union[VirtSession, None]:
+def get_cached_session() -> Optional[VirtSession]:
     if not os.path.exists(config.session_file):
         return None
     time = modification_date(config.session_file)
@@ -55,25 +76,11 @@ def get_cached_session() -> Union[VirtSession, None]:
 
 
 def get_logged_session() -> VirtSession:
-    s = get_cached_session()
-    if not s:
-        s = VirtSession()
-        s.post(
-            "https://virtonomica.ru/vera/main/user/login",
-            {
-                "userData[login]": config.login,
-                "userData[password]": config.password,
-                "remember": 1,
-            },
-        )
-        logger.info("new session initialized")
-    return s
-
-
-def get_token(s: requests.Session):
-    r = s.get("https://virtonomica.ru/api/vera/main/token")
-    return r.json()
-
-
-session = get_logged_session()
-token = get_token(session)
+    if not VirtSession.session:
+        s = get_cached_session()
+        if not s:
+            s = VirtSession()
+            s.login()
+            logger.info("new session initialized")
+        VirtSession.session = s
+    return VirtSession.session
