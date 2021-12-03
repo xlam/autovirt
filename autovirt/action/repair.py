@@ -65,6 +65,10 @@ def select_offer(
         if qual_exp[i] >= quality
     ]
 
+    if not summary:
+        logger.error(f"could not select offer to repair quality {quality}, exiting")
+        sys.exit(1)
+
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:
         logger.info(
@@ -233,11 +237,11 @@ def run(config_name: str):
     repair_config = get_repair_config(config_name)
     equipment_id = repair_config[config.Option.equip_id]
 
+    logger.info(f"starting repair equipment id {equipment_id}")
     units = equipment.get_units(equipment_id)
     if not units:
         logger.info("nothing to repair, exiting")
         sys.exit(0)
-    logger.info(f"starting repair equipment id {equipment_id}")
 
     units = filter_units_with_exclude_and_include_options(units, repair_config)
 

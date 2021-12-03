@@ -2,7 +2,7 @@ import os
 import pickle
 import requests
 import datetime
-from typing import Optional, Any
+from typing import Optional
 
 import config
 from autovirt.utils import get_logger
@@ -11,9 +11,6 @@ logger = get_logger()
 
 
 class VirtSession(requests.Session):
-
-    session: Any = None
-
     def __init__(self):
         requests.Session.__init__(self)
 
@@ -75,12 +72,16 @@ def get_cached_session() -> Optional[VirtSession]:
     return None
 
 
+_session: Optional[VirtSession] = None
+
+
 def get_logged_session() -> VirtSession:
-    if not VirtSession.session:
+    global _session
+    if not _session:
         s = get_cached_session()
         if not s:
             s = VirtSession()
             s.login()
             logger.info("new session initialized")
-        VirtSession.session = s
-    return VirtSession.session
+        _session = s
+    return _session
