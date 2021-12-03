@@ -76,14 +76,8 @@ def select_offer(
             f" quantity: {o[0].quantity}, qual_exp: {o[2]:.2f}, qp: {o[5]:.3f}"
         )
 
-    offer = summary[0][0]
-    qp = summary[0][5]
-    for x in summary:
-        if x[5] < qp:
-            qp = x[5]
-            offer = x[0]
-
-    return offer
+    minimum_qp_item = reduce(lambda x, y: x if x[5] < y[5] else y, summary)
+    return minimum_qp_item[0]
 
 
 def select_offer_to_raise_quality(
