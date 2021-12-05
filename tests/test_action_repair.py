@@ -4,6 +4,8 @@ from autovirt.action.repair import (
     quantity_to_repair,
     select_offer,
     select_offer_to_raise_quality,
+    split_mismatch_quality_units,
+    split_by_quality,
 )
 from autovirt.structs import UnitEquipment, RepairOffer
 
@@ -64,3 +66,16 @@ def test_select_offer_to_raise_quality(offers, unit, offer_id, count):
 def test_select_offer_to_raise_quality_none(offers):
     unit = UnitEquipment(0, 2000, 2000, 29.0, 36.0, 0.0, 1529)
     assert select_offer_to_raise_quality(unit, offers) is None
+
+
+def test_mismatched_quality(units):
+    normal, mismatched = split_mismatch_quality_units(units, 31.5)
+    assert len(normal) == 2
+    assert len(mismatched) == 1
+
+
+def test_split_by_quality(units):
+    res = split_by_quality(units)
+    assert len(res) == 1
+    res = split_by_quality(units, "qual")
+    assert len(res) == 3
