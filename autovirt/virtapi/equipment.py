@@ -1,11 +1,11 @@
 import sys
 
-import config
 from autovirt import utils
 from autovirt.session import get_logged_session as s
 from autovirt.structs import UnitEquipment, RepairOffer
 
 logger = utils.get_logger()
+_config = utils.get_config("autovirt")
 
 
 def fetch_units(equipment_id: int) -> list[dict]:
@@ -13,9 +13,9 @@ def fetch_units(equipment_id: int) -> list[dict]:
     r = s().get(
         "https://virtonomica.ru/api/vera/main/company/equipment/units",
         params={
-            "id": config.company_id,
+            "id": _config["company_id"],
             "product_id": equipment_id,
-            "pagesize": config.pagesize,
+            "pagesize": _config["pagesize"],
         },
     )
     return r.json()["data"].values()
@@ -26,9 +26,9 @@ def fetch_offers(product_id: int) -> list[dict]:
     r = s().get(
         "https://virtonomica.ru/api/vera/main/company/equipment/offers",
         params={
-            "id": config.company_id,
+            "id": _config["company_id"],
             "product_id": product_id,
-            "pagesize": config.pagesize,
+            "pagesize": _config["pagesize"],
         },
     )
     return r.json()["data"].values()
@@ -78,7 +78,7 @@ def repair(units: list[UnitEquipment], offer: RepairOffer):
     """Do repair of units equpment with offer provided"""
 
     params = [("units_ids[]", unit.id) for unit in units]
-    params.append(("id", config.company_id))
+    params.append(("id", _config["company_id"]))
     params.append(("offer_id", offer.id))
     r = s().post(
         "https://virtonomica.ru/api/vera/main/company/equipment/repair", params=params

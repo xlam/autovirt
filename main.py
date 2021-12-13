@@ -11,7 +11,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def run():
     print(f"Running autovirt version {version}")
     args = parse_args()
     print("args: ", args)
@@ -25,3 +25,7 @@ if __name__ == "__main__":
     action_module = ".".join(["autovirt.action", action_name])
     action = importlib.import_module(action_module)
     action.run(action_config)
+
+
+if __name__ == "__main__":
+    run()

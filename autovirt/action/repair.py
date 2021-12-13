@@ -3,12 +3,12 @@ from functools import reduce
 from math import ceil
 from typing import Tuple, Optional
 
-import config
 from autovirt import utils
 from autovirt.structs import UnitEquipment, RepairOffer
 from autovirt.virtapi import equipment
 
 logger = utils.get_logger()
+config = utils.get_config("repair")
 
 
 def quantity_to_repair(units: list[UnitEquipment]) -> int:
@@ -178,7 +178,7 @@ def repair_with_quality(
 
 
 def get_repair_config(config_name: str) -> dict:
-    repair_config = config.repair.get(config_name)
+    repair_config = config[config_name]
     if not repair_config:
         logger.error(f"config '{config_name}' does not exist, exiting")
         sys.exit(1)
@@ -188,25 +188,25 @@ def get_repair_config(config_name: str) -> dict:
 def filter_units_with_exclude_and_include_options(
     units: list[UnitEquipment], repair_config: dict
 ) -> list[UnitEquipment]:
-    if config.Option.exclude in repair_config.keys():
-        excludes = repair_config[config.Option.exclude]
+    if "exclude" in repair_config.keys():
+        excludes = repair_config["exclude"]
         units = [unit for unit in units for ex in excludes if unit.id != ex]
-    if config.Option.include in repair_config.keys():
-        includes = repair_config[config.Option.include]
+    if "include" in repair_config.keys():
+        includes = repair_config["include"]
         units = [unit for unit in units for inc in includes if unit.id == inc]
     return units
 
 
 def repair_by_quality(units: list[UnitEquipment], repair_config: dict):
     quality_type = "qual_req"
-    if config.Option.quality in repair_config.keys():
+    if "quality" in repair_config.keys():
         quality_type = "qual"
     units_ = split_by_quality(units, quality_type=quality_type)
     logger.info(
         f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
     )
     total_cost = 0.0
-    equipment_id = repair_config[config.Option.equip_id]
+    equipment_id = repair_config["equip_id"]
     for quality, units_list in units_.items():
         repair_cost = repair_with_quality(units_list, equipment_id, quality)
         total_cost += repair_cost
@@ -215,8 +215,8 @@ def repair_by_quality(units: list[UnitEquipment], repair_config: dict):
 
 def repair_with_config_offer(units: list[UnitEquipment], repair_config: dict):
     quantity = quantity_to_repair(units)
-    offers = equipment.get_offers(repair_config[config.Option.equip_id])
-    offer_id = repair_config[config.Option.offer_id]
+    offers = equipment.get_offers(repair_config["equip_id"])
+    offer_id = repair_config["offer_id"]
     offer = [o for o in offers if o.id == offer_id][0]
     total_cost = quantity * offer.price
     logger.info(f"repairing {quantity} pieces on {len(units)} units")
@@ -229,17 +229,17 @@ def repair_with_config_offer(units: list[UnitEquipment], repair_config: dict):
 
 def run(config_name: str):
     repair_config = get_repair_config(config_name)
-    equipment_id = repair_config[config.Option.equip_id]
+    equipment_id = repair_config["equip_id"]
 
     logger.info(f"starting repair equipment id {equipment_id}")
     units = equipment.get_units(equipment_id)
+    units = filter_units_with_exclude_and_include_options(units, repair_config)
+
     if not units:
         logger.info("nothing to repair, exiting")
         sys.exit(0)
 
-    units = filter_units_with_exclude_and_include_options(units, repair_config)
-
-    if config.Option.offer_id in repair_config.keys():
+    if "offer_id" in repair_config.keys():
         repair_with_config_offer(units, repair_config)
     else:
         repair_by_quality(units, repair_config)

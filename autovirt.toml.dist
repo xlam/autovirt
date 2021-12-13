@@ -1,0 +1,32 @@
+[autovirt]
+session_file = "session.dat"
+session_timeout = 1800          # 30 minutes
+login = ""                      # Virtonomica user login
+password = ""                   # Virtonomica user password
+company_id = -1                 # user company id
+log_dir = "logs"                # logs directory name
+pagesize = 1000                 # number of entries to return in server response
+
+[repair]                        # repair module configuration
+
+    [repair.comp]               # configuration name to pass to main.py with --config option
+        equipment_id = 1515     # id of equipment to repair
+        exclude = [-1]          # list of units ids to exclude from repair
+        offer_id = -1           # use this offer id to repair equipment (i.e self offer)
+
+    [repair.comp-hitech]
+        equipment_id = 1515
+        include = [-1]          # list of units ids to repair (only those will be repaired)
+        quality = true          # repair by installed quality (not required)
+
+    [repair.mtools]
+        equipment_id = 1529     # machine tools
+
+    [repair.drill]
+        equipment_id = 12097    # rock drills
+
+    [repair.tractor]
+        equipment_id = 1530     # tractors
+
+    [repair.saw]
+        equipment_id = 10717    # sawmill
