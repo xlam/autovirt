@@ -63,7 +63,7 @@ def get_cached_session() -> Optional[VirtSession]:
     if not os.path.exists(_config["session_file"]):
         return None
     time = modification_date(_config["session_file"])
-    last_mod_time = (datetime.datetime.now() - time).seconds
+    last_mod_time = (datetime.datetime.now() - time).total_seconds()
     if last_mod_time < _config["session_timeout"]:
         with open(_config["session_file"], "rb") as f:
             s = pickle.load(f)
