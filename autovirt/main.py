@@ -24,7 +24,7 @@ def run():
 
     action_module = ".".join(["autovirt.action", action_name])
     action = importlib.import_module(action_module)
-    action.run(action_config)
+    action.run(action_config)  # type: ignore
 
 
 if __name__ == "__main__":
