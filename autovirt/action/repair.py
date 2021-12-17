@@ -17,8 +17,8 @@ QUALITY_DELTA = 3
 
 
 class QualityType(Enum):
-    INSTALLED = "qual"
-    REQUIRED = "qual_req"
+    INSTALLED = "quality"
+    REQUIRED = "quality_required"
 
 
 logger = utils.get_logger()
@@ -40,7 +40,7 @@ def quantity_to_repair(units: list[UnitEquipment]) -> int:
 
 def quantity_total(units: list[UnitEquipment]) -> int:
     """Calculate total equipment count on given units"""
-    return reduce(lambda a, unit: a + unit.qnt, units, 0)
+    return reduce(lambda a, unit: a + unit.quantity, units, 0)
 
 
 def filter_offers(
@@ -66,12 +66,12 @@ def select_offer(
     offers: list[RepairOffer], units: list[UnitEquipment], quality: float = None
 ) -> RepairOffer:
     if not quality:
-        quality = units[0].qual_req
+        quality = units[0].quality_required
     qnt_rep = quantity_to_repair(units)
     qnt_total = quantity_total(units)
     offers = filter_offers(offers, quality, qnt_rep)
 
-    qual_min = utils.get_min(units, "qual")
+    qual_min = utils.get_min(units, QualityType.INSTALLED.value)
     qual_exp = [
         expected_quality(o.quality, qual_min, qnt_total, qnt_rep) for o in offers
     ]
@@ -105,16 +105,16 @@ def select_offer(
 def select_offer_to_raise_quality(
     unit: UnitEquipment, offers: list[RepairOffer], margin: float = 0
 ) -> Optional[Tuple[RepairOffer, int]]:
-    required = unit.qual_req + margin
-    quality_coeff = unit.qnt * (required - unit.qual)
+    required = unit.quality_required + margin
+    quality_coeff = unit.quantity * (required - unit.quality)
     offers = list(filter(lambda o: o.quality >= required, offers))
     if not offers:
         return None
     offer = offers[0]
-    count_to_replace = ceil(quality_coeff / (offer.quality - unit.qual))
+    count_to_replace = ceil(quality_coeff / (offer.quality - unit.quality))
     price = count_to_replace * offer.price
     for offer_ in offers[1:]:
-        count = ceil(quality_coeff / (offer_.quality - unit.qual))
+        count = ceil(quality_coeff / (offer_.quality - unit.quality))
         price_ = count * offer_.price
         if price_ < price:
             offer = offer_
@@ -145,7 +145,7 @@ def split_mismatch_quality_units(
     normal = []
     mismatch = []
     for unit in units:
-        if unit.qual < quality:
+        if unit.quality < quality:
             mismatch.append(unit)
         else:
             normal.append(unit)
@@ -160,14 +160,14 @@ def fix_units_quality(units: list[UnitEquipment], margin: float = 0):
         if not res:
             logger.info(
                 f"no offers found to fix unit {unit.id} "
-                f"(installed quality: {unit.qual}, required: {unit.qual_req}), skipping"
+                f"(installed quality: {unit.quality}, required: {unit.quality_required}), skipping"
             )
             continue
         (offer, quantity) = res
         logger.info(
             f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
             f"to replace {quantity} items at unit {unit.id} "
-            f"(installed quality: {unit.qual}, required: {unit.qual_req})"
+            f"(installed quality: {unit.quality}, required: {unit.quality_required})"
         )
         equipment.terminate(unit, quantity)
         equipment.buy(unit, offer, quantity)
