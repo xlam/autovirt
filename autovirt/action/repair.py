@@ -1,5 +1,5 @@
 import sys
-from dataclasses import dataclass
+from enum import Enum
 from functools import reduce
 from math import ceil
 from typing import Tuple, Optional
@@ -16,8 +16,7 @@ PRICE_MAX = 100000
 QUALITY_DELTA = 3
 
 
-@dataclass(frozen=True)
-class QualityType:
+class QualityType(Enum):
     INSTALLED = "qual"
     REQUIRED = "qual_req"
 
@@ -124,12 +123,12 @@ def select_offer_to_raise_quality(
 
 
 def split_by_quality(
-    units: list[UnitEquipment], quality_type: str = QualityType.REQUIRED
+    units: list[UnitEquipment], quality_type: QualityType = QualityType.REQUIRED
 ) -> dict[float, list[UnitEquipment]]:
     """Split units by quality (required or installed)"""
     res: dict[float, list[UnitEquipment]] = {}
     for unit in units:
-        quality = getattr(unit, quality_type)
+        quality = getattr(unit, quality_type.value)
         if quality not in res.keys():
             res[quality] = []
         res[quality].append(unit)
@@ -220,7 +219,7 @@ def filter_units_with_exclude_and_include_options(
     return units
 
 
-def repair_by_quality(units: list[UnitEquipment], quality_type: str):
+def repair_by_quality(units: list[UnitEquipment], quality_type: QualityType):
     units_ = split_by_quality(units, quality_type=quality_type)
     logger.info(
         f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"

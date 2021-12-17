@@ -1,5 +1,6 @@
 import pytest
 from autovirt.action.repair import (
+    QualityType,
     RepairConfig,
     quantity_total,
     quantity_to_repair,
@@ -78,7 +79,7 @@ def test_mismatched_quality(units):
 def test_split_by_quality(units):
     res = split_by_quality(units)
     assert len(res) == 1
-    res = split_by_quality(units, "qual")
+    res = split_by_quality(units, QualityType.INSTALLED)
     assert len(res) == 3
 
 
