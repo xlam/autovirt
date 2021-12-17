@@ -10,11 +10,11 @@ It uses the game API to communicate with the server. There is no any web-scrapin
 - automatic salary raise for units on which minimum employee level does not met
 - automatic salary raise for units on which labor union requires raise
 - automatic units artefacts renewal
-- configurable with python file (to be changed in the future)
+- configurable with simple [toml](https://toml.io/en/) configuration file
 
 ## Requirements
 
-- [Python 3.9](https://www.python.org/downloads/release/python-398/)
+- [Python 3.9](https://www.python.org/downloads/release/python-398/) or later
 
 Autovirt is being developed and tested with Python 3.9. Lower versions are not compatible due to lacking built-in collections type-hinting.
 
@@ -38,7 +38,7 @@ Start poetry shell to run Autovirt commands:
 ```
 $ poetry shell
 ```
-To exit poetry shell type ``exit`` in terminal. Also it is possible to run single command without invoking shell:
+To exit poetry shell type ``exit`` in terminal. Also, it is possible to run single command without invoking shell:
 ```
 $ poetry run python --version
 ```
@@ -57,7 +57,7 @@ $ python main.py repair -c comp
 ```
 This will repair all computers on all offices (and other units using computers as equipment) provided that "comp" is present in configuration file.
 
-Raise salary at units where minimum qualification does not met:
+Raise salary at units where minimum qualification does not match:
 ```
 $ python main.py salary 
 ```
@@ -76,52 +76,43 @@ $ python main.py innovations
 
 ## Configuration
 
-Copy provided ``config.py.dist`` to ``config.py``, then fill it up with your data.
+Copy provided ``autovirt.toml.dist`` to ``autovirt.toml``, then fill it up with your data.
+TOML syntax is very similar to .ini files.
 
-config.py example:
+autovirt.toml example (fill placeholders with your data):
 ```
-import enum
+[autovirt]
+session_file = "session.dat"
+session_timeout = 1800          # 30 minutes
+login = ""                      # Virtonomica user login
+password = ""                   # Virtonomica user password
+company_id = -1                 # user company id
+log_dir = "logs"                # logs directory name
+pagesize = 1000                 # number of entries to return in server response
 
-session_file = 'session.dat'	# file to store logged session
-session_timeout = 60 * 30		# lifetime of stored session in seconds
-login = ''						# your Virtonomica login
-password = ''					# your Virtonomica password
-company_id = -1					# your Virtonomica company id (look it up in browser url)
+[repair]                        # repair module configuration
 
-log_dir = 'logs'				# directory to store logs
-pagesize = 1000					# maximum returned item (i.e. units) per page
+    [repair.comp]               # configuration name to pass to main.py with --config option
+        equipment_id = 1515     # id of equipment to repair
+        exclude = [-1]          # list of units ids to exclude from repair
+        offer_id = -1           # use this offer id to repair equipment (i.e self offer)
 
-# don't touch this
-class Option(enum.Enum):
-    equip_id = enum.auto()
-    exclude = enum.auto()
-    include = enum.auto()
-    offer_id = enum.auto()
-    quality = enum.auto()
+    [repair.comp-hitech]
+        equipment_id = 1515
+        include = [-1]          # list of units ids to repair (only those will be repaired)
+        quality = true          # repair by installed quality (not required)
 
+    [repair.mtools]
+        equipment_id = 1529     # machine tools
 
-# sample repair configuration
-repair = {
-    "comp": {  					# configuration name to pass to main.py with --config option
-        Option.equip_id: 1515,  # id of equipment to repair
-        Option.exclude: [-1],  	# list of units ids to exclude from repair
-        Option.offer_id: -1,  	# use this offer id to repair equipment (i.e self offer)
-    },
-    "comp-hitech": {
-        Option.equip_id: 1515,
-        Option.include: [-1],  	# list of units ids to repair (only those will be repaired)
-        Option.quality: True,  	# repair by installed quality (not required)
-    },
-    "mtools": {
-    	Option.equip_id: 1529   # machine tools
-    },
-    "drill": {
-    	Option.equip_id: 12097  # rock drills
-    },
-    "tractor": {
-    	Option.equip_id: 1530   # tractors
-    },
-}
+    [repair.drill]
+        equipment_id = 12097    # rock drills
+
+    [repair.tractor]
+        equipment_id = 1530     # tractors
+
+    [repair.saw]
+        equipment_id = 10717    # sawmill
 ```
 
 ## Using Autovirt with crontab
@@ -129,16 +120,16 @@ repair = {
 Crontab configuration is dependent on the operating system being used. The following configuration is an example for debian/ubuntu servers (need ``. ~/.profile`` to have poetry on system $PATH for crontab):
 
 ```
-0 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c comp
-1 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c comp-hitech
-2 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c mtools
-3 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c drill
-4 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py repair -c tractor
+0 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt repair -c comp
+1 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt repair -c comp-hitech
+2 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt repair -c mtools
+3 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt repair -c drill
+4 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt repair -c tractor
 
-5 9 * * * . ~/.profile && cd ~/autovirt && poetry run python main.py innovations
+5 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt innovations
 
-10 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run python main.py employee
+10 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run autovirt employee
 
-15 9 */4 * * . ~/.profile && cd ~/autovirt && poetry run python main.py salary
+15 9 */4 * * . ~/.profile && cd ~/autovirt && poetry run autovirt salary
 
 ```
