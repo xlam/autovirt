@@ -22,6 +22,7 @@ Autovirt is being developed and tested with Python 3.9. Lower versions are not c
 
 ## Installation
 
+### Using git and poetry
 1. Clone the repository and step into its directory:
 ```
 $ git clone https://github.com/xlam/autovirt
@@ -32,61 +33,73 @@ $ cd autovirt
 $ poetry install --no-dev
 ```
 
+### Using wheel
+1. Download latest wheel package from [https://github.com/xlam/autovirt/releases](https://github.com/xlam/autovirt/releases)
+2. Install downloaded wheel with pip:
+```
+$ pip install autovirt-<version>-py3-none-any.whl
+```
+In last case you may install autivirt into system python or into any virtual environment of choice.
 ## Usage
+In case autovirt installed with pip you could just use ``autovirt`` entry script:
+```
+$ autovirt --help
+```
 
-Start poetry shell to run Autovirt commands:
+
+In case you installed autovirt via poetry you should start poetry shell:
 ```
 $ poetry shell
 ```
-To exit poetry shell type ``exit`` in terminal. Also, it is possible to run single command without invoking shell:
+It is also possible to run single command without invoking the shell:
 ```
-$ poetry run python --version
+$ poetry run autovirt --help
 ```
+To exit poetry shell type ``exit`` in terminal.
 
-After the poetry shell has started python interpreter will be invoked from newly created virtual environment, so we can run the following Autovirt commands:
+After the poetry shell has started python interpreter and installed ``autovirt`` command will be invoked from newly created virtual environment, so we can run the following Autovirt commands the same way as with pip installation:
 
 - repair
 - salary
 - employee
 - innovations
 
-These commands are to be run with ``main.py`` entry point script.
 To repair all equipment (as specified in configuration) run the following command:
 ```
-$ python main.py repair -c comp
+$ autovirt repair -c comp
 ```
 This will repair all computers on all offices (and other units using computers as equipment) provided that "comp" is present in configuration file.
 
 Raise salary at units where minimum qualification does not match:
 ```
-$ python main.py salary 
+$ autovirt salary
 ```
 
 Raise salary at units on which labor union is requiring raise. For this to work there must be mail message from labor union in the game mail inbox:
 ```
-$ python main.py employee
+$ autovirt employee
 ```
 
 Renew innovations (artefacts) on units. For this to work there must be innovation expiration message in the game mail inbox.
 ```
-$ python main.py innovations
+$ autovirt innovations
 ```
 
 
 
 ## Configuration
 
-Copy provided ``autovirt.toml.dist`` to ``autovirt.toml``, then fill it up with your data.
+Copy provided ``autovirt.toml.dist`` to ``autovirt.toml``. The configuration file must present in a directory from which ``autovirt`` command to be executed. Fill the file up with your data.
 TOML syntax is very similar to .ini files.
 
-autovirt.toml example (fill placeholders with your data):
+autovirt.toml example (fill empty values with your data):
 ```
 [autovirt]
 session_file = "session.dat"
 session_timeout = 1800          # 30 minutes
 login = ""                      # Virtonomica user login
 password = ""                   # Virtonomica user password
-company_id = -1                 # user company id
+company_id =                    # user company id
 log_dir = "logs"                # logs directory name
 pagesize = 1000                 # number of entries to return in server response
 
@@ -94,12 +107,12 @@ pagesize = 1000                 # number of entries to return in server response
 
     [repair.comp]               # configuration name to pass to main.py with --config option
         equipment_id = 1515     # id of equipment to repair
-        exclude = [-1]          # list of units ids to exclude from repair
-        offer_id = -1           # use this offer id to repair equipment (i.e self offer)
+        exclude = []            # list of units ids to exclude from repair
+        offer_id =              # use this offer id to repair equipment (i.e self offer)
 
     [repair.comp-hitech]
         equipment_id = 1515
-        include = [-1]          # list of units ids to repair (only those will be repaired)
+        include = []            # list of units ids to repair (only those will be repaired)
         quality = true          # repair by installed quality (not required)
 
     [repair.mtools]

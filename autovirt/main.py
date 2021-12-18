@@ -5,14 +5,27 @@ from autovirt.utils import init_logger
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog="Autovirt", description=f"Virtonomica automation tool (v{version})"
+    )
     parser.add_argument("action", type=str)
-    parser.add_argument("-c, --config", type=str, dest="config", default=None)
+    parser.add_argument(
+        "-c, --config",
+        type=str,
+        dest="config",
+        default=None,
+        help="configuration section for 'repair' command",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {version}",
+        help="show version",
+    )
     return parser.parse_args()
 
 
 def run():
-    print(f"Running autovirt version {version}")
     args = parse_args()
     print("args: ", args)
     action_name = args.action
