@@ -28,7 +28,7 @@ def test_unit_equipment_floats_rounded(quality: float, expected: int):
         0,
         1234,
     )
-    quality_string = str(ue.qual)
+    quality_string = str(ue.quality)
     decimal = int(quality_string.split(".")[1])
     assert decimal == expected
 

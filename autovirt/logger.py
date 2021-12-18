@@ -14,10 +14,10 @@ class Logger:
 
     @classmethod
     def __new__(cls, *args, **kwargs):
-        name = kwargs.get("name", "main")
-        log_dir = kwargs.get("log_dir", log_dir_path("logs"))
 
         if cls._instance is None:
+            name = kwargs.get("name", "main")
+            log_dir = kwargs.get("log_dir", log_dir_path("logs"))
             logger = logging.getLogger(name)
             logger.setLevel(logging.DEBUG)
             logger.propagate = False

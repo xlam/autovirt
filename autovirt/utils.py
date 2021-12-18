@@ -1,14 +1,21 @@
-import os
 import logging
-from typing import Any, Sequence
+import os
 from functools import reduce
+from typing import Any, Sequence
 
-from config import log_dir
 from autovirt.logger import Logger
+from autovirt.config import config
+
+
+def get_config(section: str) -> dict:
+    return config()[section]
+
+
+_config = get_config("autovirt")
 
 
 def get_log_dir():
-    logging_dir = os.path.join(os.path.normpath(os.getcwd()), log_dir)
+    logging_dir = os.path.join(os.path.normpath(os.getcwd()), _config["log_dir"])
     os.makedirs(logging_dir, exist_ok=True)
     return logging_dir
 
@@ -21,13 +28,24 @@ def get_logger() -> logging.Logger:
     return Logger()  # type: ignore
 
 
-def normalize(value: float, min_value: float, max_value: float):
-    """Normalize value to the range 0..1"""
+def normalize(value: float, min_value: float, max_value: float) -> float:
+    """Normalize value to range [0..1]"""
     if min_value == max_value:
         return 0
     if not min_value <= value <= max_value:
         raise ValueError(f"Value {value} is not in range [{min_value}; {max_value}]")
     return (value - min_value) / (max_value - min_value)
+
+
+def normalize_array(array: Sequence[float]) -> Sequence[float]:
+    """Normalize array to range [0..1]"""
+    if not array:
+        raise ValueError(f"array is empty")
+    min_value = min(array)
+    max_value = max(array)
+    if min_value == max_value:
+        return [0 for _ in array]
+    return [normalize(value, min_value, max_value) for value in array]
 
 
 def get_max(objects: Sequence[object], field: str) -> Any:

@@ -154,7 +154,7 @@ crashlytics-build.properties
 fabric.properties
 
 # Project specific
-config.py
+autovirt.toml
 *.dat
 test/
 notes

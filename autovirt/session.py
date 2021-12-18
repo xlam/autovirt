@@ -2,17 +2,30 @@ import os
 import pickle
 import requests
 import datetime
-from typing import Union
+from typing import Optional
 
-import config
-from autovirt.utils import get_logger
+from autovirt.utils import get_logger, get_config
 
 logger = get_logger()
+_config = get_config("autovirt")
 
 
 class VirtSession(requests.Session):
     def __init__(self):
         requests.Session.__init__(self)
+
+    def login(self):
+        r = self.post(
+            "https://virtonomica.ru/api/vera/user/login",
+            {
+                "email": _config["login"],
+                "password": _config["password"],
+            },
+        )
+        if r.status_code != 200:
+            raise RuntimeError(
+                f"Virtonomica login has failed (status code {r.status_code})"
+            )
 
     @staticmethod
     def warn_status_not_ok(res: requests.Response):
@@ -32,8 +45,13 @@ class VirtSession(requests.Session):
         return res
 
     def save_session(self):
-        with open(config.session_file, "wb") as f:
+        with open(_config["session_file"], "wb") as f:
             pickle.dump(self, f)
+
+    @property
+    def token(self) -> str:
+        r = self.get("https://virtonomica.ru/api/vera/main/token")
+        return r.json()
 
 
 def modification_date(filename):
@@ -41,39 +59,29 @@ def modification_date(filename):
     return datetime.datetime.fromtimestamp(t)
 
 
-def get_cached_session() -> Union[VirtSession, None]:
-    if not os.path.exists(config.session_file):
+def get_cached_session() -> Optional[VirtSession]:
+    if not os.path.exists(_config["session_file"]):
         return None
-    time = modification_date(config.session_file)
-    last_mod_time = (datetime.datetime.now() - time).seconds
-    if last_mod_time < config.session_timeout:
-        with open(config.session_file, "rb") as f:
+    time = modification_date(_config["session_file"])
+    last_mod_time = (datetime.datetime.now() - time).total_seconds()
+    if last_mod_time < _config["session_timeout"]:
+        with open(_config["session_file"], "rb") as f:
             s = pickle.load(f)
             logger.info("cached session loaded")
             return s
     return None
 
 
+_session: Optional[VirtSession] = None
+
+
 def get_logged_session() -> VirtSession:
-    s = get_cached_session()
-    if not s:
-        s = VirtSession()
-        s.post(
-            "https://virtonomica.ru/vera/main/user/login",
-            {
-                "userData[login]": config.login,
-                "userData[password]": config.password,
-                "remember": 1,
-            },
-        )
-        logger.info("new session initialized")
-    return s
-
-
-def get_token(s: requests.Session):
-    r = s.get("https://virtonomica.ru/api/vera/main/token")
-    return r.json()
-
-
-session = get_logged_session()
-token = get_token(session)
+    global _session
+    if not _session:
+        s = get_cached_session()
+        if not s:
+            s = VirtSession()
+            s.login()
+            logger.info("new session initialized")
+        _session = s
+    return _session

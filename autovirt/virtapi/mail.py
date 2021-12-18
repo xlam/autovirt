@@ -2,14 +2,14 @@ import time
 
 from autovirt import utils
 from autovirt.structs import Message
-from autovirt.session import token, session as s
+from autovirt.session import get_logged_session as s
 
 
 logger = utils.get_logger()
 
 
 def get_messages(box: str = "system", subject=None) -> list[Message]:
-    r = s.get(f"https://virtonomica.ru/api/vera/main/user/message/browse?box={box}")
+    r = s().get(f"https://virtonomica.ru/api/vera/main/user/message/browse?box={box}")
     data = r.json()["data"]
     if not data:
         return []
@@ -39,8 +39,8 @@ def delete_messages(messages: list[Message], box: str = "system"):
             f"https://virtonomica.ru/api/vera/main/user/message/del"
             f"?message_id={message.id}"
             f"&box={box}"
-            f"&token={token}"
+            f"&token={s().token}"
         )
         logger.info(f"deleting message {message.id} ({message.subject})")
         time.sleep(1)
-        s.get(url)
+        s().get(url)
