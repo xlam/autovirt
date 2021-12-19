@@ -4,10 +4,10 @@ import requests
 import datetime
 from typing import Optional
 
-import config
-from autovirt.utils import get_logger
+from autovirt.utils import get_logger, get_config
 
 logger = get_logger()
+_config = get_config("autovirt")
 
 
 class VirtSession(requests.Session):
@@ -18,8 +18,8 @@ class VirtSession(requests.Session):
         r = self.post(
             "https://virtonomica.ru/api/vera/user/login",
             {
-                "email": config.login,
-                "password": config.password,
+                "email": _config["login"],
+                "password": _config["password"],
             },
         )
         if r.status_code != 200:
@@ -45,7 +45,7 @@ class VirtSession(requests.Session):
         return res
 
     def save_session(self):
-        with open(config.session_file, "wb") as f:
+        with open(_config["session_file"], "wb") as f:
             pickle.dump(self, f)
 
     @property
@@ -60,12 +60,12 @@ def modification_date(filename):
 
 
 def get_cached_session() -> Optional[VirtSession]:
-    if not os.path.exists(config.session_file):
+    if not os.path.exists(_config["session_file"]):
         return None
-    time = modification_date(config.session_file)
-    last_mod_time = (datetime.datetime.now() - time).seconds
-    if last_mod_time < config.session_timeout:
-        with open(config.session_file, "rb") as f:
+    time = modification_date(_config["session_file"])
+    last_mod_time = (datetime.datetime.now() - time).total_seconds()
+    if last_mod_time < _config["session_timeout"]:
+        with open(_config["session_file"], "rb") as f:
             s = pickle.load(f)
             logger.info("cached session loaded")
             return s

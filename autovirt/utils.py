@@ -4,11 +4,18 @@ from functools import reduce
 from typing import Any, Sequence
 
 from autovirt.logger import Logger
-from config import log_dir
+from autovirt.config import config
+
+
+def get_config(section: str) -> dict:
+    return config()[section]
+
+
+_config = get_config("autovirt")
 
 
 def get_log_dir():
-    logging_dir = os.path.join(os.path.normpath(os.getcwd()), log_dir)
+    logging_dir = os.path.join(os.path.normpath(os.getcwd()), _config["log_dir"])
     os.makedirs(logging_dir, exist_ok=True)
     return logging_dir
 
