@@ -2,7 +2,7 @@ import sys
 from enum import Enum
 from functools import reduce
 from math import ceil
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Protocol
 
 from pydantic import BaseModel
 
@@ -152,117 +152,134 @@ def split_mismatch_quality_units(
     return normal, mismatch
 
 
-def fix_units_quality(units: list[UnitEquipment], margin: float = 0):
-    for unit in units:
-        # need to update offers before each operation
-        offers = equipment.get_offers(unit.equipment_id)
-        res = select_offer_to_raise_quality(unit, offers, margin)
-        if not res:
+class EquipmentGateway(Protocol):
+    def terminate(self, unit: UnitEquipment, quantity: int):
+        ...
+
+    def buy(self, unit: UnitEquipment, offer: RepairOffer, quantity: int):
+        ...
+
+    def get_offers(self, product_id: int) -> list[RepairOffer]:
+        ...
+
+    def repair(self, units: list[UnitEquipment], offer: RepairOffer):
+        ...
+
+
+class RepairAction:
+    def __init__(self, equipment_gateway: EquipmentGateway):
+        self.equipment = equipment_gateway
+
+    def fix_units_quality(self, units: list[UnitEquipment], margin: float = 0):
+        for unit in units:
+            # need to update offers before each operation
+            offers = self.equipment.get_offers(unit.equipment_id)
+            res = select_offer_to_raise_quality(unit, offers, margin)
+            if not res:
+                logger.info(
+                    f"no offers found to fix unit {unit.id} "
+                    f"(installed quality: {unit.quality}, required: {unit.quality_required}), skipping"
+                )
+                continue
+            (offer, quantity) = res
             logger.info(
-                f"no offers found to fix unit {unit.id} "
-                f"(installed quality: {unit.quality}, required: {unit.quality_required}), skipping"
+                f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
+                f"to replace {quantity} items at unit {unit.id} "
+                f"(installed quality: {unit.quality}, required: {unit.quality_required})"
             )
-            continue
-        (offer, quantity) = res
+            self.equipment.terminate(unit, quantity)
+            self.equipment.buy(unit, offer, quantity)
+
+    def repair_with_quality(self, units: list[UnitEquipment], quality: float) -> float:
+        units_normal, units_mismatch = split_mismatch_quality_units(units)
+        if units_mismatch:
+            logger.info("mismatch units qualities found, fixing them:")
+            logger.info(units_mismatch)
+            self.fix_units_quality(units_mismatch)
+        if not units_normal:
+            logger.info("nothing to repair, exiting")
+            sys.exit(0)
+        quantity = quantity_to_repair(units_normal)
+        offers = self.equipment.get_offers(units_normal[0].equipment_id)
+        offer = select_offer(offers, units_normal, quality)
+        repair_cost = quantity * offer.price
         logger.info(
-            f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
-            f"to replace {quantity} items at unit {unit.id} "
-            f"(installed quality: {unit.quality}, required: {unit.quality_required})"
+            f"found offer {offer.id} with quality {offer.quality} "
+            f"and price {offer.price} (repair cost: {repair_cost:.0f})"
         )
-        equipment.terminate(unit, quantity)
-        equipment.buy(unit, offer, quantity)
+        logger.info(
+            f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
+        )
+        self.equipment.repair(units_normal, offer)
+        return repair_cost
 
+    @staticmethod
+    def get_repair_config(config_name: str) -> dict:
+        repair_config = config[config_name]
+        if not repair_config:
+            logger.error(f"config '{config_name}' does not exist, exiting")
+            sys.exit(1)
+        return repair_config  # type: ignore
 
-def repair_with_quality(
-    units: list[UnitEquipment], equipment_id: int, quality: float
-) -> float:
-    units_normal, units_mismatch = split_mismatch_quality_units(units)
-    if units_mismatch:
-        logger.info("mismatch units qualities found, fixing them:")
-        logger.info(units_mismatch)
-        fix_units_quality(units_mismatch)
-    if not units_normal:
-        logger.info("nothing to repair, exiting")
-        sys.exit(0)
-    quantity = quantity_to_repair(units_normal)
-    offers = equipment.get_offers(equipment_id)
-    offer = select_offer(offers, units_normal, quality)
-    repair_cost = quantity * offer.price
-    logger.info(
-        f"found offer {offer.id} with quality {offer.quality} "
-        f"and price {offer.price} (repair cost: {repair_cost:.0f})"
-    )
-    logger.info(
-        f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
-    )
-    equipment.repair(units_normal, offer)
-    return repair_cost
+    @staticmethod
+    def filter_units_with_exclude_and_include_options(
+        units: list[UnitEquipment], repair_config: RepairConfig
+    ) -> list[UnitEquipment]:
+        if repair_config.exclude:
+            excludes = repair_config.exclude
+            units = [unit for unit in units for ex in excludes if unit.id != ex]
+        if repair_config.include:
+            includes = repair_config.include
+            units = [unit for unit in units for inc in includes if unit.id == inc]
+        return units
 
+    def repair_by_quality(self, units: list[UnitEquipment], quality_type: QualityType):
+        units_ = split_by_quality(units, quality_type=quality_type)
+        logger.info(
+            f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
+        )
+        total_cost = 0.0
+        for quality, units_list in units_.items():
+            repair_cost = self.repair_with_quality(units_list, quality)
+            total_cost += repair_cost
+        logger.info(f"total repair cost: {total_cost:.0f}")
 
-def get_repair_config(config_name: str) -> dict:
-    repair_config = config[config_name]
-    if not repair_config:
-        logger.error(f"config '{config_name}' does not exist, exiting")
-        sys.exit(1)
-    return repair_config  # type: ignore
+    @staticmethod
+    def repair_with_config_offer(units: list[UnitEquipment], offer_id: int) -> float:
+        quantity = quantity_to_repair(units)
+        offers = equipment.get_offers(units[0].equipment_id)
+        offer = [o for o in offers if o.id == offer_id][0]
+        total_cost = quantity * offer.price
+        logger.info(f"repairing {quantity} pieces on {len(units)} units")
+        logger.info(
+            f"using offer {offer.id} with quality {offer.quality} "
+            f"and price {offer.price} (repair cost: {total_cost:.0f})"
+        )
+        equipment.repair(units, offer)
+        return total_cost
 
+    def run(self, config_name: str):
+        repair_config = RepairConfig(**self.get_repair_config(config_name))
 
-def filter_units_with_exclude_and_include_options(
-    units: list[UnitEquipment], repair_config: RepairConfig
-) -> list[UnitEquipment]:
-    if repair_config.exclude:
-        excludes = repair_config.exclude
-        units = [unit for unit in units for ex in excludes if unit.id != ex]
-    if repair_config.include:
-        includes = repair_config.include
-        units = [unit for unit in units for inc in includes if unit.id == inc]
-    return units
+        logger.info(f"starting repair equipment id {repair_config.equipment_id}")
+        units = equipment.get_units(repair_config.equipment_id)
+        units = self.filter_units_with_exclude_and_include_options(units, repair_config)
 
+        if not units:
+            logger.info("nothing to repair, exiting")
+            sys.exit(0)
 
-def repair_by_quality(units: list[UnitEquipment], quality_type: QualityType):
-    units_ = split_by_quality(units, quality_type=quality_type)
-    logger.info(
-        f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
-    )
-    total_cost = 0.0
-    equipment_id = units[0].equipment_id
-    for quality, units_list in units_.items():
-        repair_cost = repair_with_quality(units_list, equipment_id, quality)
-        total_cost += repair_cost
-    logger.info(f"total repair cost: {total_cost:.0f}")
+        if repair_config.offer_id:
+            self.repair_with_config_offer(units, repair_config.offer_id)
+        else:
+            quality_type = (
+                QualityType.INSTALLED if repair_config.quality else QualityType.REQUIRED
+            )
+            self.repair_by_quality(units, quality_type)
 
-
-def repair_with_config_offer(units: list[UnitEquipment], offer_id: int) -> float:
-    quantity = quantity_to_repair(units)
-    offers = equipment.get_offers(units[0].equipment_id)
-    offer = [o for o in offers if o.id == offer_id][0]
-    total_cost = quantity * offer.price
-    logger.info(f"repairing {quantity} pieces on {len(units)} units")
-    logger.info(
-        f"using offer {offer.id} with quality {offer.quality} "
-        f"and price {offer.price} (repair cost: {total_cost:.0f})"
-    )
-    equipment.repair(units, offer)
-    return total_cost
+        logger.info("repairing finished")
 
 
 def run(config_name: str):
-    repair_config = RepairConfig(**get_repair_config(config_name))
-
-    logger.info(f"starting repair equipment id {repair_config.equipment_id}")
-    units = equipment.get_units(repair_config.equipment_id)
-    units = filter_units_with_exclude_and_include_options(units, repair_config)
-
-    if not units:
-        logger.info("nothing to repair, exiting")
-        sys.exit(0)
-
-    if repair_config.offer_id:
-        repair_with_config_offer(units, repair_config.offer_id)
-    else:
-        quality_type = (
-            QualityType.INSTALLED if repair_config.quality else QualityType.REQUIRED
-        )
-        repair_by_quality(units, quality_type)
-
-    logger.info("repairing finished")
+    action = RepairAction(equipment)  # type: ignore
+    action.run(config_name)
