@@ -22,6 +22,15 @@ def units():
 
 
 @pytest.fixture
+def units_mismatch():
+    return [
+        UnitEquipment(1, 1000, 1000, 29, 30, 5, 1529),
+        UnitEquipment(2, 2000, 2000, 32, 30, 20, 1529),
+        UnitEquipment(3, 3000, 3000, 33, 30, 80, 1529),
+    ]
+
+
+@pytest.fixture
 def offers():
     return [
         RepairOffer(0, 101, "Offer 1", 200, 28, 1000),
@@ -70,9 +79,9 @@ def test_select_offer_to_raise_quality_none(offers):
     assert select_offer_to_raise_quality(unit, offers) is None
 
 
-def test_mismatched_quality(units):
-    normal, mismatched = split_mismatch_quality_units(units, 31.5)
-    assert len(normal) == 2
+def test_mismatched_quality(units_mismatch):
+    normal, mismatched = split_mismatch_quality_units(units_mismatch)
+    assert len(normal) == len(units_mismatch) - 1
     assert len(mismatched) == 1
 
 

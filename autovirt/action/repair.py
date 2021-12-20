@@ -136,7 +136,7 @@ def split_by_quality(
 
 
 def split_mismatch_quality_units(
-    units: list[UnitEquipment], quality: float
+    units: list[UnitEquipment],
 ) -> tuple[list[UnitEquipment], list[UnitEquipment]]:
     """Split units into 'normal' and 'mismatch' groups.
     Mismatched unit have installed equipment of lower quality then required.
@@ -145,7 +145,7 @@ def split_mismatch_quality_units(
     normal = []
     mismatch = []
     for unit in units:
-        if unit.quality < quality:
+        if unit.quality < unit.quality_required:
             mismatch.append(unit)
         else:
             normal.append(unit)
@@ -176,7 +176,7 @@ def fix_units_quality(units: list[UnitEquipment], margin: float = 0):
 def repair_with_quality(
     units: list[UnitEquipment], equipment_id: int, quality: float
 ) -> float:
-    units_normal, units_mismatch = split_mismatch_quality_units(units, quality)
+    units_normal, units_mismatch = split_mismatch_quality_units(units)
     if units_mismatch:
         logger.info("mismatch units qualities found, fixing them:")
         logger.info(units_mismatch)
