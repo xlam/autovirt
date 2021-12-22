@@ -7,8 +7,9 @@ from typing import Tuple, Optional, Protocol
 from pydantic import BaseModel
 
 from autovirt import utils
+from autovirt.session import get_logged_session
 from autovirt.structs import UnitEquipment, RepairOffer
-from autovirt.virtapi import equipment
+from autovirt.virtapi.equipment import Equipment
 
 # maximum allowed equipment price
 PRICE_MAX = 100000
@@ -165,6 +166,9 @@ class EquipmentGateway(Protocol):
     def repair(self, units: list[UnitEquipment], offer: RepairOffer):
         ...
 
+    def get_units(self, equipment_id: int) -> list[UnitEquipment]:
+        ...
+
 
 class RepairAction:
     def __init__(self, equipment_gateway: EquipmentGateway):
@@ -244,10 +248,11 @@ class RepairAction:
             total_cost += repair_cost
         logger.info(f"total repair cost: {total_cost:.0f}")
 
-    @staticmethod
-    def repair_with_config_offer(units: list[UnitEquipment], offer_id: int) -> float:
+    def repair_with_config_offer(
+        self, units: list[UnitEquipment], offer_id: int
+    ) -> float:
         quantity = quantity_to_repair(units)
-        offers = equipment.get_offers(units[0].equipment_id)
+        offers = self.equipment.get_offers(units[0].equipment_id)
         offer = [o for o in offers if o.id == offer_id][0]
         total_cost = quantity * offer.price
         logger.info(f"repairing {quantity} pieces on {len(units)} units")
@@ -255,14 +260,14 @@ class RepairAction:
             f"using offer {offer.id} with quality {offer.quality} "
             f"and price {offer.price} (repair cost: {total_cost:.0f})"
         )
-        equipment.repair(units, offer)
+        self.equipment.repair(units, offer)
         return total_cost
 
     def run(self, config_name: str):
         repair_config = RepairConfig(**self.get_repair_config(config_name))
 
         logger.info(f"starting repair equipment id {repair_config.equipment_id}")
-        units = equipment.get_units(repair_config.equipment_id)
+        units = self.equipment.get_units(repair_config.equipment_id)
         units = self.filter_units_with_exclude_and_include_options(units, repair_config)
 
         if not units:
@@ -281,5 +286,5 @@ class RepairAction:
 
 
 def run(config_name: str):
-    action = RepairAction(equipment)  # type: ignore
+    action = RepairAction(Equipment(session=get_logged_session()))  # type: ignore
     action.run(config_name)
