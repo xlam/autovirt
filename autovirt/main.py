@@ -1,20 +1,25 @@
 import argparse
 import importlib
+import sys
+
 from autovirt import __version__ as version
-from autovirt.utils import init_logger
+from autovirt.utils import init_logger, get_config
+from autovirt.session import get_logged_session
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="Autovirt", description=f"Virtonomica automation tool (v{version})"
     )
-    parser.add_argument("action", type=str)
+    parser.add_argument(
+        "action", type=str, choices=["repair", "innovations", "salary", "employee"]
+    )
     parser.add_argument(
         "-c, --config",
         type=str,
         dest="config",
         default=None,
-        help="configuration section for 'repair' command",
+        help="configuration section of autovirt.toml for specified action. ",
     )
     parser.add_argument(
         "--version",
@@ -25,19 +30,30 @@ def parse_args():
     return parser.parse_args()
 
 
+def dispatch(action_name: str, action_options: str):
+    session = get_logged_session()
+    config = get_config("autovirt")
+    action = None
+    if action_name == "repair":
+        from autovirt.action.repair import RepairAction
+        from autovirt.virtapi.equipment import Equipment, EquipmentGatewayOptions
+
+        action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
+
+    if action:
+        action.run(action_options)
+
+
 def run():
     args = parse_args()
-    print("args: ", args)
     action_name = args.action
-    action_config = args.config
+    action_options = args.config
 
     logger = init_logger(action_name)
     logger.info("")
     logger.info(f"*** starting '{action_name}' action ***")
 
-    action_module = ".".join(["autovirt.action", action_name])
-    action = importlib.import_module(action_module)
-    action.run(action_config)  # type: ignore
+    dispatch(action_name, action_options)
 
 
 if __name__ == "__main__":

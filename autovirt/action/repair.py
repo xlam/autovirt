@@ -7,9 +7,8 @@ from typing import Tuple, Optional, Protocol
 from pydantic import BaseModel
 
 from autovirt import utils
-from autovirt.session import get_logged_session
 from autovirt.structs import UnitEquipment, RepairOffer
-from autovirt.virtapi.equipment import Equipment
+
 
 # maximum allowed equipment price
 PRICE_MAX = 100000
@@ -283,8 +282,3 @@ class RepairAction:
             self.repair_by_quality(units, quality_type)
 
         logger.info("repairing finished")
-
-
-def run(config_name: str):
-    action = RepairAction(Equipment(session=get_logged_session()))  # type: ignore
-    action.run(config_name)
