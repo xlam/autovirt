@@ -8,10 +8,13 @@ from autovirt.utils import get_logger, get_config
 
 
 class VirtSession:
-    def __init__(self, session: Optional[requests.Session] = None):
+    def __init__(
+        self, session: Optional[requests.Session] = None, config: Optional[dict] = None
+    ):
         self.session: Optional[requests.Session] = session
         self.logger = get_logger()
-        self.config = get_config("autovirt")
+        self.config = get_config("autovirt") if not config else config
+        self.BASE_URL = "https://virtonomica.ru/api/vera"
 
     def get_logged_session(self) -> requests.Session:
         if not self.session:
@@ -25,7 +28,7 @@ class VirtSession:
 
     def login(self):
         r = self.session.post(
-            "https://virtonomica.ru/api/vera/user/login",
+            f"{self.BASE_URL}/user/login",
             {
                 "email": self.config["login"],
                 "password": self.config["password"],
@@ -61,7 +64,7 @@ class VirtSession:
     @property
     def token(self) -> str:
         s = self.get_logged_session()
-        r = s.get("https://virtonomica.ru/api/vera/main/token")
+        r = s.get(f"{self.BASE_URL}/main/token")
         return r.json()
 
     @staticmethod

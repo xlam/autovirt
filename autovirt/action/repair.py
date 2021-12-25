@@ -22,7 +22,6 @@ class QualityType(Enum):
 
 
 logger = utils.get_logger()
-config = utils.get_config("repair")
 
 
 class RepairConfig(BaseModel):
@@ -170,7 +169,10 @@ class EquipmentGateway(Protocol):
 
 
 class RepairAction:
-    def __init__(self, equipment_gateway: EquipmentGateway):
+    def __init__(
+        self, equipment_gateway: EquipmentGateway, options: Optional[dict] = None
+    ):
+        self.options = utils.get_config("repair") if not options else options
         self.equipment = equipment_gateway
 
     def fix_units_quality(self, units: list[UnitEquipment], margin: float = 0):
@@ -216,9 +218,8 @@ class RepairAction:
         self.equipment.repair(units_normal, offer)
         return repair_cost
 
-    @staticmethod
-    def get_repair_config(config_name: str) -> dict:
-        repair_config = config[config_name]
+    def get_repair_config(self, config_name: str) -> dict:
+        repair_config = self.options[config_name]
         if not repair_config:
             logger.error(f"config '{config_name}' does not exist, exiting")
             sys.exit(1)

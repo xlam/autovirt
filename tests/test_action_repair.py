@@ -15,6 +15,11 @@ from autovirt.structs import UnitEquipment, RepairOffer
 
 
 @pytest.fixture
+def options():
+    return {"comp": {}}
+
+
+@pytest.fixture
 def units():
     return [
         UnitEquipment(1, 1000, 1000, 31, 30, 5, 1529),
@@ -111,25 +116,25 @@ def test_repair_config(config_dict):
 
 
 @patch("autovirt.action.repair.EquipmentGateway")
-def test_fix_mismatch_units(mock, units_mismatch, offers):
+def test_fix_mismatch_units(mock, units_mismatch, offers, options):
     mock.get_offers.return_value = offers
-    action = RepairAction(mock)
+    action = RepairAction(mock, options)
     action.fix_units_quality(units_mismatch[:1])
     mock.terminate.assert_called_with(units_mismatch[0], 167)
     mock.buy.assert_called_with(units_mismatch[0], offers[6], 167)
 
 
 @patch("autovirt.action.repair.EquipmentGateway")
-def test_repair_with_quality(mock, units, offers):
+def test_repair_with_quality(mock, units, offers, options):
     mock.get_offers.return_value = offers
-    action = RepairAction(mock)
+    action = RepairAction(mock, options)
     action.repair_with_quality(units[:1], units[0].quality_required)
     mock.repair.assert_called_with(units[:1], offers[3])
 
 
 @patch("autovirt.action.repair.EquipmentGateway")
-def test_repair_by_quality(mock, units, offers):
+def test_repair_by_quality(mock, units, offers, options):
     mock.get_offers.return_value = offers
-    action = RepairAction(mock)
+    action = RepairAction(mock, options)
     action.repair_by_quality(units, QualityType.REQUIRED)
     mock.repair.assert_called_once()
