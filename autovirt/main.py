@@ -1,10 +1,8 @@
 import argparse
-import importlib
-import sys
 
 from autovirt import __version__ as version
 from autovirt.utils import init_logger, get_config
-from autovirt.session import get_logged_session
+from autovirt.session import VirtSession
 
 
 def parse_args():
@@ -31,7 +29,7 @@ def parse_args():
 
 
 def dispatch(action_name: str, action_options: str):
-    session = get_logged_session()
+    session = VirtSession()
     config = get_config("autovirt")
     action = None
     if action_name == "repair":
@@ -41,19 +39,15 @@ def dispatch(action_name: str, action_options: str):
         action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
 
     if action:
+        logger = init_logger(action_name)
+        logger.info("")
+        logger.info(f"*** starting '{action_name}' action ***")
         action.run(action_options)
 
 
 def run():
     args = parse_args()
-    action_name = args.action
-    action_options = args.config
-
-    logger = init_logger(action_name)
-    logger.info("")
-    logger.info(f"*** starting '{action_name}' action ***")
-
-    dispatch(action_name, action_options)
+    dispatch(args.action, args.config)
 
 
 if __name__ == "__main__":
