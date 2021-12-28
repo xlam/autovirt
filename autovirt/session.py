@@ -36,6 +36,7 @@ class VirtSession:
                 self.login(s)
                 self.logger.info("new session initialized")
             self.session = s
+            self.save_session()
         return self.session
 
     def login(self, session: requests.Session):

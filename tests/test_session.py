@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 import pytest
 import requests
@@ -36,7 +37,9 @@ def session(options):
 
 
 @patch("autovirt.session.VirtSession.login")
-def test_get_logged_session(login_mock, session):
+def test_get_logged_session_new_session(login_mock, session):
+    if os.path.isfile(session.options.session_file):
+        os.remove(session.options.session_file)
     assert type(session.get_logged_session()) == requests.Session
     login_mock.assert_called()
 
