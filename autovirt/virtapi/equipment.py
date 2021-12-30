@@ -14,18 +14,18 @@ class EquipmentGatewayOptions(BaseModel):
 
 
 class Equipment:
-    def __init__(self, session: VirtSession, config: EquipmentGatewayOptions):
+    def __init__(self, session: VirtSession, options: EquipmentGatewayOptions):
         self.s = session
-        self.config = config
+        self.options = options
 
     def _fetch_units(self, equipment_id: int) -> list[dict]:
         """Fetch units equipment data"""
         r = self.s.get(
             "https://virtonomica.ru/api/vera/main/company/equipment/units",
             params={
-                "id": self.config.company_id,
+                "id": self.options.company_id,
                 "product_id": equipment_id,
-                "pagesize": self.config.pagesize,
+                "pagesize": self.options.pagesize,
             },
         )
         return r.json()["data"].values()
@@ -35,9 +35,9 @@ class Equipment:
         r = self.s.get(
             "https://virtonomica.ru/api/vera/main/company/equipment/offers",
             params={
-                "id": self.config.company_id,
+                "id": self.options.company_id,
                 "product_id": product_id,
-                "pagesize": self.config.pagesize,
+                "pagesize": self.options.pagesize,
             },
         )
         return r.json()["data"].values()
@@ -84,7 +84,7 @@ class Equipment:
         """Do repair of units equpment with offer provided"""
 
         params = [("units_ids[]", unit.id) for unit in units]
-        params.append(("id", self.config.company_id))
+        params.append(("id", self.options.company_id))
         params.append(("offer_id", offer.id))
         r = self.s.post(
             "https://virtonomica.ru/api/vera/main/company/equipment/repair",

@@ -32,17 +32,44 @@ def dispatch(action_name: str, action_options: str):
     session = VirtSession()
     config = get_config("autovirt")
     action = None
+
     if action_name == "repair":
         from autovirt.action.repair import RepairAction
         from autovirt.virtapi.equipment import Equipment, EquipmentGatewayOptions
 
         action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
 
+    if action_name == "employee":
+        from autovirt.action.employee import EmployeeAction
+        from autovirt.virtapi.mail import MailGateway
+        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+
+        action = EmployeeAction(
+            MailGateway(session),
+            EmployeeGateway(session, EmployeeGatewayOptions(**config)),
+        )
+
+    if action_name == "innovations":
+        from autovirt.action.innovations import InnovationsAction
+        from autovirt.virtapi.mail import MailGateway
+        from autovirt.virtapi.artefact import ArtefactGateway
+
+        action = InnovationsAction(MailGateway(session), ArtefactGateway(session))
+
+    if action_name == "salary":
+        from autovirt.action.salary import SalaryAction
+        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+
+        action = SalaryAction(
+            EmployeeGateway(session, EmployeeGatewayOptions(**config))
+        )
+
     if action:
         logger = init_logger(action_name)
         logger.info("")
         logger.info(f"*** starting '{action_name}' action ***")
         action.run(action_options)
+        logger.info(f"*** finished '{action_name}' action ***")
 
 
 def run():

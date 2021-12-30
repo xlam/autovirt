@@ -1,8 +1,8 @@
-from autovirt import utils
-from autovirt.virtapi import mail
-from autovirt.virtapi import employee
-from autovirt.structs import Message
+from typing import Optional
 
+from autovirt import utils
+from autovirt.action.interface import MailInterface, EmployeeInterface
+from autovirt.structs import Message
 
 logger = utils.get_logger()
 
@@ -21,29 +21,35 @@ def units_to_rise_salary(messages: list[Message]) -> list:
     return units
 
 
-def rise_salary():
-    messages = mail.get_messages(subject="Недовольство заработной платой")
-    if not messages:
-        logger.info("no units to rise salary, exiting.")
-        return
-    units = units_to_rise_salary(messages)
+class EmployeeAction:
 
-    for unit in units:
-        data = employee.unit_info(int(unit["id"]))
-        salary = round(unit["salary_demanded"]) + 5
-        logger.info(
-            f"raising salary at {unit['name']} ({unit['id']}) "
-            f"from {data['employee_salary']} to {salary}"
-        )
-        employee.set_salary(int(unit["id"]), int(data["employee_max"]), salary)
+    subject: str = "Недовольство заработной платой"
 
-    mail.delete_messages(messages)
+    def __init__(
+        self, mail_gateway: MailInterface, employee_gateway: EmployeeInterface
+    ):
+        self.mail = mail_gateway
+        self.employee = employee_gateway
 
+    def rise_salary(self):
+        messages = self.mail.get_messages(self.subject)
+        if not messages:
+            logger.info("no units to rise salary, exiting.")
+            return
+        units = units_to_rise_salary(messages)
 
-def run(config_name):
-    if not config_name:
-        pass
+        for unit in units:
+            data = self.employee.unit_info(int(unit["id"]))
+            salary = round(unit["salary_demanded"]) + 5
+            logger.info(
+                f"raising salary at {unit['name']} ({unit['id']}) "
+                f"from {data['employee_salary']} to {salary}"
+            )
+            self.employee.set_salary(int(unit["id"]), int(data["employee_max"]), salary)
 
-    logger.info("starting salary rising")
-    rise_salary()
-    logger.info("finished salary rising")
+        self.mail.delete_messages(messages)
+
+    def run(self, config_name: Optional[str] = None):
+        if not config_name:
+            pass
+        self.rise_salary()

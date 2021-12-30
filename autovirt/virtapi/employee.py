@@ -1,33 +1,39 @@
-from autovirt.utils import get_config
+from pydantic import BaseModel
+
 from autovirt.session import VirtSession
 
-_config = get_config("autovirt")
-s = VirtSession()
+
+class EmployeeGatewayOptions(BaseModel):
+    company_id: int
+    pagesize: int = 1000
 
 
-def units():
-    r = s.get(
-        "https://virtonomica.ru/api/vera/main/company/employee/units",
-        params={"id": _config["company_id"], "pagesize": _config["pagesize"]},
-    )
-    return list(r.json()["data"].values())
+class EmployeeGateway:
+    def __init__(self, session: VirtSession, options: EmployeeGatewayOptions):
+        self.s = session
+        self.options = options
 
+    def units(self) -> list:
+        r = self.s.get(
+            "https://virtonomica.ru/api/vera/main/company/employee/units",
+            params={"id": self.options.company_id, "pagesize": self.options.pagesize},
+        )
+        return list(r.json()["data"].values())
 
-def unit_info(unit_id: int) -> dict:
-    r = s.get(
-        "https://virtonomica.ru/api/vera/main/unit/employee/info",
-        params={"id": unit_id},
-    )
-    return r.json()
+    def unit_info(self, unit_id: int) -> dict:
+        r = self.s.get(
+            "https://virtonomica.ru/api/vera/main/unit/employee/info",
+            params={"id": unit_id},
+        )
+        return r.json()
 
-
-def set_salary(unit_id: int, employee_count: int, salary: float):
-    s.post(
-        f"https://virtonomica.ru/api/vera/main/unit/employee/update",
-        {
-            "id": unit_id,
-            "employee_count": employee_count,
-            "employee_salary": salary,
-            "token": s.token,
-        },
-    )
+    def set_salary(self, unit_id: int, employee_count: int, salary: float):
+        self.s.post(
+            f"https://virtonomica.ru/api/vera/main/unit/employee/update",
+            {
+                "id": unit_id,
+                "employee_count": employee_count,
+                "employee_salary": salary,
+                "token": self.s.token,
+            },
+        )

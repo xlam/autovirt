@@ -1,13 +1,17 @@
 import sys
 import time
+from typing import Optional, Protocol
 
 from autovirt import utils
-from autovirt.virtapi import mail
-from autovirt.virtapi import artefact
+from autovirt.action.interface.mail import MailInterface
 from autovirt.structs import Message
 
-
 logger = utils.get_logger()
+
+
+class Artefactinterface(Protocol):
+    def attach(self, name, unit_id):
+        ...
 
 
 def build_innovations_renewal_list(messages: list[Message]):
@@ -18,24 +22,27 @@ def build_innovations_renewal_list(messages: list[Message]):
     return renewal
 
 
-def renew_innovations():
-    messages = mail.get_messages(
-        subject="Время жизни инноваций на предприятиях подошло к концу!"
-    )
-    if not messages:
-        logger.info("nothing to renew, exiting")
-        sys.exit(0)
-    renewal = build_innovations_renewal_list(messages)
-    for item in renewal:
-        time.sleep(1)
-        artefact.attach(item["tag"], item["object_id"])
-    mail.delete_messages(messages)
+class InnovationsAction:
+    subject: str = "Время жизни инноваций на предприятиях подошло к концу!"
 
+    def __init__(
+        self, mail_gateway: MailInterface, artefact_gateway: Artefactinterface
+    ):
+        self.mail = mail_gateway
+        self.artefact = artefact_gateway
 
-def run(config_name):
-    if not config_name:
-        pass
+    def renew_innovations(self):
+        messages = self.mail.get_messages(self.subject)
+        if not messages:
+            logger.info("nothing to renew, exiting")
+            sys.exit(0)
+        renewal = build_innovations_renewal_list(messages)
+        for item in renewal:
+            time.sleep(1)
+            self.artefact.attach(item["tag"], item["object_id"])
+        self.mail.delete_messages(messages)
 
-    logger.info("starting innovations renewal")
-    renew_innovations()
-    logger.info("finished innovations renewal")
+    def run(self, config_name: Optional[str] = None):
+        if not config_name:
+            pass
+        self.renew_innovations()
