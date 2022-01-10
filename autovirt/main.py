@@ -1,5 +1,6 @@
 import argparse
 import sys
+from typing import Protocol, Optional
 
 from autovirt import __version__ as version
 from autovirt.utils import init_logger, get_config
@@ -30,10 +31,15 @@ def parse_args():
     return parser.parse_args()
 
 
+class Action(Protocol):
+    def run(self, config_name: str):
+        pass
+
+
 def dispatch(action_name: str, action_options: str):
     session = VirtSession()
     config = get_config("autovirt")
-    action = None
+    action: Optional[Action] = None
 
     if action_name == "repair":
         from autovirt.action.repair import RepairAction
