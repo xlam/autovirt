@@ -11,10 +11,8 @@ def get_config(section: str) -> dict:
     return config()[section]
 
 
-_config = get_config("autovirt")
-
-
 def get_log_dir():
+    _config = get_config("autovirt")
     logging_dir = os.path.join(os.path.normpath(os.getcwd()), _config["log_dir"])
     os.makedirs(logging_dir, exist_ok=True)
     return logging_dir

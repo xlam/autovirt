@@ -1,20 +1,26 @@
 import argparse
-import importlib
+import sys
+from typing import Protocol, Optional
+
 from autovirt import __version__ as version
-from autovirt.utils import init_logger
+from autovirt.utils import init_logger, get_config
+from autovirt.session import VirtSession
+from autovirt.exception import AutovirtError
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="Autovirt", description=f"Virtonomica automation tool (v{version})"
     )
-    parser.add_argument("action", type=str)
+    parser.add_argument(
+        "action", type=str, choices=["repair", "innovations", "salary", "employee"]
+    )
     parser.add_argument(
         "-c, --config",
         type=str,
         dest="config",
         default=None,
-        help="configuration section for 'repair' command",
+        help="configuration section of autovirt.toml for specified action. ",
     )
     parser.add_argument(
         "--version",
@@ -25,19 +31,63 @@ def parse_args():
     return parser.parse_args()
 
 
+class Action(Protocol):
+    def run(self, config_name: str):
+        pass
+
+
+def dispatch(action_name: str, action_options: str):
+    session = VirtSession()
+    config = get_config("autovirt")
+    action: Optional[Action] = None
+
+    if action_name == "repair":
+        from autovirt.action.repair import RepairAction
+        from autovirt.virtapi.equipment import Equipment, EquipmentGatewayOptions
+
+        action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
+
+    if action_name == "employee":
+        from autovirt.action.employee import EmployeeAction
+        from autovirt.virtapi.mail import MailGateway
+        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+
+        action = EmployeeAction(
+            MailGateway(session),
+            EmployeeGateway(session, EmployeeGatewayOptions(**config)),
+        )
+
+    if action_name == "innovations":
+        from autovirt.action.innovations import InnovationsAction
+        from autovirt.virtapi.mail import MailGateway
+        from autovirt.virtapi.artefact import ArtefactGateway
+
+        action = InnovationsAction(MailGateway(session), ArtefactGateway(session))
+
+    if action_name == "salary":
+        from autovirt.action.salary import SalaryAction
+        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+
+        action = SalaryAction(
+            EmployeeGateway(session, EmployeeGatewayOptions(**config))
+        )
+
+    if action:
+        logger = init_logger(action_name)
+        logger.info("")
+        logger.info(f"*** starting '{action_name}' action ***")
+        try:
+            action.run(action_options)
+        except AutovirtError as e:
+            logger.error(f"{e} ({e.__class__})")
+            logger.info("exiting.")
+            sys.exit(1)
+        logger.info(f"*** finished '{action_name}' action ***")
+
+
 def run():
     args = parse_args()
-    print("args: ", args)
-    action_name = args.action
-    action_config = args.config
-
-    logger = init_logger(action_name)
-    logger.info("")
-    logger.info(f"*** starting '{action_name}' action ***")
-
-    action_module = ".".join(["autovirt.action", action_name])
-    action = importlib.import_module(action_module)
-    action.run(action_config)  # type: ignore
+    dispatch(args.action, args.config)
 
 
 if __name__ == "__main__":
