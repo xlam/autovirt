@@ -1,0 +1,2 @@
+class AutovirtError(Exception):
+    pass

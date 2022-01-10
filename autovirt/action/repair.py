@@ -7,6 +7,7 @@ from typing import Tuple, Optional, Protocol
 from pydantic import BaseModel
 
 from autovirt import utils
+from autovirt.exception import AutovirtError
 from autovirt.structs import UnitEquipment, RepairOffer
 
 
@@ -87,8 +88,7 @@ def select_offer(
     ]
 
     if not summary:
-        logger.error(f"could not select offer to repair quality {quality}, exiting")
-        sys.exit(1)
+        raise AutovirtError(f"could not select offer to repair quality {quality}")
 
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:
@@ -219,10 +219,10 @@ class RepairAction:
         return repair_cost
 
     def get_repair_config(self, config_name: str) -> dict:
-        repair_config = self.options[config_name]
-        if not repair_config:
-            logger.error(f"config '{config_name}' does not exist, exiting")
-            sys.exit(1)
+        try:
+            repair_config = self.options[config_name]
+        except KeyError:
+            raise AutovirtError(f"configuration '{config_name}' not found!")
         return repair_config  # type: ignore
 
     @staticmethod

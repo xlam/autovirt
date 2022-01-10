@@ -1,7 +1,7 @@
-import sys
 from pydantic import BaseModel
 
 from autovirt.utils import get_logger
+from autovirt.exception import AutovirtError
 from autovirt.session import VirtSession
 from autovirt.structs import UnitEquipment, RepairOffer
 
@@ -92,8 +92,7 @@ class Equipment:
         )
         logger.info(f"Virtonomica API response: {r.json()}")
         if not r.ok:
-            logger.error(f"could not repair, status code: {r.status_code}")
-            sys.exit(0)
+            raise AutovirtError(f"could not repair, status code: {r.status_code}")
 
     def terminate(self, unit: UnitEquipment, quantity: int):
         r = self.s.post(
@@ -105,8 +104,9 @@ class Equipment:
             },
         )
         if not r.ok:
-            logger.error(f"could not terminate equipment, status code: {r.status_code}")
-            sys.exit(0)
+            raise AutovirtError(
+                f"could not terminate equipment, status code: {r.status_code}"
+            )
 
     def buy(self, unit: UnitEquipment, offer: RepairOffer, quantity: int):
         r = self.s.post(
@@ -120,5 +120,6 @@ class Equipment:
             },
         )
         if not r.ok:
-            logger.error(f"could not buy equipment, status code: {r.status_code}")
-            sys.exit(0)
+            raise AutovirtError(
+                f"could not buy equipment, status code: {r.status_code}"
+            )

@@ -1,8 +1,10 @@
 import argparse
+import sys
 
 from autovirt import __version__ as version
 from autovirt.utils import init_logger, get_config
 from autovirt.session import VirtSession
+from autovirt.exception import AutovirtError
 
 
 def parse_args():
@@ -68,7 +70,12 @@ def dispatch(action_name: str, action_options: str):
         logger = init_logger(action_name)
         logger.info("")
         logger.info(f"*** starting '{action_name}' action ***")
-        action.run(action_options)
+        try:
+            action.run(action_options)
+        except AutovirtError as e:
+            logger.error(f"{e} ({e.__class__})")
+            logger.info("exiting.")
+            sys.exit(1)
         logger.info(f"*** finished '{action_name}' action ***")
 
 
