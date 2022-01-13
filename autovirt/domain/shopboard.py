@@ -14,11 +14,10 @@ class ShopBoard(list):
     def __init__(self, items: list[ShopBoardItem] = None):
         items = items if items else []
         list.__init__(self, items)
-        self._items = self
 
     def get_excess_products(self, multiplier: int = 2) -> ShopBoard:
         res = []
-        for item in self._items:
+        for item in self:
             if item.quantity / item.sales_volume > multiplier:
                 res.append(item)
         return ShopBoard(res)

@@ -1,12 +1,12 @@
-from autovirt.session import get_logged_session as s
+from autovirt.session import VirtSession
 
 
-class ShopApi:
-    def __init__(self):
-        self._session = s()
+class ShopApiAdapter:
+    def __init__(self, session: VirtSession):
+        self.session = session
 
     def fetch_shopboard(self, shop_id: int) -> list[dict]:
-        r = self._session.get(
+        r = self.session.get(
             "https://virtonomica.ru/api/vera/main/unit/shopboard/browse",
             params={
                 "id": shop_id,

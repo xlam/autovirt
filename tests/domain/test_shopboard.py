@@ -30,12 +30,12 @@ def test_empty_shopboard_returns_no_excess_products():
 
 def test_init_with_products_list(products):
     sb = ShopBoard(products)
-    assert len(sb) == 3
+    assert len(sb) == len(products)
 
 
 def test_get_excess_products(products):
     sb = ShopBoard(products)
-    excess_products = sb.get_excess_products()
-    assert products[1] in excess_products  # default multiplier=2
-    assert products[2] in excess_products  # default multiplier=2
+    excess_products = sb.get_excess_products(multiplier=2)
+    assert products[1] in excess_products
+    assert products[2] in excess_products
     assert sb.get_excess_products(multiplier=3) == [products[2]]
