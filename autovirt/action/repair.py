@@ -35,12 +35,12 @@ class RepairConfig(BaseModel):
 
 def quantity_to_repair(units: list[UnitEquipment]) -> int:
     """Calculate total quantity of equipment to repair on given units"""
-    return reduce(lambda a, unit: a + unit.wear_quantity, units, 0)
+    return sum([unit.wear_quantity for unit in units])
 
 
 def quantity_total(units: list[UnitEquipment]) -> int:
     """Calculate total equipment count on given units"""
-    return reduce(lambda a, unit: a + unit.quantity, units, 0)
+    return sum([unit.quantity for unit in units])
 
 
 def filter_offers(

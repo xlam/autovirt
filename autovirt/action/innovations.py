@@ -9,7 +9,7 @@ from autovirt.structs import Message
 logger = utils.get_logger()
 
 
-class Artefactinterface(Protocol):
+class ArtefactInterface(Protocol):
     def attach(self, name, unit_id):
         ...
 
@@ -26,7 +26,7 @@ class InnovationsAction:
     subject: str = "Время жизни инноваций на предприятиях подошло к концу!"
 
     def __init__(
-        self, mail_gateway: MailInterface, artefact_gateway: Artefactinterface
+        self, mail_gateway: MailInterface, artefact_gateway: ArtefactInterface
     ):
         self.mail = mail_gateway
         self.artefact = artefact_gateway
