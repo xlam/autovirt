@@ -1,6 +1,5 @@
 import logging
 import os
-from functools import reduce
 from typing import Any, Sequence
 
 from autovirt.logger import Logger
@@ -48,13 +47,9 @@ def normalize_array(array: Sequence[float]) -> Sequence[float]:
 
 def get_max(objects: Sequence[object], field: str) -> Any:
     """Get maximum value of a field in the sequence of objects"""
-    return reduce(
-        lambda x, y: max([x, getattr(y, field)]), objects, getattr(objects[0], field)
-    )
+    return max([getattr(o, field) for o in objects])
 
 
 def get_min(objects: Sequence[object], field: str) -> Any:
     """Get minimum value of a field in the sequence of objects"""
-    return reduce(
-        lambda x, y: min([x, getattr(y, field)]), objects, getattr(objects[0], field)
-    )
+    return min([getattr(o, field) for o in objects])
