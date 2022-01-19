@@ -64,12 +64,16 @@ def expected_quality(
 
 def select_offer(
     offers: list[RepairOffer], units: list[UnitEquipment], quality: float = None
-) -> RepairOffer:
+) -> Optional[RepairOffer]:
     if not quality:
         quality = units[0].quality_required
     qnt_rep = quantity_to_repair(units)
     qnt_total = quantity_total(units)
     offers = filter_offers(offers, quality, qnt_rep)
+
+    if not offers:
+        logger.error(f"could not select offer to repair quality {quality}, skipping")
+        return None
 
     qual_min = utils.get_min(units, QualityType.INSTALLED.value)
     qual_exp = [
@@ -86,10 +90,6 @@ def select_offer(
         for i, o in enumerate(offers)
         if qual_exp[i] >= quality
     ]
-
-    if not summary:
-        logger.error(f"could not select offer to repair quality {quality}, exiting")
-        sys.exit(1)
 
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:
@@ -187,6 +187,8 @@ def repair_with_quality(
     quantity = quantity_to_repair(units_normal)
     offers = equipment.get_offers(equipment_id)
     offer = select_offer(offers, units_normal, quality)
+    if not offer:
+        return 0.0
     repair_cost = quantity * offer.price
     logger.info(
         f"found offer {offer.id} with quality {offer.quality} "
