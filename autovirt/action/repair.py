@@ -2,14 +2,14 @@ import sys
 from enum import Enum
 from functools import reduce
 from math import ceil
-from typing import Tuple, Optional, Protocol
+from typing import Tuple, Optional
 
 from pydantic import BaseModel
 
 from autovirt import utils
+from autovirt.action.interface import EquipmentGateway
 from autovirt.exception import AutovirtError
 from autovirt.structs import UnitEquipment, RepairOffer
-
 
 # maximum allowed equipment price
 PRICE_MAX = 100000
@@ -151,23 +151,6 @@ def split_mismatch_quality_units(
         else:
             normal.append(unit)
     return normal, mismatch
-
-
-class EquipmentGateway(Protocol):
-    def terminate(self, unit: UnitEquipment, quantity: int):
-        ...
-
-    def buy(self, unit: UnitEquipment, offer: RepairOffer, quantity: int):
-        ...
-
-    def get_offers(self, product_id: int) -> list[RepairOffer]:
-        ...
-
-    def repair(self, units: list[UnitEquipment], offer: RepairOffer):
-        ...
-
-    def get_units(self, equipment_id: int) -> list[UnitEquipment]:
-        ...
 
 
 class RepairAction:
