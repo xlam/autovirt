@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from autovirt.action.interface import EmployeeInterface
 from autovirt.session import VirtSession
 
 
@@ -8,7 +9,7 @@ class EmployeeGatewayOptions(BaseModel):
     pagesize: int = 1000
 
 
-class EmployeeGateway:
+class EmployeeGateway(EmployeeInterface):
     def __init__(self, session: VirtSession, options: EmployeeGatewayOptions):
         self.s = session
         self.options = options

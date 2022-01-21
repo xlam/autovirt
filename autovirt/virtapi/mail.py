@@ -2,13 +2,14 @@ import time
 from typing import Optional
 
 from autovirt import utils
-from autovirt.structs import Message
+from autovirt.action.interface import MailInterface
 from autovirt.session import VirtSession
+from autovirt.structs import Message
 
 logger = utils.get_logger()
 
 
-class MailGateway:
+class MailGateway(MailInterface):
 
     default_box = "system"
 

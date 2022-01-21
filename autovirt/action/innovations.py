@@ -1,17 +1,12 @@
 import sys
 import time
-from typing import Optional, Protocol
+from typing import Optional
 
 from autovirt import utils
-from autovirt.action.interface.mail import MailInterface
+from autovirt.action.interface import MailInterface, ArtefactInterface
 from autovirt.structs import Message
 
 logger = utils.get_logger()
-
-
-class ArtefactInterface(Protocol):
-    def attach(self, name, unit_id):
-        ...
 
 
 def build_innovations_renewal_list(messages: list[Message]):

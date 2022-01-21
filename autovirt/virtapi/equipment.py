@@ -1,9 +1,10 @@
 from pydantic import BaseModel
 
-from autovirt.utils import get_logger
+from autovirt.action.interface import EquipmentGateway
 from autovirt.exception import AutovirtError
 from autovirt.session import VirtSession
 from autovirt.structs import UnitEquipment, RepairOffer
+from autovirt.utils import get_logger
 
 logger = get_logger()
 
@@ -13,7 +14,7 @@ class EquipmentGatewayOptions(BaseModel):
     pagesize: int = 1000
 
 
-class Equipment:
+class Equipment(EquipmentGateway):
     def __init__(self, session: VirtSession, options: EquipmentGatewayOptions):
         self.s = session
         self.options = options
