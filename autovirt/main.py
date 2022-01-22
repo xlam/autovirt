@@ -42,34 +42,40 @@ def dispatch(action_name: str, action_options: str):
     action: Optional[Action] = None
 
     if action_name == "repair":
-        from autovirt.action.repair import RepairAction
+        from autovirt.equipment import RepairAction
         from autovirt.virtapi.equipment import Equipment, EquipmentGatewayOptions
 
         action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
 
     if action_name == "employee":
-        from autovirt.action.employee import EmployeeAction
-        from autovirt.virtapi.mail import MailGateway
-        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+        from autovirt.employee import SetDemandedSalaryAction
+        from autovirt.virtapi.mail import VirtMailGateway
+        from autovirt.virtapi.employee import (
+            VirtEmployeeGateway,
+            EmployeeGatewayOptions,
+        )
 
-        action = EmployeeAction(
-            MailGateway(session),
-            EmployeeGateway(session, EmployeeGatewayOptions(**config)),
+        action = SetDemandedSalaryAction(
+            VirtMailGateway(session),
+            VirtEmployeeGateway(session, EmployeeGatewayOptions(**config)),
         )
 
     if action_name == "innovations":
-        from autovirt.action.innovations import InnovationsAction
-        from autovirt.virtapi.mail import MailGateway
-        from autovirt.virtapi.artefact import ArtefactGateway
+        from autovirt.artefact import RenewAction
+        from autovirt.virtapi.mail import VirtMailGateway
+        from autovirt.virtapi.artefact import VirtArtefactGateway
 
-        action = InnovationsAction(MailGateway(session), ArtefactGateway(session))
+        action = RenewAction(VirtMailGateway(session), VirtArtefactGateway(session))
 
     if action_name == "salary":
-        from autovirt.action.salary import SalaryAction
-        from autovirt.virtapi.employee import EmployeeGateway, EmployeeGatewayOptions
+        from autovirt.employee import SetRequiredSalaryAction
+        from autovirt.virtapi.employee import (
+            VirtEmployeeGateway,
+            EmployeeGatewayOptions,
+        )
 
-        action = SalaryAction(
-            EmployeeGateway(session, EmployeeGatewayOptions(**config))
+        action = SetRequiredSalaryAction(
+            VirtEmployeeGateway(session, EmployeeGatewayOptions(**config))
         )
 
     if action:

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from autovirt.action.interface import EquipmentGateway
+from autovirt.equipment.interface import EquipmentGateway
 from autovirt.exception import AutovirtError
 from autovirt.session import VirtSession
 from autovirt.structs import UnitEquipment, RepairOffer

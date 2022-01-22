@@ -1,33 +1,21 @@
 from typing import Optional
 
 from autovirt import utils
-from autovirt.action.interface import MailInterface, EmployeeInterface
-from autovirt.structs import Message
+from autovirt.employee.domain import units_to_rise_salary
+from autovirt.employee.interface import EmployeeGateway
+from autovirt.mail.interface import MailGateway
 
 logger = utils.get_logger()
 
 
-def units_to_rise_salary(messages: list[Message]) -> list:
-    units = []
-    for message in messages:
-        for attach in message.attaches:
-            units.append(
-                {
-                    "id": attach["object_id"],
-                    "name": attach["object_name"],
-                    "salary_demanded": float(attach["tag"]),
-                }
-            )
-    return units
-
-
-class EmployeeAction:
+class SetDemandedSalaryAction:
+    SALARY_MARGIN: float = 5.0
+    """ Salary margin to add to demanded salary value"""
 
     subject: str = "Недовольство заработной платой"
+    """ Mail subject to filter units demanding salary raise"""
 
-    def __init__(
-        self, mail_gateway: MailInterface, employee_gateway: EmployeeInterface
-    ):
+    def __init__(self, mail_gateway: MailGateway, employee_gateway: EmployeeGateway):
         self.mail = mail_gateway
         self.employee = employee_gateway
 
@@ -40,7 +28,7 @@ class EmployeeAction:
 
         for unit in units:
             data = self.employee.unit_info(int(unit["id"]))
-            salary = round(unit["salary_demanded"]) + 5
+            salary = round(unit["salary_demanded"]) + self.SALARY_MARGIN
             logger.info(
                 f"raising salary at {unit['name']} ({unit['id']}) "
                 f"from {data['employee_salary']} to {salary}"

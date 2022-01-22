@@ -1,7 +1,7 @@
 import abc
 
 
-class ArtefactInterface(abc.ABC):
+class ArtefactGateway(abc.ABC):
     @abc.abstractmethod
     def attach(self, name, unit_id):
-        ...
+        pass

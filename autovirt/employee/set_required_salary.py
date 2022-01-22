@@ -1,28 +1,24 @@
 from typing import Optional
 
 from autovirt import utils
-from autovirt.action.interface import EmployeeInterface
+from autovirt.employee.domain import units_to_update_salary
+from autovirt.employee.interface import EmployeeGateway
 
 logger = utils.get_logger()
 
 
-class SalaryAction:
-    def __init__(self, employee_gateway: EmployeeInterface):
-        self.employee = employee_gateway
+class SetRequiredSalaryAction:
+    SALARY_MARGIN: float = 5.0
+    """ Salary margin to add to required salary value"""
 
-    def units_to_update_salary(self) -> list[dict]:
-        data = self.employee.units()
-        units = []
-        for unit in data:
-            if float(unit["labor_level"]) < float(unit["employee_level_required"]):
-                units.append(unit)
-        return units
+    def __init__(self, employee_gateway: EmployeeGateway):
+        self.employee = employee_gateway
 
     def run(self, config_name: Optional[str] = None):
         if not config_name:
             pass
 
-        units = self.units_to_update_salary()
+        units = units_to_update_salary(self.employee.units())
         if not units:
             logger.info("no units to update salary, exiting.")
             quit(0)
@@ -32,7 +28,7 @@ class SalaryAction:
             unit_info = self.employee.unit_info(unit["id"])
 
             # set salary to required plus 5$ for sure
-            salary = round(unit_info["salary_required"]) + 5
+            salary = round(unit_info["salary_required"]) + self.SALARY_MARGIN
 
             logger.info(
                 f"updating salary at unit "

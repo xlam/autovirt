@@ -1,7 +1,9 @@
 from unittest.mock import patch, call
+
 import pytest
 
-from autovirt.action.employee import EmployeeAction, units_to_rise_salary
+from autovirt.employee.domain import units_to_rise_salary
+from autovirt.employee.set_demanded_salary import SetDemandedSalaryAction
 from autovirt.structs import Message
 
 
@@ -27,12 +29,12 @@ def test_units_to_raise_salary(messages):
     assert len(units_to_rise_salary(messages[:1])) == len(messages[0].attaches)
 
 
-@patch("autovirt.action.employee.EmployeeInterface")
-@patch("autovirt.action.employee.MailInterface")
+@patch("autovirt.employee.set_demanded_salary.EmployeeGateway")
+@patch("autovirt.employee.set_demanded_salary.MailGateway")
 def test_rise_salary(mail_mock, employee_mock, messages):
     mail_mock.get_messages.return_value = messages[:1]
     employee_mock.unit_info.return_value = {"employee_salary": 90, "employee_max": 1000}
-    employee = EmployeeAction(mail_mock, employee_mock)
+    employee = SetDemandedSalaryAction(mail_mock, employee_mock)
     employee.rise_salary()
     employee_mock.assert_has_calls(
         [

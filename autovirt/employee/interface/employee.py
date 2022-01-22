@@ -1,7 +1,7 @@
 import abc
 
 
-class EmployeeInterface(abc.ABC):
+class EmployeeGateway(abc.ABC):
     @abc.abstractmethod
     def units(self) -> list:
         ...

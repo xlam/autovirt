@@ -3,26 +3,17 @@ import time
 from typing import Optional
 
 from autovirt import utils
-from autovirt.action.interface import MailInterface, ArtefactInterface
-from autovirt.structs import Message
+from autovirt.mail.interface import MailGateway
+from autovirt.artefact.interface import ArtefactGateway
+from autovirt.artefact.domain import build_innovations_renewal_list
 
 logger = utils.get_logger()
 
 
-def build_innovations_renewal_list(messages: list[Message]):
-    renewal = []
-    for message in messages:
-        for attach in message.attaches:
-            renewal.append(attach)
-    return renewal
-
-
-class InnovationsAction:
+class RenewAction:
     subject: str = "Время жизни инноваций на предприятиях подошло к концу!"
 
-    def __init__(
-        self, mail_gateway: MailInterface, artefact_gateway: ArtefactInterface
-    ):
+    def __init__(self, mail_gateway: MailGateway, artefact_gateway: ArtefactGateway):
         self.mail = mail_gateway
         self.artefact = artefact_gateway
 
