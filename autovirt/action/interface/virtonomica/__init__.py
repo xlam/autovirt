@@ -1,1 +1,0 @@
-from .shopgateway import ShopGateway

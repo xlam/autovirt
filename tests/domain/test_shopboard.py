@@ -1,6 +1,6 @@
 import pytest
 
-from autovirt.domain.shopboard import ShopBoard, ShopBoardItem
+from autovirt.logistics.domain.shopboard import ShopBoard, ShopBoardItem
 
 shopboard_data = [
     (0, 100, 100, 100, 123),

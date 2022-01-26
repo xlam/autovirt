@@ -1,4 +1,4 @@
-from autovirt.gateway.virtonomica.shopgateway import ShopGateway
+from autovirt.logistics.gateway.virtonomica.shopgateway import ShopGateway
 
 
 def data(shop_id: int) -> list[dict]:
@@ -40,7 +40,7 @@ def test_shop_gateway():
     shop_id = 1
     gw = ShopGateway(ShopApiMock())
     res = gw.get_shopboard(shop_id)
-    from autovirt.domain.shopboard import ShopBoard
+    from autovirt.logistics.domain.shopboard import ShopBoard
 
     assert isinstance(res, ShopBoard)
     assert len(res) == len(data(shop_id))

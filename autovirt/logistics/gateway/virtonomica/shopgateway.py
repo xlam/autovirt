@@ -1,4 +1,4 @@
-from autovirt.domain.shopboard import ShopBoard, ShopBoardItem
+from autovirt.logistics.domain.shopboard import ShopBoard, ShopBoardItem
 
 from typing import Protocol
 

@@ -1,6 +1,6 @@
 import pytest
 
-from autovirt.domain.supplies import Supplies, Supply, SupplyContract
+from autovirt.logistics.domain.supplies import Supplies, Supply, SupplyContract
 
 
 @pytest.fixture
