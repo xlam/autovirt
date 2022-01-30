@@ -18,14 +18,5 @@ def test_get_units_returns_valid_list(mock_fetch_units, mock_session):
     e = equipment.VirtEquipment(mock_session, options)
     units = e.get_units(equipment_id)
     assert type(units[0]) == UnitEquipment
-    mock_fetch_units.assert_called_with(equipment_id)
-
-
-@patch("autovirt.virtapi.equipment.VirtSession")
-@patch("autovirt.virtapi.equipment.VirtEquipment._fetch_units")
-def test_get_units_filters_zero_weared(mock_fetch_units, mock_session):
-    mock_fetch_units.return_value = offers_data
-    e = equipment.VirtEquipment(mock_session, options)
-    units = e.get_units(equipment_id)
     ids = [unit.id for unit in units]
     assert zero_weared_unit not in ids
