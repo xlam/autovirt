@@ -3,9 +3,9 @@ import sys
 from typing import Protocol, Optional
 
 from autovirt import __version__ as version
-from autovirt.utils import init_logger, get_config
-from autovirt.session import VirtSession
+from autovirt import utils
 from autovirt.exception import AutovirtError
+from autovirt.session import VirtSession
 
 
 def parse_args():
@@ -38,48 +38,45 @@ class Action(Protocol):
 
 def dispatch(action_name: str, action_options: str):
     session = VirtSession()
-    config = get_config("autovirt")
+    config = utils.get_config("autovirt")
     action: Optional[Action] = None
 
     if action_name == "repair":
         from autovirt.equipment import RepairAction
-        from autovirt.virtapi.equipment import Equipment, EquipmentGatewayOptions
+        from autovirt.virtapi.equipment import VirtEquipment
+        from autovirt.virtapi import GatewayOptions
 
-        action = RepairAction(Equipment(session, EquipmentGatewayOptions(**config)))
+        action = RepairAction(VirtEquipment(session, GatewayOptions(**config)))
 
     if action_name == "employee":
         from autovirt.employee import SetDemandedSalaryAction
-        from autovirt.virtapi.mail import VirtMailGateway
-        from autovirt.virtapi.employee import (
-            VirtEmployeeGateway,
-            EmployeeGatewayOptions,
-        )
+        from autovirt.virtapi.mail import VirtMail
+        from autovirt.virtapi.employee import VirtEmployee
+        from autovirt.virtapi import GatewayOptions
 
         action = SetDemandedSalaryAction(
-            VirtMailGateway(session),
-            VirtEmployeeGateway(session, EmployeeGatewayOptions(**config)),
+            VirtMail(session),
+            VirtEmployee(session, GatewayOptions(**config)),
         )
 
     if action_name == "innovations":
         from autovirt.artefact import RenewAction
-        from autovirt.virtapi.mail import VirtMailGateway
-        from autovirt.virtapi.artefact import VirtArtefactGateway
+        from autovirt.virtapi.mail import VirtMail
+        from autovirt.virtapi.artefact import VirtArtefact
 
-        action = RenewAction(VirtMailGateway(session), VirtArtefactGateway(session))
+        action = RenewAction(VirtMail(session), VirtArtefact(session))
 
     if action_name == "salary":
         from autovirt.employee import SetRequiredSalaryAction
-        from autovirt.virtapi.employee import (
-            VirtEmployeeGateway,
-            EmployeeGatewayOptions,
-        )
+        from autovirt.virtapi.employee import VirtEmployee
+        from autovirt.virtapi import GatewayOptions
 
         action = SetRequiredSalaryAction(
-            VirtEmployeeGateway(session, EmployeeGatewayOptions(**config))
+            VirtEmployee(session, GatewayOptions(**config))
         )
 
     if action:
-        logger = init_logger(action_name)
+        logger = utils.init_logger(action_name)
         logger.info("")
         logger.info(f"*** starting '{action_name}' action ***")
         try:

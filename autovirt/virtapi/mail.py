@@ -9,7 +9,7 @@ from autovirt.structs import Message
 logger = utils.get_logger()
 
 
-class VirtMailGateway(MailGateway):
+class VirtMail(MailGateway):
 
     default_box = "system"
 

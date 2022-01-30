@@ -1,21 +1,15 @@
-from pydantic import BaseModel
-
 from autovirt.equipment.interface import EquipmentGateway
 from autovirt.exception import AutovirtError
 from autovirt.session import VirtSession
 from autovirt.structs import UnitEquipment, RepairOffer
 from autovirt.utils import get_logger
+from autovirt.virtapi import GatewayOptions
 
 logger = get_logger()
 
 
-class EquipmentGatewayOptions(BaseModel):
-    company_id: int
-    pagesize: int = 1000
-
-
-class Equipment(EquipmentGateway):
-    def __init__(self, session: VirtSession, options: EquipmentGatewayOptions):
+class VirtEquipment(EquipmentGateway):
+    def __init__(self, session: VirtSession, options: GatewayOptions):
         self.s = session
         self.options = options
 

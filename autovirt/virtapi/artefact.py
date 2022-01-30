@@ -5,7 +5,7 @@ from autovirt.artefact.interface import ArtefactGateway
 logger = utils.get_logger()
 
 
-class VirtArtefactGateway(ArtefactGateway):
+class VirtArtefact(ArtefactGateway):
     def __init__(self, session: VirtSession):
         self.s = session
 

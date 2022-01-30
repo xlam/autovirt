@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from autovirt.structs import Message
-from autovirt.virtapi.mail import VirtMailGateway
+from autovirt.virtapi.mail import VirtMail
 
 
 @pytest.fixture
@@ -45,9 +45,9 @@ def messages_dict() -> dict:
 
 
 @patch("autovirt.virtapi.mail.VirtSession")
-@patch("autovirt.virtapi.mail.VirtMailGateway._fetch_messages")
+@patch("autovirt.virtapi.mail.VirtMail._fetch_messages")
 def test_get_messages(fetch_mock, session_mock, messages_dict):
-    mail = VirtMailGateway(session_mock)
+    mail = VirtMail(session_mock)
     fetch_mock.return_value = messages_dict
     messages = mail.get_messages()
     assert len(messages) == len(messages_dict)
