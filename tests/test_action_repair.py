@@ -1,9 +1,7 @@
-from unittest.mock import patch
+from unittest.mock import Mock
+
 import pytest
-from autovirt.equipment.repair import (
-    RepairConfig,
-    RepairAction,
-)
+
 from autovirt.equipment.domain.equipment import (
     QualityType,
     quantity_to_repair,
@@ -12,6 +10,11 @@ from autovirt.equipment.domain.equipment import (
     select_offer_to_raise_quality,
     split_by_quality,
     split_mismatch_quality_units,
+)
+from autovirt.equipment.interface import EquipmentGateway
+from autovirt.equipment.repair import (
+    RepairConfig,
+    RepairAction,
 )
 from autovirt.structs import UnitEquipment, RepairOffer
 
@@ -117,26 +120,27 @@ def test_repair_config(config_dict):
         assert isinstance(config_dict[key], type(c[key]))
 
 
-@patch("autovirt.equipment.repair.EquipmentGateway")
-def test_fix_mismatch_units(mock, units_mismatch, offers, options):
+@pytest.fixture
+def mock_equipment(offers):
+    mock = Mock(spec=EquipmentGateway)
     mock.get_offers.return_value = offers
-    action = RepairAction(mock, options)
+    return mock
+
+
+def test_fix_mismatch_units(mock_equipment, units_mismatch, offers, options):
+    action = RepairAction(mock_equipment, options)
     action.fix_units_quality(units_mismatch[:1])
-    mock.terminate.assert_called_with(units_mismatch[0], 167)
-    mock.buy.assert_called_with(units_mismatch[0], offers[6], 167)
+    mock_equipment.terminate.assert_called_with(units_mismatch[0], 167)
+    mock_equipment.buy.assert_called_with(units_mismatch[0], offers[6], 167)
 
 
-@patch("autovirt.equipment.repair.EquipmentGateway")
-def test_repair_with_quality(mock, units, offers, options):
-    mock.get_offers.return_value = offers
-    action = RepairAction(mock, options)
+def test_repair_with_quality(mock_equipment, units, offers, options):
+    action = RepairAction(mock_equipment, options)
     action.repair_with_quality(units[:1], units[0].quality_required)
-    mock.repair.assert_called_with(units[:1], offers[3])
+    mock_equipment.repair.assert_called_with(units[:1], offers[3])
 
 
-@patch("autovirt.equipment.repair.EquipmentGateway")
-def test_repair_by_quality(mock, units, offers, options):
-    mock.get_offers.return_value = offers
-    action = RepairAction(mock, options)
+def test_repair_by_quality(mock_equipment, units, offers, options):
+    action = RepairAction(mock_equipment, options)
     action.repair_by_quality(units, QualityType.REQUIRED)
-    mock.repair.assert_called_once()
+    mock_equipment.repair.assert_called_once()

@@ -21,5 +21,5 @@ class EquipmentGateway(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_units(self, equipment_id: int) -> list[UnitEquipment]:
+    def get_units_to_repair(self, equipment_id: int) -> list[UnitEquipment]:
         pass

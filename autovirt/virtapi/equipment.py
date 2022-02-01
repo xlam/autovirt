@@ -37,9 +37,9 @@ class VirtEquipment(EquipmentGateway):
         )
         return r.json()["data"].values()
 
-    def get_units(self, equipment_id: int) -> list[UnitEquipment]:
+    def get_units_to_repair(self, equipment_id: int) -> list[UnitEquipment]:
         """Get units to repair by equipment.
-        Only units whose equipment wear in greater then 0% will be returned
+        Only units whose equipment wear in greater than 0% will be returned
         """
         units_data = self._fetch_units(equipment_id)
         units = []

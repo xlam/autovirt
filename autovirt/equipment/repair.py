@@ -130,7 +130,7 @@ class RepairAction:
         repair_config = RepairConfig(**self.get_repair_config(config_name))
 
         logger.info(f"starting repair equipment id {repair_config.equipment_id}")
-        units = self.equipment.get_units(repair_config.equipment_id)
+        units = self.equipment.get_units_to_repair(repair_config.equipment_id)
         units = self.filter_units_with_exclude_and_include_options(units, repair_config)
 
         if not units:
