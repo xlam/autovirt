@@ -7,6 +7,7 @@ from autovirt import utils
 from autovirt.equipment.domain.equipment import (
     QualityType,
     quantity_to_repair,
+    filter_offers,
     select_offer,
     select_offer_to_raise_quality,
     split_by_quality,
@@ -65,11 +66,13 @@ class RepairAction:
             sys.exit(0)
         quantity = quantity_to_repair(units_normal)
         offers = self.equipment.get_offers(units_normal[0].equipment_id)
-        try:
-            offer = select_offer(offers, units_normal, quality)
-        except AutovirtError as e:
-            logger.error(e)
+        offers = filter_offers(offers, quality, quantity)
+        if not offers:
+            logger.error(
+                f"could not select offer to repair quality {quality}, skipping"
+            )
             return 0.0
+        offer = select_offer(offers, units_normal, quality)
         repair_cost = quantity * offer.price
         logger.info(
             f"found offer {offer.id} with quality {offer.quality} "

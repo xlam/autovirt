@@ -54,21 +54,14 @@ def select_offer(
 ) -> RepairOffer:
     if not quality:
         quality = units[0].quality_required
+
     qnt_rep = quantity_to_repair(units)
     qnt_total = quantity_total(units)
-    offers = filter_offers(offers, quality, qnt_rep)
-
-    if not offers:
-        raise AutovirtError(
-            f"could not select offer to repair quality {quality}, skipping"
-        )
-
     qual_min = utils.get_min(units, QualityType.INSTALLED.value)
     qual_exp = [
         expected_quality(o.quality, qual_min, qnt_total, qnt_rep) for o in offers
     ]
     qual_diff = [abs(qual - quality) for qual in qual_exp]
-
     diff_norm = utils.normalize_array(qual_diff)
     price_norm = utils.normalize_array([o.price for o in offers])
     qp_dist = [p + q for (p, q) in zip(price_norm, diff_norm)]
