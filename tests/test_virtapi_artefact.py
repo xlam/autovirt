@@ -1,6 +1,7 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
+from autovirt.session import VirtSession
 from autovirt.virtapi.artefact import VirtArtefact
 
 
@@ -117,12 +118,14 @@ def slot_artefacts_data():
     }
 
 
-@patch("autovirt.virtapi.artefact.VirtSession")
-@patch("autovirt.virtapi.artefact.VirtArtefact._fetch_unit_slots")
-@patch("autovirt.virtapi.artefact.VirtArtefact._fetch_slot_artefacts")
+@pytest.fixture
+def session_mock():
+    mock = Mock(spec_set=VirtSession)
+    mock.token = 1
+    return mock
+
+
 def test_attach(
-    fetch_slot_artefacts_mock,
-    fetch_unit_slots_mock,
     session_mock,
     slots_data,
     slot_artefacts_data,
@@ -130,11 +133,10 @@ def test_attach(
     def fetch_unit_slot(slot_id_, unit_id):
         return slot_artefacts_data[slot_id_]
 
-    fetch_unit_slots_mock.return_value = slots_data
-    fetch_slot_artefacts_mock.side_effect = fetch_unit_slot
-    session_mock.token = 1
     slot_id = "300137"
     artefact = VirtArtefact(session_mock)
+    artefact._fetch_unit_slots = Mock(return_value=slots_data)
+    artefact._fetch_slot_artefacts = Mock(side_effect=fetch_unit_slot)
     artefact.attach(
         slot_artefacts_data[slot_id][0]["name"],
         slot_artefacts_data[slot_id][0]["unit_id"],

@@ -23,7 +23,7 @@ class VirtArtefact(ArtefactGateway):
         )
         return list(r.json().values())
 
-    def _fetch_artefacts(self, slots, unit_id) -> list[dict]:
+    def _fetch_all_artefacts(self, slots, unit_id) -> list[dict]:
         artefacts = []
         for slot in slots:
             slot_artefacts = self._fetch_slot_artefacts(slot["id"], unit_id)
@@ -36,7 +36,7 @@ class VirtArtefact(ArtefactGateway):
         slots = self._fetch_unit_slots(unit_id)
 
         # get all artefacts for all unit slots
-        artefacts = self._fetch_artefacts(slots, unit_id)
+        artefacts = self._fetch_all_artefacts(slots, unit_id)
 
         url = "https://virtonomica.ru/api/vera/main/unit/artefact/attach"
 

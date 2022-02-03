@@ -1,5 +1,7 @@
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import patch
+
 from autovirt.structs import Message
 from autovirt.virtapi.mail import VirtMail
 
@@ -44,11 +46,9 @@ def messages_dict() -> dict:
     }
 
 
-@patch("autovirt.virtapi.mail.VirtSession")
-@patch("autovirt.virtapi.mail.VirtMail._fetch_messages")
-def test_get_messages(fetch_mock, session_mock, messages_dict):
-    mail = VirtMail(session_mock)
-    fetch_mock.return_value = messages_dict
+def test_get_messages(messages_dict):
+    mail = VirtMail(Mock())
+    mail._fetch_messages = Mock(return_value=messages_dict)
     messages = mail.get_messages()
     assert len(messages) == len(messages_dict)
     assert isinstance(messages[0], Message)
