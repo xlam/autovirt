@@ -23,7 +23,7 @@ class VirtMail(MailGateway):
         data = r.json()["data"]
         return data
 
-    def get_messages(
+    def get_messages_by_subject(
         self, subject: str = None, box: Optional[str] = None
     ) -> list[Message]:
         box = box if box else self.default_box

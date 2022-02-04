@@ -49,6 +49,6 @@ def messages_dict() -> dict:
 def test_get_messages(messages_dict):
     mail = VirtMail(Mock())
     mail._fetch_messages = Mock(return_value=messages_dict)
-    messages = mail.get_messages()
+    messages = mail.get_messages_by_subject()
     assert len(messages) == len(messages_dict)
     assert isinstance(messages[0], Message)

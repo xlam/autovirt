@@ -20,7 +20,7 @@ class SetDemandedSalaryAction:
         self.employee = employee_gateway
 
     def rise_salary(self):
-        messages = self.mail.get_messages(self.subject)
+        messages = self.mail.get_messages_by_subject(self.subject)
         if not messages:
             logger.info("no units to rise salary, exiting.")
             return

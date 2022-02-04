@@ -18,7 +18,7 @@ class RenewAction:
         self.artefact = artefact_gateway
 
     def renew_innovations(self):
-        messages = self.mail.get_messages(self.subject)
+        messages = self.mail.get_messages_by_subject(self.subject)
         if not messages:
             logger.info("nothing to renew, exiting")
             sys.exit(0)

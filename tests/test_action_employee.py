@@ -32,7 +32,7 @@ def test_units_to_raise_salary(messages):
 @patch("autovirt.employee.set_demanded_salary.EmployeeGateway")
 @patch("autovirt.employee.set_demanded_salary.MailGateway")
 def test_rise_salary(mail_mock, employee_mock, messages):
-    mail_mock.get_messages.return_value = messages[:1]
+    mail_mock.get_messages_by_subject.return_value = messages[:1]
     employee_mock.unit_info.return_value = {"employee_salary": 90, "employee_max": 1000}
     employee = SetDemandedSalaryAction(mail_mock, employee_mock)
     employee.rise_salary()
