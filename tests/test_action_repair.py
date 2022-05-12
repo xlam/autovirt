@@ -1,21 +1,42 @@
+from unittest.mock import Mock
+
 import pytest
-from autovirt.action.repair import (
+
+from autovirt.equipment.domain.equipment import (
     QualityType,
-    RepairConfig,
-    quantity_total,
     quantity_to_repair,
+    quantity_total,
     select_offer,
     select_offer_to_raise_quality,
-    split_mismatch_quality_units,
     split_by_quality,
+    split_mismatch_quality_units,
+)
+from autovirt.equipment.interface import EquipmentGateway
+from autovirt.equipment.repair import (
+    RepairConfig,
+    RepairAction,
 )
 from autovirt.structs import UnitEquipment, RepairOffer
+
+
+@pytest.fixture
+def options():
+    return {"comp": {}}
 
 
 @pytest.fixture
 def units():
     return [
         UnitEquipment(1, 1000, 1000, 31, 30, 5, 1529),
+        UnitEquipment(2, 2000, 2000, 32, 30, 20, 1529),
+        UnitEquipment(3, 3000, 3000, 33, 30, 80, 1529),
+    ]
+
+
+@pytest.fixture
+def units_mismatch():
+    return [
+        UnitEquipment(1, 1000, 1000, 29, 30, 5, 1529),
         UnitEquipment(2, 2000, 2000, 32, 30, 20, 1529),
         UnitEquipment(3, 3000, 3000, 33, 30, 80, 1529),
     ]
@@ -70,9 +91,9 @@ def test_select_offer_to_raise_quality_none(offers):
     assert select_offer_to_raise_quality(unit, offers) is None
 
 
-def test_mismatched_quality(units):
-    normal, mismatched = split_mismatch_quality_units(units, 31.5)
-    assert len(normal) == 2
+def test_mismatched_quality(units_mismatch):
+    normal, mismatched = split_mismatch_quality_units(units_mismatch)
+    assert len(normal) == len(units_mismatch) - 1
     assert len(mismatched) == 1
 
 
@@ -97,3 +118,29 @@ def test_repair_config(config_dict):
     for key, value in config_dict.items():
         assert key in c.keys()
         assert isinstance(config_dict[key], type(c[key]))
+
+
+@pytest.fixture
+def mock_equipment(offers):
+    mock = Mock(spec=EquipmentGateway)
+    mock.get_offers.return_value = offers
+    return mock
+
+
+def test_fix_mismatch_units(mock_equipment, units_mismatch, offers, options):
+    action = RepairAction(mock_equipment, options)
+    action.fix_units_quality(units_mismatch[:1])
+    mock_equipment.terminate.assert_called_with(units_mismatch[0], 167)
+    mock_equipment.buy.assert_called_with(units_mismatch[0], offers[6], 167)
+
+
+def test_repair_with_quality(mock_equipment, units, offers, options):
+    action = RepairAction(mock_equipment, options)
+    action.repair_with_quality(units[:1], units[0].quality_required)
+    mock_equipment.repair.assert_called_with(units[:1], offers[3])
+
+
+def test_repair_by_quality(mock_equipment, units, offers, options):
+    action = RepairAction(mock_equipment, options)
+    action.repair_by_quality(units, QualityType.REQUIRED)
+    mock_equipment.repair.assert_called_once()

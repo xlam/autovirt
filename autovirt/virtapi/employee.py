@@ -1,32 +1,34 @@
-from autovirt.utils import get_config
-from autovirt.session import get_logged_session as s
-
-_config = get_config("autovirt")
-
-
-def units():
-    r = s().get(
-        "https://virtonomica.ru/api/vera/main/company/employee/units",
-        params={"id": _config["company_id"], "pagesize": _config["pagesize"]},
-    )
-    return list(r.json()["data"].values())
+from autovirt.employee.interface import EmployeeGateway
+from autovirt.session import VirtSession
+from autovirt.virtapi import GatewayOptions
 
 
-def unit_info(unit_id: int) -> dict:
-    r = s().get(
-        "https://virtonomica.ru/api/vera/main/unit/employee/info",
-        params={"id": unit_id},
-    )
-    return r.json()
+class VirtEmployee(EmployeeGateway):
+    def __init__(self, session: VirtSession, options: GatewayOptions):
+        self.s = session
+        self.options = options
 
+    def units(self) -> list:
+        r = self.s.get(
+            "https://virtonomica.ru/api/vera/main/company/employee/units",
+            params={"id": self.options.company_id, "pagesize": self.options.pagesize},
+        )
+        return list(r.json()["data"].values())
 
-def set_salary(unit_id: int, employee_count: int, salary: float):
-    s().post(
-        f"https://virtonomica.ru/api/vera/main/unit/employee/update",
-        {
-            "id": unit_id,
-            "employee_count": employee_count,
-            "employee_salary": salary,
-            "token": s().token,
-        },
-    )
+    def unit_info(self, unit_id: int) -> dict:
+        r = self.s.get(
+            "https://virtonomica.ru/api/vera/main/unit/employee/info",
+            params={"id": unit_id},
+        )
+        return r.json()
+
+    def set_salary(self, unit_id: int, employee_count: int, salary: float):
+        self.s.post(
+            f"https://virtonomica.ru/api/vera/main/unit/employee/update",
+            {
+                "id": unit_id,
+                "employee_count": employee_count,
+                "employee_salary": salary,
+                "token": self.s.token,
+            },
+        )

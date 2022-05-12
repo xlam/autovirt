@@ -1,0 +1,2 @@
+from .set_demanded_salary import SetDemandedSalaryAction
+from .set_required_salary import SetRequiredSalaryAction

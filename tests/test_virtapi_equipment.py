@@ -1,26 +1,21 @@
 import json
-from unittest.mock import patch
-from autovirt.virtapi import equipment
-from autovirt.structs import UnitEquipment
+from unittest.mock import Mock
 
-with open("tests/repair-1529-json-short.txt", "r") as f:
+from autovirt.structs import UnitEquipment
+from autovirt.virtapi import GatewayOptions
+from autovirt.virtapi.equipment import VirtEquipment
+
+with open("tests/data/repair-1529-json-short.txt", "r") as f:
     offers_data = json.load(f)
 equipment_id = 1529
 zero_weared_unit = 9113441
+options = GatewayOptions(company_id=0)
 
 
-@patch("autovirt.virtapi.equipment.fetch_units")
-def test_get_units_returns_valid_list(mock_fetch_units):
-    mock_fetch_units.return_value = offers_data
-    units = equipment.get_units(equipment_id)
-    assert type(units) == list
-    assert type(units[0]) == UnitEquipment
-    mock_fetch_units.assert_called_with(equipment_id)
-
-
-@patch("autovirt.virtapi.equipment.fetch_units")
-def test_get_units_filters_zero_weared(mock_fetch_units):
-    mock_fetch_units.return_value = offers_data
-    units = equipment.get_units(equipment_id)
+def test_get_units_returns_valid_list():
+    e = VirtEquipment(Mock(), options)
+    e._fetch_units = Mock(return_value=offers_data)
+    units = e.get_units_to_repair(equipment_id)
+    assert isinstance(units[0], UnitEquipment)
     ids = [unit.id for unit in units]
     assert zero_weared_unit not in ids
