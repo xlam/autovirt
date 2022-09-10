@@ -37,6 +37,7 @@ class Action(Protocol):
 
 
 def dispatch(action_name: str, action_options: str):
+    logger = utils.init_logger(action_name)
     session = VirtSession()
     config = utils.get_config("autovirt")
     action: Optional[Action] = None
@@ -76,7 +77,6 @@ def dispatch(action_name: str, action_options: str):
         )
 
     if action:
-        logger = utils.init_logger(action_name)
         logger.info("")
         logger.info(f"*** starting '{action_name}' action ***")
         try:
