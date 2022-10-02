@@ -5,7 +5,7 @@ from autovirt.logistics.domain import StorageItem
 
 class StorageGateway(abc.ABC):
     @abc.abstractmethod
-    def get(self, unit_id: int):
+    def get(self, unit_id: int) -> list[StorageItem]:
         pass
 
     @abc.abstractmethod
