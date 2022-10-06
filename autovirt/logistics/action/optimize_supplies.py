@@ -1,18 +1,18 @@
-from autovirt.logistics.domain import StorageItem
-from autovirt.logistics.action.gateway import StorageGateway
+from autovirt.logistics.action.gateway import SuppliesGateway
+from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies
 
 
 class OptimizeSuppliesAction:
-    def __init__(self, storage_gateway: StorageGateway):
-        self.storage_gateway = storage_gateway
+    def __init__(self, supplies_gateway: SuppliesGateway):
+        self.supplies_gateway = supplies_gateway
 
-    def execute(self, unit_id: int, factor: int = 1) -> list[StorageItem]:
-        storage = self.storage_gateway.get(unit_id)
-        changed_storage = []
-        for item in storage:
-            ordered = item.ordered
-            item.set_order_by_spent_factor(factor)
-            if ordered != item.ordered:
-                changed_storage.append(item)
-        self.storage_gateway.set_supplies(changed_storage)
-        return changed_storage
+    def execute(self, unit_id: int, factor: int = 1) -> UnitSupplies:
+        supplies = self.supplies_gateway.get(unit_id)
+        changed_supplies = UnitSupplies()
+        for supply in supplies:
+            ordered = supply.ordered
+            supply.set_order_by_required_factor(factor)
+            if ordered != supply.ordered:
+                changed_supplies.append(supply)
+        self.supplies_gateway.set_supplies(changed_supplies)
+        return changed_supplies

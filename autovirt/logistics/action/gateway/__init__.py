@@ -1,1 +1,1 @@
-from .storage import StorageGateway
+from .supplies import SuppliesGateway
