@@ -28,9 +28,9 @@ def contracts():
 @pytest.fixture
 def supplies_list(contracts):
     return [
-        Supply(product_id=0, available=5, required=10, contracts=[contracts[0]]),
-        Supply(product_id=1, available=10, required=5, contracts=[contracts[1:2]]),
-        Supply(product_id=2, available=10, required=0, contracts=[contracts[3]]),
+        Supply(product_id=0, quantity=5, required=10, contracts=[contracts[0]]),
+        Supply(product_id=1, quantity=10, required=5, contracts=[contracts[1:2]]),
+        Supply(product_id=2, quantity=10, required=0, contracts=[contracts[3]]),
     ]
 
 
@@ -54,7 +54,7 @@ def test_get_contracts_by_product_id(supplies):
 
 
 @pytest.mark.parametrize(
-    "available, required, factor, expected",
+    "quantity, required, factor, expected",
     [
         (5, 10, 2, 20),
         (100, 10, 2, 0),
@@ -63,8 +63,8 @@ def test_get_contracts_by_product_id(supplies):
     ],
 )
 def test_set_ordered_product_quantity_by_stock_quantity_and_spent_factor(
-    available, required, factor, expected, contracts
+    quantity, required, factor, expected, contracts
 ):
-    supply = Supply(1, available, required, [contracts[1]])
+    supply = Supply(1, quantity, required, [contracts[1]])
     supply.set_order_by_required_factor(factor)
     assert supply.ordered == expected

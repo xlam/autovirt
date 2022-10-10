@@ -13,7 +13,7 @@ def supplies():
         [
             Supply(
                 product_id=1,
-                available=100,
+                quantity=100,
                 required=5,
                 contracts=[
                     SupplyContract(

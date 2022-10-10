@@ -13,7 +13,7 @@ class SupplyContract:
 @dataclass
 class Supply:
     product_id: int
-    available: int
+    quantity: int
     required: int
     contracts: list[SupplyContract] = field(default_factory=list)
 
@@ -22,7 +22,7 @@ class Supply:
         return sum(contract.party_quantity for contract in self.contracts)
 
     def set_order_by_required_factor(self, factor: int = 1):
-        if self.available > self.required * factor:
+        if self.quantity > self.required * factor:
             for contract in self.contracts:
                 contract.party_quantity = 0
         else:
