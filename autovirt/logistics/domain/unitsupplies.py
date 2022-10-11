@@ -31,7 +31,14 @@ class Supply:
             )
             for contract in self.contracts:
                 contract.party_quantity = (
-                    contract.free_for_buy / total_free_for_buy * self.required * factor
+                    (
+                        contract.free_for_buy
+                        / total_free_for_buy
+                        * self.required
+                        * factor
+                    )
+                    if total_free_for_buy
+                    else 0
                 )
 
 

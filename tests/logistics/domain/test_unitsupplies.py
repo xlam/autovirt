@@ -22,6 +22,9 @@ def contracts():
         SupplyContract(
             consumer_id=1, offer_id=4, supplier_id=4, free_for_buy=10, party_quantity=2
         ),
+        SupplyContract(
+            consumer_id=1, offer_id=5, supplier_id=5, free_for_buy=0, party_quantity=5
+        ),
     ]
 
 
@@ -70,3 +73,15 @@ def test_set_ordered_product_quantity_by_stock_quantity_and_spent_factor(
     supply = Supply(1, quantity, required, [contracts[1]])
     supply.set_order_by_required_factor(factor)
     assert supply.ordered == expected
+
+
+def test_no_free_for_buy_and_zero_required(contracts):
+    s1 = Supply(1, 5, 10, [contracts[4]])
+    s1.set_order_by_required_factor(2)
+    assert s1.ordered == 0
+    s2 = Supply(1, 5, 0, [contracts[1]])
+    s2.set_order_by_required_factor(2)
+    assert s2.ordered == 0
+    s3 = Supply(1, 0, 0, [contracts[1]])
+    s3.set_order_by_required_factor(2)
+    assert s3.ordered == 0
