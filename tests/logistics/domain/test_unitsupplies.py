@@ -39,18 +39,20 @@ def supplies(supplies_list):
     return UnitSupplies(supplies_list)
 
 
-def test_get_supply_by_product_id(supplies):
-    assert supplies.get_supply_by_product_id(product_id=0) == supplies[0]
+def test_get_supply_by_product_id(supplies, supplies_list):
+    assert supplies.get_supply_by_product_id(product_id=0) == supplies_list[0]
 
 
-def test_get_supply_by_product_id_throws_exception(supplies):
+def test_get_supply_by_product_id_exception(supplies):
     index = len(supplies)
     with pytest.raises(IndexError):
         supplies.get_supply_by_product_id(product_id=index)
 
 
-def test_get_contracts_by_product_id(supplies):
-    assert supplies.get_contracts_by_product_id(product_id=2) == supplies[2].contracts
+def test_get_contracts_by_product_id(supplies, supplies_list):
+    assert (
+        supplies.get_contracts_by_product_id(product_id=2) == supplies_list[2].contracts
+    )
 
 
 @pytest.mark.parametrize(
