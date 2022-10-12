@@ -1,5 +1,5 @@
 from autovirt.logistics.action.gateway import SuppliesGateway
-from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies
+from autovirt.logistics.domain.unitsupplies import UnitSupplies
 
 
 class OptimizeSuppliesAction:
@@ -11,7 +11,7 @@ class OptimizeSuppliesAction:
         changed_supplies = UnitSupplies()
         for supply in supplies:
             ordered = supply.ordered
-            supply.set_order_by_required_factor(factor)
+            supply.set_order_quantity_by_factor_of_required(factor)
             if ordered != supply.ordered:
                 changed_supplies.append(supply)
         self.supplies_gateway.set_supplies(changed_supplies)

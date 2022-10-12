@@ -28,7 +28,7 @@ class ApiSuppliesGateway(SuppliesGateway):
                 [
                     SupplyContract(
                         consumer_id=int(contract["consumer_id"]),
-                        offer_id=offer_id,
+                        offer_id=int(offer_id),
                         supplier_id=int(contract["supplier_id"]),
                         free_for_buy=int(contract["free_for_buy"]),
                         party_quantity=int(contract["party_quantity"]),

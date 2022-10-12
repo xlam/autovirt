@@ -71,17 +71,31 @@ def test_set_ordered_product_quantity_by_stock_quantity_and_spent_factor(
     quantity, required, factor, expected, contracts
 ):
     supply = Supply(1, quantity, required, [contracts[1]])
-    supply.set_order_by_required_factor(factor)
+    supply.set_order_quantity_by_factor_of_required(factor)
     assert supply.ordered == expected
 
 
 def test_no_free_for_buy_and_zero_required(contracts):
     s1 = Supply(1, 5, 10, [contracts[4]])
-    s1.set_order_by_required_factor(2)
+    s1.set_order_quantity_by_factor_of_required(2)
     assert s1.ordered == 0
     s2 = Supply(1, 5, 0, [contracts[1]])
-    s2.set_order_by_required_factor(2)
+    s2.set_order_quantity_by_factor_of_required(2)
     assert s2.ordered == 0
     s3 = Supply(1, 0, 0, [contracts[1]])
-    s3.set_order_by_required_factor(2)
+    s3.set_order_quantity_by_factor_of_required(2)
     assert s3.ordered == 0
+
+
+@pytest.mark.parametrize(
+    "quantity, required, contracts, expected",
+    [
+        (100, 500, [SupplyContract(1, 2, 3, 1000, 0)], 500),
+        (600, 100, [SupplyContract(1, 2, 3, 1000, 0)], 0),
+        (0, 100, [SupplyContract(1, 2, 3, 1000, 0)], 500),
+    ],
+)
+def test_set_order_quantity_by_target_share(quantity, required, contracts, expected):
+    supply = Supply(1, quantity, required, contracts)
+    supply.set_order_quantity_by_target_quantity(target_quantity=500)
+    assert supply.ordered == expected
