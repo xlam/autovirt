@@ -10,6 +10,7 @@ from autovirt.equipment.domain.equipment import (
     select_offer_to_raise_quality,
     split_by_quality,
     split_mismatch_quality_units,
+    NoSiutableOffersExists,
 )
 from autovirt.equipment.interface import EquipmentGateway
 from autovirt.equipment.repair import (
@@ -57,6 +58,11 @@ def offers():
 
 def test_select_offer(offers, units):
     assert select_offer(offers, units) == offers[3]
+
+
+def test_empty_offers_summary(units):
+    with pytest.raises(NoSiutableOffersExists):
+        select_offer([RepairOffer(0, 0, "company", 100, 1, 1000)], units)
 
 
 def test_quantity_to_repair(units):

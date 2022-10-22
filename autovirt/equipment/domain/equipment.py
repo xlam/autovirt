@@ -15,6 +15,10 @@ PRICE_MAX = 100000
 QUALITY_DELTA = 3
 
 
+class NoSiutableOffersExists(AutovirtError):
+    pass
+
+
 class QualityType(Enum):
     INSTALLED = "quality"
     REQUIRED = "quality_required"
@@ -71,6 +75,9 @@ def select_offer(
         for i, o in enumerate(offers)
         if qual_exp[i] >= quality
     ]
+
+    if not summary:
+        raise NoSiutableOffersExists
 
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:
