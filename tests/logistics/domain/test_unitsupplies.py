@@ -93,6 +93,12 @@ def test_no_free_for_buy_and_zero_required(contracts):
         (100, 500, [SupplyContract(1, 2, 3, 1000, 0)], 500),
         (600, 100, [SupplyContract(1, 2, 3, 1000, 0)], 0),
         (0, 100, [SupplyContract(1, 2, 3, 1000, 0)], 500),
+        (
+            0,
+            100,
+            [SupplyContract(1, 1, 1, 1000, 0), SupplyContract(1, 2, 2, 1000, 0)],
+            500,
+        ),
     ],
 )
 def test_set_order_quantity_by_target_share(quantity, required, contracts, expected):

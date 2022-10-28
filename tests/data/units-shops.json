@@ -1,0 +1,148 @@
+{
+  "info": {
+    "count": 40,
+    "page": 1,
+    "page_size": "3",
+    "sort": [
+      "id desc"
+    ]
+  },
+  "data": {
+    "11085002": {
+      "id": "11085002",
+      "name": "Магазин",
+      "country_id": "422607",
+      "country_symbol": "mx",
+      "country_name": "Мексика",
+      "region_id": "422610",
+      "region_name": "Центральная Мексика",
+      "city_id": "422615",
+      "city_name": "Пуэбла-де-Сарагоса",
+      "unit_type_id": "1886",
+      "unit_type_symbol": "shop",
+      "unit_type_name": "Магазин",
+      "size": "150",
+      "labor_max": "1500",
+      "equipment_max": "0",
+      "square": "15000",
+      "unit_type_produce_name": "Основная",
+      "unit_class_id": "1885",
+      "unit_class_name": "Магазин",
+      "unit_class_kind": "shop",
+      "productivity": "1",
+      "notice": null,
+      "market_status": "",
+      "time_to_build": "0",
+      "office_sort": "1",
+      "products": [
+        {
+          "id": "423274",
+          "symbol": "brand/comp_accessories_mouse",
+          "name": "Могучая Мышь"
+        },
+        {
+          "id": "423378",
+          "symbol": "usb",
+          "name": "USB-флэш-накопитель (устар.)"
+        }
+      ]
+    },
+    "11057272": {
+      "id": "11057272",
+      "name": "Магазин",
+      "country_id": "424615",
+      "country_symbol": "be",
+      "country_name": "Бельгия",
+      "region_id": "424617",
+      "region_name": "Валлония",
+      "city_id": "424621",
+      "city_name": "Шарлеруа",
+      "unit_type_id": "1886",
+      "unit_type_symbol": "shop",
+      "unit_type_name": "Магазин",
+      "size": "100",
+      "labor_max": "1000",
+      "equipment_max": "0",
+      "square": "10000",
+      "unit_type_produce_name": "Основная",
+      "unit_class_id": "1885",
+      "unit_class_name": "Магазин",
+      "unit_class_kind": "shop",
+      "productivity": "1",
+      "notice": null,
+      "market_status": "",
+      "time_to_build": "0",
+      "office_sort": "1",
+      "products": [
+        {
+          "id": "1482",
+          "symbol": "fabric",
+          "name": "Ткань"
+        },
+        {
+          "id": "15335",
+          "symbol": "football",
+          "name": "Спортинвентарь"
+        }
+      ]
+    },
+    "11057258": {
+      "id": "11057258",
+      "name": "Магазин",
+      "country_id": "424615",
+      "country_symbol": "be",
+      "country_name": "Бельгия",
+      "region_id": "424618",
+      "region_name": "Брюссельский столичный регион",
+      "city_id": "424624",
+      "city_name": "Схарбек",
+      "unit_type_id": "1886",
+      "unit_type_symbol": "shop",
+      "unit_type_name": "Магазин",
+      "size": "100",
+      "labor_max": "1000",
+      "equipment_max": "0",
+      "square": "10000",
+      "unit_type_produce_name": "Основная",
+      "unit_class_id": "1885",
+      "unit_class_name": "Магазин",
+      "unit_class_kind": "shop",
+      "productivity": "1",
+      "notice": null,
+      "market_status": "",
+      "time_to_build": "0",
+      "office_sort": "1",
+      "products": [
+        {
+          "id": "1482",
+          "symbol": "fabric",
+          "name": "Ткань"
+        },
+        {
+          "id": "15335",
+          "symbol": "football",
+          "name": "Спортинвентарь"
+        }
+      ]
+    }
+  },
+  "indicators": {
+    "11057258": {
+      "303080": {
+        "id": "303080",
+        "kind": "shop_service_no_max",
+        "name": "Уровень сервиса в магазине не максимален"
+      }
+    },
+    "11057272": {
+      "303080": {
+        "id": "303080",
+        "kind": "shop_service_no_max",
+        "name": "Уровень сервиса в магазине не максимален"
+      }
+    }
+  },
+  "extensions": [],
+  "constructions": [],
+  "preferences": {}
+}

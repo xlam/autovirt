@@ -2,7 +2,7 @@ from autovirt.logistics.action.gateway import SuppliesGateway
 from autovirt.logistics.domain.unitsupplies import UnitSupplies
 
 
-class OptimizeSuppliesAction:
+class OptimizeUnitSuppliesAction:
     def __init__(self, supplies_gateway: SuppliesGateway):
         self.supplies_gateway = supplies_gateway
 

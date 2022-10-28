@@ -1,14 +1,14 @@
-from unittest.mock import Mock
-
-import pytest
-
-from autovirt.logistics.action import OptimizeSuppliesAction
-from autovirt.logistics.action.gateway import SuppliesGateway
+from autovirt.logistics.action import (
+    OptimizeUnitSuppliesAction,
+    OptimizeShopsSuppliesAction,
+)
+from autovirt.logistics.action.gateway import SuppliesGateway, UnitsGateway
 from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies, SupplyContract
 
+COPIES = 3
 
-@pytest.fixture
-def supplies():
+
+def make_unit_supplies(consumer_id) -> UnitSupplies:
     return UnitSupplies(
         [
             Supply(
@@ -17,7 +17,7 @@ def supplies():
                 required=5,
                 contracts=[
                     SupplyContract(
-                        consumer_id=1,
+                        consumer_id=consumer_id,
                         offer_id=1,
                         supplier_id=11,
                         free_for_buy=100,
@@ -25,26 +25,49 @@ def supplies():
                     )
                 ],
             ),
-            Supply(2, 5, 10, [SupplyContract(1, 2, 12, 100, 10)]),
-            Supply(3, 200, 100, [SupplyContract(1, 3, 13, 100, 200)]),
-            Supply(4, 200, 10, [SupplyContract(1, 4, 14, 100, 0)]),
+            Supply(2, 5, 10, [SupplyContract(consumer_id, 2, 12, 100, 10)]),
+            Supply(3, 200, 100, [SupplyContract(consumer_id, 3, 13, 100, 200)]),
+            Supply(4, 200, 10, [SupplyContract(consumer_id, 4, 14, 100, 0)]),
         ]
     )
 
 
-@pytest.fixture
-def mock_supplies_gateway(supplies):
-    mock = Mock(spec=SuppliesGateway)
-    mock.get.return_value = supplies
-    return mock
+def more_supplies() -> list[UnitSupplies]:
+    return [make_unit_supplies(consumer_id) for consumer_id in range(COPIES)]
 
 
-def test_optimize_supplies_action(mock_supplies_gateway, supplies):
-    unit_id = 1
+class FakeSuppliesGateway(SuppliesGateway):
+    def __init__(self):
+        self.supplies = more_supplies()
+        self.sets = []
+
+    def get(self, unit_id: int) -> UnitSupplies:
+        return self.supplies[unit_id]
+
+    def set_supplies(self, supplies: UnitSupplies):
+        self.sets.append(supplies)
+
+
+class FakeUnitsGateway(UnitsGateway):
+    def get_shops_ids(self) -> list[int]:
+        return list(range(COPIES))
+
+
+def test_optimize_supplies_action():
+    unit_id = 0
     factor = 2
-    action = OptimizeSuppliesAction(mock_supplies_gateway)
+    action = OptimizeUnitSuppliesAction(FakeSuppliesGateway())
     res = action.execute(unit_id, factor)
-    mock_supplies_gateway.get.assert_called_with(unit_id)
-    mock_supplies_gateway.set_supplies.assert_called_with(UnitSupplies(supplies[:2]))
+    assert len(res) == 2
     assert res[0].ordered == 0
     assert res[1].ordered == 20
+
+
+def test_optimize_shops_supplies():
+    factor = 2
+    action = OptimizeShopsSuppliesAction(FakeUnitsGateway(), FakeSuppliesGateway())
+    res = action.execute(factor)
+    assert len(res) == 3
+    print(res)
+    assert res[1][0].ordered == 0
+    assert res[1][1].ordered == 20
