@@ -1,0 +1,1 @@
+from .set_demanded_salary import SetDemandedSalaryAction

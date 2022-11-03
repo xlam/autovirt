@@ -50,14 +50,12 @@ def dispatch(action_name: str, action_options: str):
         action = RepairAction(VirtEquipment(session, GatewayOptions(**config)))
 
     if action_name == "employee":
-        from autovirt.employee import SetDemandedSalaryAction
-        from autovirt.virtapi.mail import VirtMail
-        from autovirt.virtapi.employee import VirtEmployee
+        from autovirt.employee.action import SetDemandedSalaryAction
+        from autovirt.employee.adapter import UnitSalaryAdapter
         from autovirt.virtapi import GatewayOptions
 
         action = SetDemandedSalaryAction(
-            VirtMail(session),
-            VirtEmployee(session, GatewayOptions(**config)),
+            UnitSalaryAdapter(session, GatewayOptions(**config)),
         )
 
     if action_name == "innovations":
@@ -69,7 +67,7 @@ def dispatch(action_name: str, action_options: str):
 
     if action_name == "salary":
         from autovirt.employee import SetRequiredSalaryAction
-        from autovirt.virtapi.employee import VirtEmployee
+        from autovirt.employee.adapter import VirtEmployee
         from autovirt.virtapi import GatewayOptions
 
         action = SetRequiredSalaryAction(
