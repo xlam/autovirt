@@ -1,9 +1,6 @@
-import pytest
-
-from autovirt.employee.domain.unit_salary import UnitSalary
-
-from autovirt.employee.interface.unit_salary import UnitSalaryGateway
+from autovirt.employee.action.gateway.unit_salary import UnitSalaryGateway
 from autovirt.employee.action.set_demanded_salary import SetDemandedSalaryAction
+from autovirt.employee.domain.unit_salary import UnitSalary
 
 
 class FakeUnitSalaryAdapter(UnitSalaryGateway):

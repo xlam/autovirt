@@ -58,21 +58,21 @@ def dispatch(action_name: str, action_options: str):
             UnitSalaryAdapter(session, GatewayOptions(**config)),
         )
 
-    if action_name == "innovations":
-        from autovirt.artefact import RenewAction
-        from autovirt.virtapi.mail import VirtMail
-        from autovirt.virtapi.artefact import VirtArtefact
-
-        action = RenewAction(VirtMail(session), VirtArtefact(session))
-
     if action_name == "salary":
-        from autovirt.employee import SetRequiredSalaryAction
+        from autovirt.employee.action import SetRequiredSalaryAction
         from autovirt.employee.adapter import VirtEmployee
         from autovirt.virtapi import GatewayOptions
 
         action = SetRequiredSalaryAction(
             VirtEmployee(session, GatewayOptions(**config))
         )
+
+    if action_name == "innovations":
+        from autovirt.artefact import RenewAction
+        from autovirt.virtapi.mail import VirtMail
+        from autovirt.virtapi.artefact import VirtArtefact
+
+        action = RenewAction(VirtMail(session), VirtArtefact(session))
 
     if action:
         logger.info("")

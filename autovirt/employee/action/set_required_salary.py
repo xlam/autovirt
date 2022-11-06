@@ -2,7 +2,7 @@ from typing import Optional
 
 from autovirt import utils
 from autovirt.employee.domain import units_to_update_salary
-from autovirt.employee.interface import EmployeeGateway
+from autovirt.employee.action.gateway import EmployeeGateway
 
 logger = utils.get_logger()
 

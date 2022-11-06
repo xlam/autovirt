@@ -1,4 +1,4 @@
-from autovirt.employee.interface import EmployeeGateway
+from autovirt.employee.action.gateway import EmployeeGateway
 from autovirt.session import VirtSession
 from autovirt.virtapi import GatewayOptions
 
