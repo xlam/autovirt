@@ -67,12 +67,12 @@ class RepairAction:
         quantity = quantity_to_repair(units_normal)
         offers = self.equipment.get_offers(units_normal[0].equipment_id)
         offers = filter_offers(offers, quality, quantity)
-        if not offers:
+        offer = select_offer(offers, units_normal, quality)
+        if not offer:
             logger.error(
                 f"could not select offer to repair quality {quality}, skipping"
             )
             return 0.0
-        offer = select_offer(offers, units_normal, quality)
         repair_cost = quantity * offer.price
         logger.info(
             f"found offer {offer.id} with quality {offer.quality} "

@@ -1,10 +1,9 @@
 from enum import Enum
 from functools import reduce
 from math import ceil
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from autovirt import utils
-from autovirt.exception import AutovirtError
 from autovirt.structs import UnitEquipment, RepairOffer
 
 logger = utils.get_logger()
@@ -13,10 +12,6 @@ logger = utils.get_logger()
 PRICE_MAX = 100000
 # value to add and sub from offer quality when filtering
 QUALITY_DELTA = 3
-
-
-class NoSiutableOffersExists(AutovirtError):
-    pass
 
 
 class QualityType(Enum):
@@ -55,7 +50,9 @@ def expected_quality(
 
 def select_offer(
     offers: list[RepairOffer], units: list[UnitEquipment], quality: float = None
-) -> RepairOffer:
+) -> Union[RepairOffer, None]:
+    if not offers:
+        return None
     if not quality:
         quality = units[0].quality_required
 
@@ -77,7 +74,7 @@ def select_offer(
     ]
 
     if not summary:
-        raise NoSiutableOffersExists
+        return None
 
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:

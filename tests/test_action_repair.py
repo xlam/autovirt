@@ -10,7 +10,6 @@ from autovirt.equipment.domain.equipment import (
     select_offer_to_raise_quality,
     split_by_quality,
     split_mismatch_quality_units,
-    NoSiutableOffersExists,
 )
 from autovirt.equipment.interface import EquipmentGateway
 from autovirt.equipment.repair import (
@@ -56,13 +55,29 @@ def offers():
     ]
 
 
+@pytest.fixture
+def offers_for_installed():
+    return [
+        [
+            RepairOffer(0, 101, "Offer 1", 200, 28, 1000),
+            RepairOffer(1, 102, "Offer 2", 300, 31, 5000),
+            RepairOffer(2, 103, "Offer 3", 100, 30, 10000),
+        ],
+        [],
+        [
+            RepairOffer(4, 105, "Offer 5", 200, 30, 10000),
+            RepairOffer(5, 106, "Offer 6", 250, 33, 10000),
+            RepairOffer(6, 107, "Offer 7", 400, 35, 10000),
+        ],
+    ]
+
+
 def test_select_offer(offers, units):
     assert select_offer(offers, units) == offers[3]
 
 
 def test_empty_offers_summary(units):
-    with pytest.raises(NoSiutableOffersExists):
-        select_offer([RepairOffer(0, 0, "company", 100, 1, 1000)], units)
+    assert select_offer([RepairOffer(0, 0, "company", 100, 1, 1000)], units) is None
 
 
 def test_quantity_to_repair(units):
@@ -133,6 +148,13 @@ def mock_equipment(offers):
     return mock
 
 
+@pytest.fixture
+def mock_equipment_for_installed(offers_for_installed):
+    mock = Mock(spec=EquipmentGateway)
+    mock.get_offers.side_effect = offers_for_installed
+    return mock
+
+
 def test_fix_mismatch_units(mock_equipment, units_mismatch, offers, options):
     action = RepairAction(mock_equipment, options)
     action.fix_units_quality(units_mismatch[:1])
@@ -150,3 +172,11 @@ def test_repair_by_quality(mock_equipment, units, offers, options):
     action = RepairAction(mock_equipment, options)
     action.repair_by_quality(units, QualityType.REQUIRED)
     mock_equipment.repair.assert_called_once()
+
+
+def test_repair_by_quality_installed(
+    mock_equipment_for_installed, units, offers, options
+):
+    action = RepairAction(mock_equipment_for_installed, options)
+    action.repair_by_quality(units, QualityType.INSTALLED)
+    assert mock_equipment_for_installed.repair.call_count == 2
