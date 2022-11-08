@@ -51,20 +51,20 @@ def dispatch(action_name: str, action_options: str):
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction
-        from autovirt.employee.adapter import UnitSalaryAdapter
+        from autovirt.employee.adapter import EmployeeAdapter
         from autovirt.virtapi import GatewayOptions
 
         action = SetDemandedSalaryAction(
-            UnitSalaryAdapter(session, GatewayOptions(**config)),
+            EmployeeAdapter(session, GatewayOptions(**config)),
         )
 
     if action_name == "salary":
         from autovirt.employee.action import SetRequiredSalaryAction
-        from autovirt.employee.adapter import VirtEmployee
+        from autovirt.employee.adapter import EmployeeAdapter
         from autovirt.virtapi import GatewayOptions
 
         action = SetRequiredSalaryAction(
-            VirtEmployee(session, GatewayOptions(**config))
+            EmployeeAdapter(session, GatewayOptions(**config))
         )
 
     if action_name == "innovations":

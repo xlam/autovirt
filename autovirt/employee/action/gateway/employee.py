@@ -1,15 +1,15 @@
-import abc
+from typing import Protocol
+
+from autovirt.employee.domain.demanding_unit_salary import DemandingUnitSalary
+from autovirt.employee.domain.requiring_unit_salary import RequiringUnitSalary
 
 
-class EmployeeGateway(abc.ABC):
-    @abc.abstractmethod
-    def units(self) -> list:
+class EmployeeGateway(Protocol):
+    def get_units_requiring_salary_raise(self) -> list[RequiringUnitSalary]:
         ...
 
-    @abc.abstractmethod
-    def unit_info(self, unit_id: int) -> dict:
+    def get_units_demanding_salary_raise(self) -> list[DemandingUnitSalary]:
         ...
 
-    @abc.abstractmethod
     def set_salary(self, unit_id: int, employee_count: int, salary: float):
         ...

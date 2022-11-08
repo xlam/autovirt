@@ -75,7 +75,7 @@ Raise salary at units where minimum qualification does not match:
 $ autovirt salary
 ```
 
-Raise salary at units on which labor union is requiring raise. For this to work there must be mail message from labor union in the game mail inbox:
+Raise salary at units on which labor union is requiring raise.
 ```
 $ autovirt employee
 ```

@@ -1,40 +1,28 @@
 from typing import Optional
 
 from autovirt import utils
-from autovirt.employee.domain import units_to_update_salary
 from autovirt.employee.action.gateway import EmployeeGateway
 
 logger = utils.get_logger()
 
 
 class SetRequiredSalaryAction:
-    SALARY_MARGIN: float = 5.0
-    """ Salary margin to add to required salary value"""
-
     def __init__(self, employee_gateway: EmployeeGateway):
-        self.employee = employee_gateway
+        self.employee_gateway = employee_gateway
 
     def run(self, config_name: Optional[str] = None):
         if not config_name:
             pass
 
-        units = units_to_update_salary(self.employee.units())
+        units = self.employee_gateway.get_units_requiring_salary_raise()
         if not units:
-            logger.info("no units to update salary, exiting.")
-            quit(0)
-        logger.info(f"{len(units)} units to update salary")
+            logger.info("no units to set required level salary, exiting.")
+            return
 
         for unit in units:
-            unit_info = self.employee.unit_info(unit["id"])
-
-            # set salary to required plus 5$ for sure
-            salary = round(unit_info["salary_required"]) + self.SALARY_MARGIN
-
+            unit.set_required_salary()
             logger.info(
-                f"updating salary at unit "
-                f"{unit['id']} ({unit['name']}, {unit['city_name']}) from "
-                f"{unit['labor_salary']} to {salary}"
+                f"raising salary at {unit.name} ({unit.unit_id}), {unit.city_name} "
+                f"from {unit.initial_salary} to {unit.salary}"
             )
-            self.employee.set_salary(
-                int(unit["id"]), int(unit_info["employee_max"]), salary
-            )
+            self.employee_gateway.set_salary(unit.unit_id, unit.labor_max, unit.salary)

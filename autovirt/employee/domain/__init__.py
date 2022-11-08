@@ -1,1 +1,2 @@
-from .employee import units_to_update_salary, units_to_rise_salary
+from .demanding_unit_salary import DemandingUnitSalary
+from .requiring_unit_salary import RequiringUnitSalary
