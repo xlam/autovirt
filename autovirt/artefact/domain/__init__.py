@@ -1,1 +1,4 @@
-from .artefact import build_innovations_renewal_list
+from .artefact import (
+    Artefact,
+    filter_artefacts_to_renew,
+)

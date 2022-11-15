@@ -1,9 +1,21 @@
-from autovirt.structs import Message
+from dataclasses import dataclass
+
+EXPIRE_THRESHOLD = 5
 
 
-def build_innovations_renewal_list(messages: list[Message]) -> list:
-    renewal = []
-    for message in messages:
-        for attach in message.attaches:
-            renewal.append(attach)
-    return renewal
+@dataclass
+class Artefact:
+    id: int
+    name: str
+    expires: int
+    unit_id: int
+    unit_name: str
+    city_name: str
+
+
+def filter_artefacts_to_renew(artefacts: list[Artefact]) -> list[Artefact]:
+    res = []
+    for artefact in artefacts:
+        if artefact.expires < EXPIRE_THRESHOLD:
+            res.append(artefact)
+    return res

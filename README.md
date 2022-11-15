@@ -80,7 +80,7 @@ Raise salary at units on which labor union is requiring raise.
 $ autovirt employee
 ```
 
-Renew innovations (artefacts) on units. For this to work there must be innovation expiration message in the game mail inbox.
+Renew all innovations (artefacts) having time to live lesser then 5. 
 ```
 $ autovirt innovations
 ```

@@ -1,0 +1,239 @@
+{
+  "info": {
+    "count": 200,
+    "page": 1,
+    "page_size": "3",
+    "sort": [
+      "id desc"
+    ]
+  },
+  "data": {
+    "11085002": {
+      "id": "11085002",
+      "unit_type_id": "1886",
+      "unit_class_id": "1885",
+      "unit_type_produce_bound_level": null,
+      "unit_type_symbol": "shop",
+      "unit_type_name": "Store ",
+      "productivity": "1",
+      "name": "Store ",
+      "city_id": "422615",
+      "city_name": "Puebla de Zaragoza",
+      "region_id": "422610",
+      "region_name": "Central Mexico",
+      "country_id": "422607",
+      "country_name": "Mexico",
+      "country_symbol": "mx",
+      "unit_type_produce_bound_name": "100",
+      "artefact_ids": "{302821,302661}",
+      "slots": "{300144,300143}",
+      "product_symbols": [
+        "NULL"
+      ],
+      "artefacts": {
+        "slots": {
+          "300136": {
+            "id": "300136",
+            "name": "Warehouse",
+            "symbol": "warehouse",
+            "sort_order": "80",
+            "enabled": "t"
+          },
+          "300143": {
+            "id": "300143",
+            "name": "Marketing",
+            "symbol": "marketing",
+            "sort_order": "50",
+            "enabled": "t"
+          },
+          "300144": {
+            "id": "300144",
+            "name": "Retail",
+            "symbol": "retail",
+            "sort_order": "50",
+            "enabled": "t"
+          },
+          "300137": {
+            "id": "300137",
+            "name": "Other",
+            "symbol": "other",
+            "sort_order": "1",
+            "enabled": "t"
+          }
+        },
+        "attached": {
+          "300136": [],
+          "300143": {
+            "id": "302661",
+            "unit_id": "11085002",
+            "artefact_id": "302661",
+            "name": "Partnership agreement with an advertising agency",
+            "desc": "By signing a contract with a famous advertising agency to promote your store you have gained 50% more rapid popularity growth.",
+            "symbol": "165434100406.gif",
+            "initial_cost": "50000",
+            "point_cost": "0",
+            "cost_per_turn": "25000",
+            "ttl": "60",
+            "expires": "57"
+          },
+          "300144": {
+            "id": "302821",
+            "unit_id": "11085002",
+            "artefact_id": "302821",
+            "name": "Electronics heaven",
+            "desc": "\"The whole range of new high-tech products - only in our store!\" This slogan has helped you significantly increase sales of electronics. Effect: increase of the maximum of sales for the Electronics section +30%.",
+            "symbol": "182756100402.gif",
+            "initial_cost": "500000",
+            "point_cost": "0",
+            "cost_per_turn": "500000",
+            "ttl": "45",
+            "expires": "42"
+          },
+          "300137": []
+        }
+      }
+    },
+    "11057272": {
+      "id": "11057272",
+      "unit_type_id": "1886",
+      "unit_class_id": "1885",
+      "unit_type_produce_bound_level": null,
+      "unit_type_symbol": "shop",
+      "unit_type_name": "Store ",
+      "productivity": "1",
+      "name": "Store ",
+      "city_id": "424621",
+      "city_name": "Charleroi",
+      "region_id": "424617",
+      "region_name": "Walonreye",
+      "country_id": "424615",
+      "country_name": "Belgium",
+      "country_symbol": "be",
+      "unit_type_produce_bound_name": "100",
+      "artefact_ids": "{302661,302495}",
+      "slots": "{300143,300144}",
+      "product_symbols": [
+        "NULL"
+      ],
+      "artefacts": {
+        "slots": {
+          "300136": {
+            "id": "300136",
+            "name": "Warehouse",
+            "symbol": "warehouse",
+            "sort_order": "80",
+            "enabled": "t"
+          },
+          "300143": {
+            "id": "300143",
+            "name": "Marketing",
+            "symbol": "marketing",
+            "sort_order": "50",
+            "enabled": "t"
+          },
+          "300144": {
+            "id": "300144",
+            "name": "Retail",
+            "symbol": "retail",
+            "sort_order": "50",
+            "enabled": "t"
+          },
+          "300137": {
+            "id": "300137",
+            "name": "Other",
+            "symbol": "other",
+            "sort_order": "1",
+            "enabled": "t"
+          }
+        },
+        "attached": {
+          "300136": [],
+          "300143": {
+            "id": "302661",
+            "unit_id": "11057272",
+            "artefact_id": "302661",
+            "name": "Partnership agreement with an advertising agency",
+            "desc": "By signing a contract with a famous advertising agency to promote your store you have gained 50% more rapid popularity growth.",
+            "symbol": "165434100406.gif",
+            "initial_cost": "50000",
+            "point_cost": "0",
+            "cost_per_turn": "25000",
+            "ttl": "60",
+            "expires": "43"
+          },
+          "300144": {
+            "id": "302495",
+            "unit_id": "11057272",
+            "artefact_id": "302495",
+            "name": "Million small things",
+            "desc": "The manufactured goods section of your store is very successful - attention to customers and great range of goods make valuable contribution to the sales growth. Effect: increase of the maximum of sales for the Manufactured goods section +30%.",
+            "symbol": "180263100405.gif",
+            "initial_cost": "500000",
+            "point_cost": "0",
+            "cost_per_turn": "500000",
+            "ttl": "45",
+            "expires": "28"
+          },
+          "300137": []
+        }
+      }
+    },
+    "11057271": {
+      "id": "11057271",
+      "unit_type_id": "1817",
+      "unit_class_id": "1815",
+      "unit_type_produce_bound_level": null,
+      "unit_type_symbol": "office",
+      "unit_type_name": "Office ",
+      "productivity": "1",
+      "name": "Office ",
+      "city_id": "424621",
+      "city_name": "Charleroi",
+      "region_id": "424617",
+      "region_name": "Walonreye",
+      "country_id": "424615",
+      "country_name": "Belgium",
+      "country_symbol": "be",
+      "unit_type_produce_bound_name": "1",
+      "artefact_ids": "{302645}",
+      "slots": "{300143}",
+      "product_symbols": [
+        "NULL"
+      ],
+      "artefacts": {
+        "slots": {
+          "300138": {
+            "id": "300138",
+            "name": "Management",
+            "symbol": "management",
+            "sort_order": "90",
+            "enabled": "t"
+          },
+          "300143": {
+            "id": "300143",
+            "name": "Marketing",
+            "symbol": "marketing",
+            "sort_order": "50",
+            "enabled": "t"
+          }
+        },
+        "attached": {
+          "300138": [],
+          "300143": {
+            "id": "302645",
+            "unit_id": "11057271",
+            "artefact_id": "302645",
+            "name": "Creative department",
+            "desc": "By establishing a Creative department you have gained more rapid growth of brand recognition. Effect: acceleration of growth of all brands of the office +50% ",
+            "symbol": "162174100406.gif",
+            "initial_cost": "500000",
+            "point_cost": "0",
+            "cost_per_turn": "25000",
+            "ttl": "30",
+            "expires": "13"
+          }
+        }
+      }
+    }
+  }
+}

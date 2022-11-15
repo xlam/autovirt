@@ -68,11 +68,11 @@ def dispatch(action_name: str, action_options: str):
         )
 
     if action_name == "innovations":
-        from autovirt.artefact import RenewAction
-        from autovirt.virtapi.mail import VirtMail
-        from autovirt.virtapi.artefact import VirtArtefact
+        from autovirt.artefact.action import RenewAction
+        from autovirt.artefact.adapter import ArtefactAdapter
+        from autovirt.virtapi import GatewayOptions
 
-        action = RenewAction(VirtMail(session), VirtArtefact(session))
+        action = RenewAction(ArtefactAdapter(session, GatewayOptions(**config)))
 
     if action:
         logger.info("")
