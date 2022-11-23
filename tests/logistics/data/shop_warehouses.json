@@ -1,0 +1,48 @@
+{
+  "info": {
+    "count": 5,
+    "page": 1,
+    "page_size": 50,
+    "sort": []
+  },
+  "data": {
+    "8389688": {
+      "id": "8389688",
+      "name": "Склад",
+      "country_symbol": "az",
+      "country_name": "Азербайджан",
+      "region_name": "Азербайджан",
+      "city_name": "Гянджа",
+      "unit_class_kind": "warehouse",
+      "size": "400",
+      "labor_max": "0",
+      "equipment_max": "0",
+      "square": "4000000",
+      "unit_type_symbol": "warehouse",
+      "transport_cost": "28",
+      "tax_cost": "844.200754693038",
+      "total_cost": "872.200754693038",
+      "quality": "10.8616562261782",
+      "qty": "0"
+    },
+    "10113313": {
+      "id": "10113313",
+      "name": "Склад",
+      "country_symbol": "ru",
+      "country_name": "Россия",
+      "region_name": "Поволжье",
+      "city_name": "Саратов",
+      "unit_class_kind": "warehouse",
+      "size": "1500",
+      "labor_max": "0",
+      "equipment_max": "0",
+      "square": "15000000",
+      "unit_type_symbol": "warehouse",
+      "transport_cost": "26.45",
+      "tax_cost": "882.573516269994",
+      "total_cost": "909.023516269994",
+      "quality": "21.7233124523564",
+      "qty": "51277"
+    }
+  }
+}
