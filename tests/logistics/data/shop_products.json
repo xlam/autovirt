@@ -1,0 +1,62 @@
+[
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "15334",
+    "product_name": "Бейсболка",
+    "sales_volume": "6070",
+    "order_amount": "15000",
+    "purchase_amount": "15000",
+    "quantity": "1212714",
+    "share_of_the_market": "10.8"
+  },
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "422204",
+    "product_name": "Деловая одежда",
+    "sales_volume": "4000",
+    "order_amount": "4000",
+    "purchase_amount": "4000",
+    "quantity": "4000",
+    "share_of_the_market": "43.85"
+  },
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "1520",
+    "product_name": "Одежда",
+    "sales_volume": "0",
+    "order_amount": "20000",
+    "purchase_amount": "0",
+    "quantity": "0",
+    "share_of_the_market": "0"
+  },
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "423164",
+    "product_name": "Сапоги",
+    "sales_volume": "2250",
+    "order_amount": "4000",
+    "purchase_amount": "4000",
+    "quantity": "170633",
+    "share_of_the_market": "13.35"
+  },
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "422649",
+    "product_name": "Сомбреро",
+    "sales_volume": "23",
+    "order_amount": "4000",
+    "purchase_amount": "4000",
+    "quantity": "199529",
+    "share_of_the_market": "0.2"
+  },
+  {
+    "shop_unit_id": "8408693",
+    "product_id": "301319",
+    "product_name": "Сумки и портфели",
+    "sales_volume": "5000",
+    "order_amount": "5000",
+    "purchase_amount": "5000",
+    "quantity": "5000",
+    "share_of_the_market": "17.07"
+  }
+]
