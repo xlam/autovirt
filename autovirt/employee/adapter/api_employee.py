@@ -43,7 +43,7 @@ class ApiEmployeeAdapter(EmployeeGateway):
                         unit["name"],
                         unit["city_name"],
                         int(unit["labor_max"]),
-                        float(unit["salary"]),
+                        float(unit["labor_salary"]),
                         unit_info["salary_required"],
                     )
                 )

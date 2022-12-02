@@ -57,10 +57,5 @@ class ApiShopGateway(ShopGateway):
             "qty": delivery.quantity,
             "token": self.s.token,
         }
-        logger.info(
-            f"Delivering {delivery.quantity} pieces of '{delivery.product_name}' ({delivery.product_id}) "
-            f"from shop {delivery.from_unit_id} to warehouse {delivery.to_unit_id}, "
-            f"delivery cost: {delivery.total_cost:.2f}"
-        )
         r = self.s.post(url, params)
         logger.info(f"response: {r}")
