@@ -33,4 +33,4 @@ def test_manage_retail_prices():
 
     result = action.run(shop_id=1, method=by_mid_values)
     assert len(result) > 0
-    assert sales_adapter.updates[2].price == 229411
+    assert sales_adapter.updates[2].price == 100000

@@ -45,7 +45,8 @@ def by_mid_values(product: Product) -> int:
     mid_price = (product.locals_price + product.shops_price) / 2
     quality_coeff = product.quality / mid_quality
     if quality_coeff > 1:
-        return int(mid_price + mid_price * (quality_coeff - 1))
+        price = int(mid_price + mid_price * (quality_coeff - 1))
+        return min(price, int(product.locals_price * 2))
     elif quality_coeff < 1:
         return int(mid_price - mid_price * (1 - quality_coeff))
     else:
