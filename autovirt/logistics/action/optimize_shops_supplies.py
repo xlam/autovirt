@@ -8,10 +8,10 @@ class OptimizeShopsSuppliesAction:
         self.units_gateway = units_gateway
         self.supplies_gateway = supplies_gateway
 
-    def execute(self, factor: int = 1) -> list[UnitSupplies]:
+    def execute(self, factor: int = 1, dry_run: bool = False) -> list[UnitSupplies]:
         shops_ids = self.units_gateway.get_shops_ids()
         optimize_action = OptimizeUnitSuppliesAction(self.supplies_gateway)
         changed_supplies = []
         for shop_id in shops_ids:
-            changed_supplies.append(optimize_action.execute(shop_id, factor))
+            changed_supplies.append(optimize_action.execute(shop_id, factor, dry_run))
         return changed_supplies

@@ -1,6 +1,5 @@
 import argparse
 import sys
-from typing import Protocol, Optional
 
 from autovirt import __version__ as version
 from autovirt import utils
@@ -31,16 +30,14 @@ def parse_args():
     return parser.parse_args()
 
 
-class Action(Protocol):
-    def run(self, config_name: str):
-        pass
-
-
 def dispatch(action_name: str, action_options: str):
     logger = utils.init_logger(action_name)
     session = VirtSession()
     config = utils.get_config("autovirt")
-    action: Optional[Action] = None
+    action = None
+
+    # Quick walk-around for passing different arguments to actions run() method
+    params = []
 
     if action_name == "repair":
         from autovirt.equipment import RepairAction
@@ -48,13 +45,14 @@ def dispatch(action_name: str, action_options: str):
         from autovirt.virtapi import GatewayOptions
 
         action = RepairAction(VirtEquipment(session, GatewayOptions(**config)))
+        params = [action_options]
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction
         from autovirt.employee.adapter import EmployeeAdapter
         from autovirt.virtapi import GatewayOptions
 
-        action = SetDemandedSalaryAction(
+        action = SetDemandedSalaryAction(  # type: ignore
             EmployeeAdapter(session, GatewayOptions(**config)),
         )
 
@@ -63,7 +61,7 @@ def dispatch(action_name: str, action_options: str):
         from autovirt.employee.adapter import EmployeeAdapter
         from autovirt.virtapi import GatewayOptions
 
-        action = SetRequiredSalaryAction(
+        action = SetRequiredSalaryAction(  # type: ignore
             EmployeeAdapter(session, GatewayOptions(**config))
         )
 
@@ -72,13 +70,13 @@ def dispatch(action_name: str, action_options: str):
         from autovirt.artefact.adapter import ArtefactAdapter
         from autovirt.virtapi import GatewayOptions
 
-        action = RenewAction(ArtefactAdapter(session, GatewayOptions(**config)))
+        action = RenewAction(ArtefactAdapter(session, GatewayOptions(**config)))  # type: ignore
 
     if action:
         logger.info("")
         logger.info(f"*** starting '{action_name}' action ***")
         try:
-            action.run(action_options)
+            action.run(*params)
         except AutovirtError as e:
             logger.error(f"{e} ({e.__class__})")
             logger.info("exiting.")

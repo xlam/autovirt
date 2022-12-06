@@ -1,5 +1,3 @@
-from typing import Optional
-
 from autovirt import utils
 from autovirt.employee.action.gateway import EmployeeGateway
 
@@ -10,10 +8,7 @@ class SetRequiredSalaryAction:
     def __init__(self, employee_gateway: EmployeeGateway):
         self.employee_gateway = employee_gateway
 
-    def run(self, config_name: Optional[str] = None):
-        if not config_name:
-            pass
-
+    def run(self, dry_run: bool = False):
         units = self.employee_gateway.get_units_requiring_salary_raise()
         if not units:
             logger.info("no units to set required level salary, exiting.")
@@ -25,4 +20,7 @@ class SetRequiredSalaryAction:
                 f"raising salary at {unit.name} ({unit.unit_id}), {unit.city_name} "
                 f"from {unit.initial_salary} to {unit.salary}"
             )
-            self.employee_gateway.set_salary(unit.unit_id, unit.labor_max, unit.salary)
+            if not dry_run:
+                self.employee_gateway.set_salary(
+                    unit.unit_id, unit.labor_max, unit.salary
+                )
