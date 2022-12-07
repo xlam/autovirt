@@ -32,7 +32,9 @@ class RepairAction:
     def __init__(self, equipment_gateway: EquipmentGateway):
         self.equipment = equipment_gateway
 
-    def fix_units_quality(self, units: list[UnitEquipment], margin: float = 0):
+    def fix_units_quality(
+        self, units: list[UnitEquipment], margin: float = 0, dry_run: bool = False
+    ):
         for unit in units:
             # need to update offers before each operation
             offers = self.equipment.get_offers(unit.equipment_id)
@@ -49,15 +51,18 @@ class RepairAction:
                 f"to replace {quantity} items at unit {unit.id} "
                 f"(installed quality: {unit.quality}, required: {unit.quality_required})"
             )
-            self.equipment.terminate(unit, quantity)
-            self.equipment.buy(unit, offer, quantity)
+            if not dry_run:
+                self.equipment.terminate(unit, quantity)
+                self.equipment.buy(unit, offer, quantity)
 
-    def repair_with_quality(self, units: list[UnitEquipment], quality: float) -> float:
+    def repair_with_quality(
+        self, units: list[UnitEquipment], quality: float, dry_run: bool = False
+    ) -> float:
         units_normal, units_mismatch = split_mismatch_quality_units(units)
         if units_mismatch:
             logger.info("mismatch units qualities found, fixing them:")
             logger.info(units_mismatch)
-            self.fix_units_quality(units_mismatch)
+            self.fix_units_quality(units_mismatch, dry_run=dry_run)
         if not units_normal:
             logger.info("nothing to repair, exiting")
             sys.exit(0)
@@ -78,7 +83,8 @@ class RepairAction:
         logger.info(
             f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
         )
-        self.equipment.repair(units_normal, offer)
+        if not dry_run:
+            self.equipment.repair(units_normal, offer)
         return repair_cost
 
     @staticmethod
@@ -93,19 +99,24 @@ class RepairAction:
             units = [unit for unit in units for inc in includes if unit.id == inc]
         return units
 
-    def repair_by_quality(self, units: list[UnitEquipment], quality_type: QualityType):
+    def repair_by_quality(
+        self,
+        units: list[UnitEquipment],
+        quality_type: QualityType,
+        dry_run: bool = False,
+    ):
         units_ = split_by_quality(units, quality_type=quality_type)
         logger.info(
             f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
         )
         total_cost = 0.0
         for quality, units_list in units_.items():
-            repair_cost = self.repair_with_quality(units_list, quality)
+            repair_cost = self.repair_with_quality(units_list, quality, dry_run)
             total_cost += repair_cost
         logger.info(f"total repair cost: {total_cost:.0f}")
 
     def repair_with_config_offer(
-        self, units: list[UnitEquipment], offer_id: int
+        self, units: list[UnitEquipment], offer_id: int, dry_run: bool = False
     ) -> float:
         quantity = quantity_to_repair(units)
         offers = self.equipment.get_offers(units[0].equipment_id)
@@ -116,7 +127,8 @@ class RepairAction:
             f"using offer {offer.id} with quality {offer.quality} "
             f"and price {offer.price} (repair cost: {total_cost:.0f})"
         )
-        self.equipment.repair(units, offer)
+        if not dry_run:
+            self.equipment.repair(units, offer)
         return total_cost
 
     def run(self, input_dto: RepairInputDTO):
@@ -129,11 +141,11 @@ class RepairAction:
             sys.exit(0)
 
         if input_dto.offer_id:
-            self.repair_with_config_offer(units, input_dto.offer_id)
+            self.repair_with_config_offer(units, input_dto.offer_id, input_dto.dry_run)
         else:
             quality_type = (
                 QualityType.INSTALLED if input_dto.quality else QualityType.REQUIRED
             )
-            self.repair_by_quality(units, quality_type)
+            self.repair_by_quality(units, quality_type, input_dto.dry_run)
 
         logger.info("repairing finished")
