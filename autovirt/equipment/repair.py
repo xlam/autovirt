@@ -14,25 +14,22 @@ from autovirt.equipment.domain.equipment import (
     split_mismatch_quality_units,
 )
 from autovirt.equipment.interface import EquipmentGateway
-from autovirt.exception import AutovirtError
 from autovirt.structs import UnitEquipment
 
 logger = utils.get_logger()
 
 
-class RepairConfig(BaseModel):
+class RepairInputDTO(BaseModel):
     equipment_id: int
     include: Optional[list[int]] = None
     exclude: Optional[list[int]] = None
     offer_id: Optional[int] = None
     quality: Optional[bool] = None
+    dry_run: bool = False
 
 
 class RepairAction:
-    def __init__(
-        self, equipment_gateway: EquipmentGateway, options: Optional[dict] = None
-    ):
-        self.options = utils.get_config("repair") if not options else options
+    def __init__(self, equipment_gateway: EquipmentGateway):
         self.equipment = equipment_gateway
 
     def fix_units_quality(self, units: list[UnitEquipment], margin: float = 0):
@@ -84,22 +81,15 @@ class RepairAction:
         self.equipment.repair(units_normal, offer)
         return repair_cost
 
-    def get_repair_config(self, config_name: str) -> dict:
-        try:
-            repair_config = self.options[config_name]
-        except KeyError:
-            raise AutovirtError(f"configuration '{config_name}' not found!")
-        return repair_config  # type: ignore
-
     @staticmethod
     def filter_units_with_exclude_and_include_options(
-        units: list[UnitEquipment], repair_config: RepairConfig
+        units: list[UnitEquipment], repair_options: RepairInputDTO
     ) -> list[UnitEquipment]:
-        if repair_config.exclude:
-            excludes = repair_config.exclude
+        if repair_options.exclude:
+            excludes = repair_options.exclude
             units = [unit for unit in units for ex in excludes if unit.id != ex]
-        if repair_config.include:
-            includes = repair_config.include
+        if repair_options.include:
+            includes = repair_options.include
             units = [unit for unit in units for inc in includes if unit.id == inc]
         return units
 
@@ -129,22 +119,20 @@ class RepairAction:
         self.equipment.repair(units, offer)
         return total_cost
 
-    def run(self, config_name: str):
-        repair_config = RepairConfig(**self.get_repair_config(config_name))
-
-        logger.info(f"starting repair equipment id {repair_config.equipment_id}")
-        units = self.equipment.get_units_to_repair(repair_config.equipment_id)
-        units = self.filter_units_with_exclude_and_include_options(units, repair_config)
+    def run(self, input_dto: RepairInputDTO):
+        logger.info(f"starting repair equipment id {input_dto.equipment_id}")
+        units = self.equipment.get_units_to_repair(input_dto.equipment_id)
+        units = self.filter_units_with_exclude_and_include_options(units, input_dto)
 
         if not units:
             logger.info("nothing to repair, exiting")
             sys.exit(0)
 
-        if repair_config.offer_id:
-            self.repair_with_config_offer(units, repair_config.offer_id)
+        if input_dto.offer_id:
+            self.repair_with_config_offer(units, input_dto.offer_id)
         else:
             quality_type = (
-                QualityType.INSTALLED if repair_config.quality else QualityType.REQUIRED
+                QualityType.INSTALLED if input_dto.quality else QualityType.REQUIRED
             )
             self.repair_by_quality(units, quality_type)
 

@@ -1,1 +1,1 @@
-from .repair import RepairAction
+from .repair import RepairAction, RepairInputDTO

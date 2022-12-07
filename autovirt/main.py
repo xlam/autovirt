@@ -40,12 +40,21 @@ def dispatch(action_name: str, action_options: str):
     params = []
 
     if action_name == "repair":
-        from autovirt.equipment import RepairAction
+        from autovirt.equipment import RepairAction, RepairInputDTO
         from autovirt.virtapi.equipment import VirtEquipment
         from autovirt.virtapi import GatewayOptions
 
+        def get_repair_config(config_section: str) -> dict:
+            repair_config = utils.get_config("repair")
+            try:
+                repair_options = repair_config[config_section]
+            except KeyError:
+                raise AutovirtError(f"configuration '{config_section}' not found!")
+            return repair_options
+
+        input_dto = RepairInputDTO(**get_repair_config(action_options))
+        params = [input_dto]
         action = RepairAction(VirtEquipment(session, GatewayOptions(**config)))
-        params = [action_options]
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction

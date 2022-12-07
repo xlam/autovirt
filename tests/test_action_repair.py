@@ -13,15 +13,10 @@ from autovirt.equipment.domain.equipment import (
 )
 from autovirt.equipment.interface import EquipmentGateway
 from autovirt.equipment.repair import (
-    RepairConfig,
+    RepairInputDTO,
     RepairAction,
 )
 from autovirt.structs import UnitEquipment, RepairOffer
-
-
-@pytest.fixture
-def options():
-    return {"comp": {}}
 
 
 @pytest.fixture
@@ -134,7 +129,7 @@ def test_split_by_quality(units):
     ],
 )
 def test_repair_config(config_dict):
-    config = RepairConfig(**config_dict)
+    config = RepairInputDTO(**config_dict)
     c = config.dict()
     for key, value in config_dict.items():
         assert key in c.keys()
@@ -155,28 +150,26 @@ def mock_equipment_for_installed(offers_for_installed):
     return mock
 
 
-def test_fix_mismatch_units(mock_equipment, units_mismatch, offers, options):
-    action = RepairAction(mock_equipment, options)
+def test_fix_mismatch_units(mock_equipment, units_mismatch, offers):
+    action = RepairAction(mock_equipment)
     action.fix_units_quality(units_mismatch[:1])
     mock_equipment.terminate.assert_called_with(units_mismatch[0], 167)
     mock_equipment.buy.assert_called_with(units_mismatch[0], offers[6], 167)
 
 
-def test_repair_with_quality(mock_equipment, units, offers, options):
-    action = RepairAction(mock_equipment, options)
+def test_repair_with_quality(mock_equipment, units, offers):
+    action = RepairAction(mock_equipment)
     action.repair_with_quality(units[:1], units[0].quality_required)
     mock_equipment.repair.assert_called_with(units[:1], offers[3])
 
 
-def test_repair_by_quality(mock_equipment, units, offers, options):
-    action = RepairAction(mock_equipment, options)
+def test_repair_by_quality(mock_equipment, units, offers):
+    action = RepairAction(mock_equipment)
     action.repair_by_quality(units, QualityType.REQUIRED)
     mock_equipment.repair.assert_called_once()
 
 
-def test_repair_by_quality_installed(
-    mock_equipment_for_installed, units, offers, options
-):
-    action = RepairAction(mock_equipment_for_installed, options)
+def test_repair_by_quality_installed(mock_equipment_for_installed, units, offers):
+    action = RepairAction(mock_equipment_for_installed)
     action.repair_by_quality(units, QualityType.INSTALLED)
     assert mock_equipment_for_installed.repair.call_count == 2
