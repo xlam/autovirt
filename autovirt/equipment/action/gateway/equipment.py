@@ -1,26 +1,21 @@
-import abc
+from typing import Protocol
 
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 
-class EquipmentGateway(abc.ABC):
-    @abc.abstractmethod
+class EquipmentGateway(Protocol):
     def terminate(self, unit: UnitEquipment, quantity: int):
-        pass
+        ...
 
-    @abc.abstractmethod
     def buy(self, unit: UnitEquipment, offer: RepairOffer, quantity: int):
-        pass
+        ...
 
-    @abc.abstractmethod
-    def get_offers(self, product_id: int) -> list[RepairOffer]:
-        pass
+    def get_offers(self, unit_id: int, quantity_from: int = 0) -> list[RepairOffer]:
+        ...
 
-    @abc.abstractmethod
     def repair(self, units: list[UnitEquipment], offer: RepairOffer):
-        pass
+        ...
 
-    @abc.abstractmethod
     def get_units_to_repair(self, equipment_id: int) -> list[UnitEquipment]:
-        pass
+        ...

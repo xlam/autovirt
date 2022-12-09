@@ -1,10 +1,10 @@
 from autovirt.equipment.action.gateway import EquipmentGateway
-from autovirt.exception import AutovirtError
-from autovirt.session import VirtSession
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
-from autovirt.utils import get_logger
+from autovirt.exception import AutovirtError
 from autovirt.gateway_options import GatewayOptions
+from autovirt.session import VirtSession
+from autovirt.utils import get_logger
 
 logger = get_logger()
 
@@ -26,13 +26,12 @@ class ApiEquipmentAdapter(EquipmentGateway):
         )
         return r.json()["data"].values()
 
-    def _fetch_offers(self, product_id: int) -> list[dict]:
-        """Fetch offers by product id"""
+    def _fetch_offers(self, unit_id: int, quantity_from: int = 0) -> list[dict]:
         r = self.s.get(
-            "https://virtonomica.ru/api/vera/main/company/equipment/offers",
+            "https://virtonomica.ru/api/vera/main/unit/equipment/offers",
             params={
-                "id": self.options.company_id,
-                "product_id": product_id,
+                "id": unit_id,
+                "quantity_from": quantity_from,
                 "pagesize": self.options.pagesize,
             },
         )
@@ -59,9 +58,9 @@ class ApiEquipmentAdapter(EquipmentGateway):
                 )
         return units
 
-    def get_offers(self, product_id: int) -> list[RepairOffer]:
+    def get_offers(self, unit_id: int, quantity_from: int = 0) -> list[RepairOffer]:
         """Get all offers for the product"""
-        offers_data = self._fetch_offers(product_id)
+        offers_data = self._fetch_offers(unit_id, quantity_from)
         offers = []
         for offer in offers_data:
             offers.append(
@@ -71,7 +70,7 @@ class ApiEquipmentAdapter(EquipmentGateway):
                     str(offer["company_name"]),
                     float(offer["price"]),
                     float(offer["quality"]),
-                    int(offer["quantity"]),
+                    int(offer["free_for_buy"]),
                 )
             )
         return offers

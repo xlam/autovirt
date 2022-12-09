@@ -37,7 +37,7 @@ class RepairAction:
     ):
         for unit in units:
             # need to update offers before each operation
-            offers = self.equipment_adapter.get_offers(unit.equipment_id)
+            offers = self.equipment_adapter.get_offers(unit.id)
             res = select_offer_to_raise_quality(unit, offers, margin)
             if not res:
                 logger.info(
@@ -67,7 +67,7 @@ class RepairAction:
             logger.info("nothing to repair, exiting")
             sys.exit(0)
         quantity = quantity_to_repair(units_normal)
-        offers = self.equipment_adapter.get_offers(units_normal[0].equipment_id)
+        offers = self.equipment_adapter.get_offers(units_normal[0].id, quantity)
         offers = filter_offers(offers, quality, quantity)
         offer = select_offer(offers, units_normal, quality)
         if not offer:
@@ -119,7 +119,7 @@ class RepairAction:
         self, units: list[UnitEquipment], offer_id: int, dry_run: bool = False
     ) -> float:
         quantity = quantity_to_repair(units)
-        offers = self.equipment_adapter.get_offers(units[0].equipment_id)
+        offers = self.equipment_adapter.get_offers(units[0].id, quantity)
         offer = [o for o in offers if o.id == offer_id][0]
         total_cost = quantity * offer.price
         logger.info(f"repairing {quantity} pieces on {len(units)} units")
