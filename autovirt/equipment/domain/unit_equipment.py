@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from math import ceil
 
-FLOAT_PRECISION = 2
-
 
 @dataclass
 class UnitEquipment:
@@ -17,10 +15,6 @@ class UnitEquipment:
     @property
     def wear_quantity(self) -> int:
         return ceil(self.quantity * self.wear * 0.01)
-
-    def __post_init__(self):
-        self.quality = round(self.quality, FLOAT_PRECISION)
-        self.quality_required = round(self.quality_required, FLOAT_PRECISION)
 
     def expected_quality(self, repair_quality: float):
         return (
