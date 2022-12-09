@@ -1,9 +1,9 @@
 import json
 from unittest.mock import Mock
 
-from autovirt.structs import UnitEquipment
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 from autovirt.virtapi import GatewayOptions
-from autovirt.virtapi.equipment import VirtEquipment
+from autovirt.equipment.adapter.api_equipment import ApiEquipmentAdapter
 
 with open("tests/data/repair-1529-json-short.txt", "r") as f:
     offers_data = json.load(f)
@@ -13,7 +13,7 @@ options = GatewayOptions(company_id=0)
 
 
 def test_get_units_returns_valid_list():
-    e = VirtEquipment(Mock(), options)
+    e = ApiEquipmentAdapter(Mock(), options)
     e._fetch_units = Mock(return_value=offers_data)
     units = e.get_units_to_repair(equipment_id)
     assert isinstance(units[0], UnitEquipment)

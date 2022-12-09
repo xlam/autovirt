@@ -1,14 +1,15 @@
-from autovirt.equipment.interface import EquipmentGateway
+from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.exception import AutovirtError
 from autovirt.session import VirtSession
-from autovirt.structs import UnitEquipment, RepairOffer
+from autovirt.equipment.domain.repair_offer import RepairOffer
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 from autovirt.utils import get_logger
 from autovirt.virtapi import GatewayOptions
 
 logger = get_logger()
 
 
-class VirtEquipment(EquipmentGateway):
+class ApiEquipmentAdapter(EquipmentGateway):
     def __init__(self, session: VirtSession, options: GatewayOptions):
         self.s = session
         self.options = options

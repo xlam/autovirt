@@ -13,8 +13,8 @@ from autovirt.equipment.domain.equipment import (
     split_by_quality,
     split_mismatch_quality_units,
 )
-from autovirt.equipment.interface import EquipmentGateway
-from autovirt.structs import UnitEquipment
+from autovirt.equipment.action.gateway import EquipmentGateway
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 logger = utils.get_logger()
 

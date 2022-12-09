@@ -40,8 +40,8 @@ def dispatch(action_name: str, action_options: str):
     params = []
 
     if action_name == "repair":
-        from autovirt.equipment import RepairAction, RepairInputDTO
-        from autovirt.virtapi.equipment import VirtEquipment
+        from autovirt.equipment.action import RepairAction, RepairInputDTO
+        from autovirt.equipment.adapter.api_equipment import ApiEquipmentAdapter
         from autovirt.virtapi import GatewayOptions
 
         def get_repair_config(config_section: str) -> dict:
@@ -54,7 +54,7 @@ def dispatch(action_name: str, action_options: str):
 
         input_dto = RepairInputDTO(**get_repair_config(action_options))
         params = [input_dto]
-        action = RepairAction(VirtEquipment(session, GatewayOptions(**config)))
+        action = RepairAction(ApiEquipmentAdapter(session, GatewayOptions(**config)))
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction

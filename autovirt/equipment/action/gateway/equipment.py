@@ -1,6 +1,7 @@
 import abc
 
-from autovirt.structs import UnitEquipment, RepairOffer
+from autovirt.equipment.domain.repair_offer import RepairOffer
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 
 class EquipmentGateway(abc.ABC):

@@ -1,5 +1,5 @@
 import pytest
-from autovirt.structs import UnitEquipment
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 
 @pytest.fixture()

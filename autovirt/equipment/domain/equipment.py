@@ -4,7 +4,8 @@ from math import ceil
 from typing import Optional, Tuple, Union
 
 from autovirt import utils
-from autovirt.structs import UnitEquipment, RepairOffer
+from autovirt.equipment.domain.repair_offer import RepairOffer
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 logger = utils.get_logger()
 

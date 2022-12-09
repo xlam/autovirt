@@ -11,12 +11,13 @@ from autovirt.equipment.domain.equipment import (
     split_by_quality,
     split_mismatch_quality_units,
 )
-from autovirt.equipment.interface import EquipmentGateway
-from autovirt.equipment.repair import (
+from autovirt.equipment.action.gateway import EquipmentGateway
+from autovirt.equipment.action.repair import (
     RepairInputDTO,
     RepairAction,
 )
-from autovirt.structs import UnitEquipment, RepairOffer
+from autovirt.equipment.domain.repair_offer import RepairOffer
+from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 
 @pytest.fixture
