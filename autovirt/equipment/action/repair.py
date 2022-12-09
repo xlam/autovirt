@@ -24,7 +24,7 @@ class RepairInputDTO(BaseModel):
     include: Optional[list[int]] = None
     exclude: Optional[list[int]] = None
     offer_id: Optional[int] = None
-    quality: Optional[bool] = None
+    keep_quality: Optional[bool] = None
     dry_run: bool = False
 
 
@@ -42,14 +42,14 @@ class RepairAction:
             if not res:
                 logger.info(
                     f"no offers found to fix unit {unit.id} "
-                    f"(installed quality: {unit.quality}, required: {unit.quality_required}), skipping"
+                    f"(installed quality: {unit.quality_installed}, required: {unit.quality_required}), skipping"
                 )
                 continue
             (offer, quantity) = res
             logger.info(
                 f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
                 f"to replace {quantity} items at unit {unit.id} "
-                f"(installed quality: {unit.quality}, required: {unit.quality_required})"
+                f"(installed quality: {unit.quality_installed}, required: {unit.quality_required})"
             )
             if not dry_run:
                 self.equipment_adapter.terminate(unit, quantity)
@@ -115,7 +115,7 @@ class RepairAction:
             total_cost += repair_cost
         logger.info(f"total repair cost: {total_cost:.0f}")
 
-    def repair_with_config_offer(
+    def repair_with_offer(
         self, units: list[UnitEquipment], offer_id: int, dry_run: bool = False
     ) -> float:
         quantity = quantity_to_repair(units)
@@ -141,10 +141,12 @@ class RepairAction:
             return
 
         if input_dto.offer_id:
-            self.repair_with_config_offer(units, input_dto.offer_id, input_dto.dry_run)
+            self.repair_with_offer(units, input_dto.offer_id, input_dto.dry_run)
         else:
             quality_type = (
-                QualityType.INSTALLED if input_dto.quality else QualityType.REQUIRED
+                QualityType.INSTALLED
+                if input_dto.keep_quality
+                else QualityType.REQUIRED
             )
             self.repair_by_quality(units, quality_type, input_dto.dry_run)
 

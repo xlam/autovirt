@@ -125,7 +125,7 @@ def test_split_by_quality(units):
     "config_dict",
     [
         {"equipment_id": 0},
-        {"equipment_id": 0, "exclude": [0], "quality": True},
+        {"equipment_id": 0, "exclude": [0], "keep_quality": True},
         {"equipment_id": 0, "include": [0, 1], "offer_id": 0},
     ],
 )

@@ -18,7 +18,7 @@ pagesize = 1000                 # number of entries to return in server response
     [repair.comp-hitech]
         equipment_id = 1515
         include = [-1]          # list of units ids to repair (only those will be repaired)
-        quality = true          # repair by installed quality (not required)
+        keep_quality = true     # repair by installed quality (not required)
 
     [repair.mtools]
         equipment_id = 1529     # machine tools

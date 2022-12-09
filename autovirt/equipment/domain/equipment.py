@@ -16,7 +16,7 @@ QUALITY_DELTA = 3
 
 
 class QualityType(Enum):
-    INSTALLED = "quality"
+    INSTALLED = "quality_installed"
     REQUIRED = "quality_required"
 
 
@@ -88,19 +88,20 @@ def select_offer(
     return minimum_qp_item[0]
 
 
+# todo: check for enough quantity to replace equipment
 def select_offer_to_raise_quality(
     unit: UnitEquipment, offers: list[RepairOffer], margin: float = 0
 ) -> Optional[Tuple[RepairOffer, int]]:
     required = unit.quality_required + margin
-    quality_coeff = unit.quantity * (required - unit.quality)
+    quality_coeff = unit.quantity * (required - unit.quality_installed)
     offers = list(filter(lambda o: o.quality >= required, offers))
     if not offers:
         return None
     offer = offers[0]
-    count_to_replace = ceil(quality_coeff / (offer.quality - unit.quality))
+    count_to_replace = ceil(quality_coeff / (offer.quality - unit.quality_installed))
     price = count_to_replace * offer.price
     for offer_ in offers[1:]:
-        count = ceil(quality_coeff / (offer_.quality - unit.quality))
+        count = ceil(quality_coeff / (offer_.quality - unit.quality_installed))
         price_ = count * offer_.price
         if price_ < price:
             offer = offer_
@@ -114,7 +115,7 @@ def split_by_quality(
     """Split units by quality (required or installed)"""
     res: dict[float, list[UnitEquipment]] = {}
     for unit in units:
-        quality = getattr(unit, quality_type.value)
+        quality = getattr(unit, str(quality_type.value))
         if quality not in res.keys():
             res[quality] = []
         res[quality].append(unit)
@@ -131,7 +132,7 @@ def split_mismatch_quality_units(
     normal = []
     mismatch = []
     for unit in units:
-        if unit.quality < unit.quality_required:
+        if unit.quality_installed < unit.quality_required:
             mismatch.append(unit)
         else:
             normal.append(unit)
