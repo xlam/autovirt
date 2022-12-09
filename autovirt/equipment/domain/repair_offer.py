@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from autovirt.equipment.domain.unit_equipment import FLOAT_PRECISION
+FLOAT_PRECISION = 2
 
 
 @dataclass()

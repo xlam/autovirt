@@ -1,7 +1,7 @@
 import json
 
-from autovirt.logistics.adapter.units import ApiUnitsGateway
-from autovirt.virtapi import GatewayOptions
+from autovirt.logistics.adapter.api_units import ApiUnitsGateway
+from autovirt.gateway_options import GatewayOptions
 
 
 class Response:

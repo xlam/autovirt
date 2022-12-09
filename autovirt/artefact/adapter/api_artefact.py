@@ -1,13 +1,13 @@
 from autovirt.artefact.action.gateway import ArtefactGateway
 from autovirt.artefact.domain import Artefact
 from autovirt.session import VirtSession
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 from autovirt import utils
 
 logger = utils.get_logger()
 
 
-class ArtefactAdapter(ArtefactGateway):
+class ApiArtefactAdapter(ArtefactGateway):
     def __init__(self, session: VirtSession, options: GatewayOptions):
         self.s = session
         self.options = options

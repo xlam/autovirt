@@ -1,6 +1,6 @@
 from autovirt.logistics.action.gateway import UnitsGateway
 from autovirt.session import VirtSession
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 
 
 class ApiUnitsGateway(UnitsGateway):

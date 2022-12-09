@@ -2,10 +2,10 @@ from autovirt.employee.action.gateway import EmployeeGateway
 from autovirt.employee.domain import DemandingUnitSalary
 from autovirt.employee.domain import RequiringUnitSalary
 from autovirt.session import VirtSession
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 
 
-class EmployeeAdapter(EmployeeGateway):
+class ApiEmployeeAdapter(EmployeeGateway):
     def __init__(self, session: VirtSession, options: GatewayOptions):
         self.s = session
         self.options = options

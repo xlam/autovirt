@@ -1,1 +1,1 @@
-from .artefact import ArtefactAdapter
+from .api_artefact import ApiArtefactAdapter

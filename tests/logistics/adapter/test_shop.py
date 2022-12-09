@@ -1,6 +1,6 @@
 import json
 
-from autovirt.logistics.adapter.shop import ApiShopGateway
+from autovirt.logistics.adapter.api_shop import ApiShopGateway
 from autovirt.logistics.domain.unitproduct import UnitProduct
 from autovirt.logistics.domain.warehouse import Warehouse
 

@@ -42,7 +42,7 @@ def dispatch(action_name: str, action_options: str):
     if action_name == "repair":
         from autovirt.equipment.action import RepairAction, RepairInputDTO
         from autovirt.equipment.adapter.api_equipment import ApiEquipmentAdapter
-        from autovirt.virtapi import GatewayOptions
+        from autovirt.gateway_options import GatewayOptions
 
         def get_repair_config(config_section: str) -> dict:
             repair_config = utils.get_config("repair")
@@ -58,28 +58,28 @@ def dispatch(action_name: str, action_options: str):
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction
-        from autovirt.employee.adapter import EmployeeAdapter
-        from autovirt.virtapi import GatewayOptions
+        from autovirt.employee.adapter import ApiEmployeeAdapter
+        from autovirt.gateway_options import GatewayOptions
 
         action = SetDemandedSalaryAction(  # type: ignore
-            EmployeeAdapter(session, GatewayOptions(**config)),
+            ApiEmployeeAdapter(session, GatewayOptions(**config)),
         )
 
     if action_name == "salary":
         from autovirt.employee.action import SetRequiredSalaryAction
-        from autovirt.employee.adapter import EmployeeAdapter
-        from autovirt.virtapi import GatewayOptions
+        from autovirt.employee.adapter import ApiEmployeeAdapter
+        from autovirt.gateway_options import GatewayOptions
 
         action = SetRequiredSalaryAction(  # type: ignore
-            EmployeeAdapter(session, GatewayOptions(**config))
+            ApiEmployeeAdapter(session, GatewayOptions(**config))
         )
 
     if action_name == "innovations":
         from autovirt.artefact.action import RenewAction
-        from autovirt.artefact.adapter import ArtefactAdapter
-        from autovirt.virtapi import GatewayOptions
+        from autovirt.artefact.adapter import ApiArtefactAdapter
+        from autovirt.gateway_options import GatewayOptions
 
-        action = RenewAction(ArtefactAdapter(session, GatewayOptions(**config)))  # type: ignore
+        action = RenewAction(ApiArtefactAdapter(session, GatewayOptions(**config)))  # type: ignore
 
     if action:
         logger.info("")

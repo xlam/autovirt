@@ -4,7 +4,7 @@ from autovirt.session import VirtSession
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
 from autovirt.utils import get_logger
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 
 logger = get_logger()
 

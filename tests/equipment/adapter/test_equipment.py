@@ -2,7 +2,7 @@ import json
 from unittest.mock import Mock
 
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 from autovirt.equipment.adapter.api_equipment import ApiEquipmentAdapter
 
 with open("tests/data/repair-1529-json-short.txt", "r") as f:

@@ -1,1 +1,1 @@
-from .employee import EmployeeAdapter
+from .api_employee import ApiEmployeeAdapter

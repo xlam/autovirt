@@ -1,6 +1,6 @@
 import json
 
-from autovirt.logistics.adapter.supplies import ApiSuppliesGateway
+from autovirt.logistics.adapter.api_supplies import ApiSuppliesGateway
 
 
 class Response:

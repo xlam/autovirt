@@ -3,10 +3,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from autovirt.artefact.adapter import ArtefactAdapter
+from autovirt.artefact.adapter import ApiArtefactAdapter
 from autovirt.artefact.domain import Artefact
 from autovirt.session import VirtSession
-from autovirt.virtapi import GatewayOptions
+from autovirt.gateway_options import GatewayOptions
 
 
 class Response:
@@ -38,7 +38,7 @@ def artefact():
 
 def test_returns_correct_artefacts(session_mock, artefact):
     session_mock.get.return_value = Response()
-    adapter = ArtefactAdapter(session_mock, GatewayOptions(company_id=0))
+    adapter = ApiArtefactAdapter(session_mock, GatewayOptions(company_id=0))
     artefacts = adapter.get_artefacts()
     assert len(artefacts) == 5
     assert type(artefacts[0]) == Artefact
@@ -46,7 +46,7 @@ def test_returns_correct_artefacts(session_mock, artefact):
 
 
 def test_attach(session_mock, artefact):
-    adapter = ArtefactAdapter(session_mock, GatewayOptions(company_id=0))
+    adapter = ApiArtefactAdapter(session_mock, GatewayOptions(company_id=0))
     adapter.attach(artefact)
     session_mock.post.assert_called_with(
         "https://virtonomica.ru/api/vera/main/unit/artefact/attach",
@@ -59,7 +59,7 @@ def test_attach(session_mock, artefact):
 
 
 def test_remove(session_mock, artefact):
-    adapter = ArtefactAdapter(session_mock, GatewayOptions(company_id=0))
+    adapter = ApiArtefactAdapter(session_mock, GatewayOptions(company_id=0))
     adapter.remove(artefact)
     session_mock.post.assert_called_with(
         "https://virtonomica.ru/api/vera/main/unit/artefact/remove",

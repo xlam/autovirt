@@ -1,6 +1,6 @@
 import abc
 
-from autovirt.structs import Message
+from autovirt.mail.domain.message import Message
 
 
 class MailGateway(abc.ABC):
