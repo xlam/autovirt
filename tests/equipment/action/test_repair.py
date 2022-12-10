@@ -107,6 +107,9 @@ def test_select_offer_to_raise_quality_none(offers):
     unit = UnitEquipment(0, 2000, 2000, 29.0, 36.0, 0.0, 1529)
     assert select_offer_to_raise_quality(unit, offers) is None
 
+    offers_ = [RepairOffer(1, 1, "Offer1", 400, 40.0, 1)]
+    assert select_offer_to_raise_quality(unit, offers_) is None
+
 
 def test_mismatched_quality(units_mismatch):
     normal, mismatched = split_mismatch_quality_units(units_mismatch)

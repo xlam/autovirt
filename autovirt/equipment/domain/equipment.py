@@ -88,25 +88,32 @@ def select_offer(
     return minimum_qp_item[0]
 
 
-# todo: check for enough quantity to replace equipment
 def select_offer_to_raise_quality(
     unit: UnitEquipment, offers: list[RepairOffer], margin: float = 0
 ) -> Optional[Tuple[RepairOffer, int]]:
-    required = unit.quality_required + margin
-    quality_coeff = unit.quantity * (required - unit.quality_installed)
-    offers = list(filter(lambda o: o.quality >= required, offers))
+
+    quality_required = unit.quality_required + margin
+    quality_coeff = unit.quantity * (quality_required - unit.quality_installed)
+
+    # calculates equipment quantity to replace with given offer
+    def calc_quantity(offer_: RepairOffer) -> int:
+        return ceil(quality_coeff / (offer_.quality - unit.quality_installed))
+
+    offers = list(filter(lambda o: o.quality >= quality_required, offers))
+    offers = list(filter(lambda o: o.quantity >= calc_quantity(o), offers))
     if not offers:
         return None
-    offer = offers[0]
-    count_to_replace = ceil(quality_coeff / (offer.quality - unit.quality_installed))
-    price = count_to_replace * offer.price
-    for offer_ in offers[1:]:
-        count = ceil(quality_coeff / (offer_.quality - unit.quality_installed))
-        price_ = count * offer_.price
-        if price_ < price:
-            offer = offer_
-            count_to_replace = count
-    return offer, count_to_replace
+
+    selected_offer = offers[0]
+    quantity_to_replace = calc_quantity(selected_offer)
+    total_cost = quantity_to_replace * selected_offer.price
+    for offer in offers[1:]:
+        quantity = calc_quantity(offer)
+        cost = quantity * offer.price
+        if cost < total_cost:
+            selected_offer = offer
+            quantity_to_replace = quantity
+    return selected_offer, quantity_to_replace
 
 
 def split_by_quality(
