@@ -6,7 +6,7 @@ class RepairOffer:
     id: int
     company_id: int
     company_name: str
-    price: float
+    cost: float
     quality: float
     quantity: int
 

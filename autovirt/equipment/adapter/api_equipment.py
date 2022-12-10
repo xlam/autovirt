@@ -68,7 +68,7 @@ class ApiEquipmentAdapter(EquipmentGateway):
                     int(offer["id"]),
                     int(offer["company_id"]),
                     str(offer["company_name"]),
-                    float(offer["price"]),
+                    float(offer["total_cost"]),
                     float(offer["quality"]),
                     int(offer["free_for_buy"]),
                 )

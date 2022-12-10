@@ -37,7 +37,7 @@ def filter_offers(
     filtered = list(filter(lambda x: x.quality > quality - QUALITY_DELTA, offers))
     filtered = list(filter(lambda x: x.quality < quality + QUALITY_DELTA, filtered))
     filtered = list(filter(lambda x: x.quantity > quantity, filtered))
-    filtered = list(filter(lambda x: x.price < PRICE_MAX, filtered))
+    filtered = list(filter(lambda x: x.cost < PRICE_MAX, filtered))
     return filtered
 
 
@@ -65,11 +65,11 @@ def select_offer(
     ]
     qual_diff = [abs(qual - quality) for qual in qual_exp]
     diff_norm = utils.normalize_array(qual_diff)
-    price_norm = utils.normalize_array([o.price for o in offers])
-    qp_dist = [p + q for (p, q) in zip(price_norm, diff_norm)]
+    cost_norm = utils.normalize_array([o.cost for o in offers])
+    qp_dist = [p + q for (p, q) in zip(cost_norm, diff_norm)]
 
     summary: list = [
-        [o, price_norm[i], qual_exp[i], qual_diff[i], diff_norm[i], qp_dist[i]]
+        [o, cost_norm[i], qual_exp[i], qual_diff[i], diff_norm[i], qp_dist[i]]
         for i, o in enumerate(offers)
         if qual_exp[i] >= quality
     ]
@@ -80,7 +80,7 @@ def select_offer(
     logger.info(f"listing filtered offers for quality of {quality}:")
     for o in summary:
         logger.info(
-            f"id: {o[0].id}, quality: {o[0].quality}, price: {o[0].price},"
+            f"id: {o[0].id}, quality: {o[0].quality}, cost: {o[0].cost},"
             f" quantity: {o[0].quantity}, qual_exp: {o[2]:.2f}, qp: {o[5]:.3f}"
         )
 
@@ -106,10 +106,10 @@ def select_offer_to_raise_quality(
 
     selected_offer = offers[0]
     quantity_to_replace = calc_quantity(selected_offer)
-    total_cost = quantity_to_replace * selected_offer.price
+    total_cost = quantity_to_replace * selected_offer.cost
     for offer in offers[1:]:
         quantity = calc_quantity(offer)
-        cost = quantity * offer.price
+        cost = quantity * offer.cost
         if cost < total_cost:
             selected_offer = offer
             quantity_to_replace = quantity

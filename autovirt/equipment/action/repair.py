@@ -47,7 +47,7 @@ class RepairAction:
                 continue
             (offer, quantity) = res
             logger.info(
-                f"got offer {offer.id} (quality: {offer.quality}, price: {offer.price}) "
+                f"got offer {offer.id} (quality: {offer.quality}, price: {offer.cost}) "
                 f"to replace {quantity} items at unit {unit.id} "
                 f"(installed quality: {unit.quality_installed}, required: {unit.quality_required})"
             )
@@ -75,10 +75,10 @@ class RepairAction:
                 f"could not select offer to repair quality {quality}, skipping"
             )
             return 0.0
-        repair_cost = quantity * offer.price
+        repair_cost = quantity * offer.cost
         logger.info(
             f"found offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.price} (repair cost: {repair_cost:.0f})"
+            f"and price {offer.cost} (repair cost: {repair_cost:.0f})"
         )
         logger.info(
             f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
@@ -121,11 +121,11 @@ class RepairAction:
         quantity = quantity_to_repair(units)
         offers = self.equipment_adapter.get_offers(units[0].id, quantity)
         offer = [o for o in offers if o.id == offer_id][0]
-        total_cost = quantity * offer.price
+        total_cost = quantity * offer.cost
         logger.info(f"repairing {quantity} pieces on {len(units)} units")
         logger.info(
             f"using offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.price} (repair cost: {total_cost:.0f})"
+            f"and price {offer.cost} (repair cost: {total_cost:.0f})"
         )
         if not dry_run:
             self.equipment_adapter.repair(units, offer)
