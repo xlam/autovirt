@@ -11,7 +11,7 @@ from autovirt.equipment.domain.equipment import (
     select_offer,
     select_offer_to_raise_quality,
     split_by_quality,
-    split_mismatch_quality_units,
+    split_mismatch_required_quality_units,
 )
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
@@ -38,48 +38,28 @@ class RepairAction:
         for unit in units:
             # need to update offers before each operation
             offers = self.equipment_adapter.get_offers(unit.id)
-            res = select_offer_to_raise_quality(unit, offers, margin)
-            if not res:
-                logger.info(
-                    f"no offers found to fix unit {unit.id} "
-                    f"(installed quality: {unit.quality_installed}, required: {unit.quality_required}), skipping"
-                )
+            offer, quantity = select_offer_to_raise_quality(unit, offers, margin)
+            if not offer:
                 continue
-            (offer, quantity) = res
-            logger.info(
-                f"got offer {offer.id} (quality: {offer.quality}, price: {offer.cost}) "
-                f"to replace {quantity} items at unit {unit.id} "
-                f"(installed quality: {unit.quality_installed}, required: {unit.quality_required})"
-            )
             if not dry_run:
-                self.equipment_adapter.terminate(unit, quantity)
-                self.equipment_adapter.buy(unit, offer, quantity)
+                self.equipment_adapter.terminate(unit, quantity)  # type: ignore
+                self.equipment_adapter.buy(unit, offer, quantity)  # type: ignore
 
     def repair_with_quality(
         self, units: list[UnitEquipment], quality: float, dry_run: bool = False
     ) -> float:
-        units_normal, units_mismatch = split_mismatch_quality_units(units)
+        units_normal, units_mismatch = split_mismatch_required_quality_units(units)
         if units_mismatch:
-            logger.info("mismatch units qualities found, fixing them:")
-            logger.info(units_mismatch)
             self.fix_units_quality(units_mismatch, dry_run=dry_run)
         if not units_normal:
-            logger.info("nothing to repair, exiting")
             sys.exit(0)
         quantity = quantity_to_repair(units_normal)
         offers = self.equipment_adapter.get_offers(units_normal[0].id, quantity)
         offers = filter_offers(offers, quality, quantity)
         offer = select_offer(offers, units_normal, quality)
         if not offer:
-            logger.error(
-                f"could not select offer to repair quality {quality}, skipping"
-            )
             return 0.0
         repair_cost = quantity * offer.cost
-        logger.info(
-            f"found offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.cost} (repair cost: {repair_cost:.0f})"
-        )
         logger.info(
             f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
         )
@@ -105,13 +85,13 @@ class RepairAction:
         quality_type: QualityType,
         dry_run: bool = False,
     ):
-        units_ = split_by_quality(units, quality_type=quality_type)
+        quality_groups = split_by_quality(units, quality_type=quality_type)
         logger.info(
-            f"prepared units with {len(units_)} quality levels: {list(units_.keys())}"
+            f"prepared {len(quality_groups)} unit groups with qualities {list(quality_groups.keys())}"
         )
         total_cost = 0.0
-        for quality, units_list in units_.items():
-            repair_cost = self.repair_with_quality(units_list, quality, dry_run)
+        for quality, units in quality_groups.items():
+            repair_cost = self.repair_with_quality(units, quality, dry_run)
             total_cost += repair_cost
         logger.info(f"total repair cost: {total_cost:.0f}")
 

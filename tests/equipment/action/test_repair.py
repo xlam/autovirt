@@ -9,7 +9,7 @@ from autovirt.equipment.domain.equipment import (
     select_offer,
     select_offer_to_raise_quality,
     split_by_quality,
-    split_mismatch_quality_units,
+    split_mismatch_required_quality_units,
 )
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.action.repair import (
@@ -105,14 +105,14 @@ def test_select_offer_to_raise_quality(offers, unit, offer_id, count):
 
 def test_select_offer_to_raise_quality_none(offers):
     unit = UnitEquipment(0, 2000, 2000, 29.0, 36.0, 0.0, 1529)
-    assert select_offer_to_raise_quality(unit, offers) is None
+    assert select_offer_to_raise_quality(unit, offers) == (None, None)
 
     offers_ = [RepairOffer(1, 1, "Offer1", 400, 40.0, 1)]
-    assert select_offer_to_raise_quality(unit, offers_) is None
+    assert select_offer_to_raise_quality(unit, offers_) == (None, None)
 
 
 def test_mismatched_quality(units_mismatch):
-    normal, mismatched = split_mismatch_quality_units(units_mismatch)
+    normal, mismatched = split_mismatch_required_quality_units(units_mismatch)
     assert len(normal) == len(units_mismatch) - 1
     assert len(mismatched) == 1
 
