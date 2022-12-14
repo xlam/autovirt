@@ -20,16 +20,39 @@ def gateway_options():
     return GatewayOptions(company_id=0)
 
 
-def test_get_units_returns_valid_list():
+def test_get_units_returns_valid_all_list():
     equipment_id = 1528
     zero_weared_unit = 8821199
     adapter = ApiEquipmentAdapter(Mock(), gateway_options())
     adapter.s.get = Mock(return_value=Response("tests/data/units-to-repair-1528.json"))
     units = adapter.get_units_to_repair(equipment_id)
-    assert len(units) > 0
+    assert len(units) == 3
     assert isinstance(units[0], UnitEquipment)
     ids = [unit.id for unit in units]
     assert zero_weared_unit not in ids
+
+
+def test_get_units_returns_only_specified_units():
+    equipment_id = 1528
+    specified_units_ids = [8821200]
+    adapter = ApiEquipmentAdapter(Mock(), gateway_options())
+    adapter.s.get = Mock(return_value=Response("tests/data/units-to-repair-1528.json"))
+    units = adapter.get_units_to_repair(equipment_id, units_only=specified_units_ids)
+    assert len(units) == len(specified_units_ids)
+    ids = [unit.id for unit in units]
+    assert ids.sort() == specified_units_ids.sort()
+
+
+def test_get_units_returns_all_but_specified_units():
+    equipment_id = 1528
+    specified_units_ids = [8821200]
+    adapter = ApiEquipmentAdapter(Mock(), gateway_options())
+    adapter.s.get = Mock(return_value=Response("tests/data/units-to-repair-1528.json"))
+    units = adapter.get_units_to_repair(equipment_id, units_exclude=specified_units_ids)
+    ids = [unit.id for unit in units]
+    assert len(units) == 2
+    for unit_id in specified_units_ids:
+        assert unit_id not in ids
 
 
 def test_get_offers_returns_valid_list():

@@ -37,7 +37,12 @@ class ApiEquipmentAdapter(EquipmentGateway):
         )
         return r.json()["data"].values()
 
-    def get_units_to_repair(self, equipment_id: int) -> list[UnitEquipment]:
+    def get_units_to_repair(
+        self,
+        equipment_id: int,
+        units_only: list[int] = None,
+        units_exclude: list[int] = None,
+    ) -> list[UnitEquipment]:
         """Get units to repair by equipment.
         Only units whose equipment wear in greater than 0% will be returned
         """
@@ -56,6 +61,13 @@ class ApiEquipmentAdapter(EquipmentGateway):
                         int(unit["equipment_product_id"]),
                     )
                 )
+
+            if units_only:
+                units = list(filter(lambda x: x.id in units_only, units))  # type: ignore
+
+            if units_exclude:
+                units = list(filter(lambda x: x.id not in units_exclude, units))  # type: ignore
+
         return units
 
     def get_offers(self, unit_id: int, quantity_from: int = 0) -> list[RepairOffer]:

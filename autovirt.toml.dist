@@ -12,12 +12,12 @@ pagesize = 1000                 # number of entries to return in server response
 
     [repair.comp]               # configuration name to pass to main.py with --config option
         equipment_id = 1515     # id of equipment to repair
-        exclude = [-1]          # list of units ids to exclude from repair
+        units_exclude = [-1]    # list of units ids to exclude from repair
         offer_id = -1           # use this offer id to repair equipment (i.e self offer)
 
     [repair.comp-hitech]
         equipment_id = 1515
-        include = [-1]          # list of units ids to repair (only those will be repaired)
+        units_only = [-1]       # list of units ids to repair (only those will be repaired)
         keep_quality = true     # repair by installed quality (not required)
 
     [repair.mtools]

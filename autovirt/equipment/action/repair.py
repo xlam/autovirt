@@ -21,8 +21,8 @@ logger = utils.get_logger()
 
 class RepairInputDTO(BaseModel):
     equipment_id: int
-    include: Optional[list[int]] = None
-    exclude: Optional[list[int]] = None
+    units_only: Optional[list[int]] = None
+    units_exclude: Optional[list[int]] = None
     offer_id: Optional[int] = None
     keep_quality: Optional[bool] = None
     dry_run: bool = False
@@ -67,18 +67,6 @@ class RepairAction:
             self.equipment_adapter.repair(units_normal, offer)
         return repair_cost
 
-    @staticmethod
-    def filter_units_with_exclude_and_include_options(
-        units: list[UnitEquipment], repair_options: RepairInputDTO
-    ) -> list[UnitEquipment]:
-        if repair_options.exclude:
-            excludes = repair_options.exclude
-            units = [unit for unit in units for ex in excludes if unit.id != ex]
-        if repair_options.include:
-            includes = repair_options.include
-            units = [unit for unit in units for inc in includes if unit.id == inc]
-        return units
-
     def repair_by_quality(
         self,
         units: list[UnitEquipment],
@@ -113,8 +101,11 @@ class RepairAction:
 
     def run(self, input_dto: RepairInputDTO):
         logger.info(f"starting repair equipment id {input_dto.equipment_id}")
-        units = self.equipment_adapter.get_units_to_repair(input_dto.equipment_id)
-        units = self.filter_units_with_exclude_and_include_options(units, input_dto)
+        units = self.equipment_adapter.get_units_to_repair(
+            equipment_id=input_dto.equipment_id,
+            units_only=input_dto.units_only,
+            units_exclude=input_dto.units_exclude,
+        )
 
         if not units:
             logger.info("nothing to repair, exiting")

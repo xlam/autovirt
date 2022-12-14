@@ -17,5 +17,10 @@ class EquipmentGateway(Protocol):
     def repair(self, units: list[UnitEquipment], offer: RepairOffer):
         ...
 
-    def get_units_to_repair(self, equipment_id: int) -> list[UnitEquipment]:
+    def get_units_to_repair(
+        self,
+        equipment_id: int,
+        units_only: list[int] = None,
+        units_exclude: list[int] = None,
+    ) -> list[UnitEquipment]:
         ...

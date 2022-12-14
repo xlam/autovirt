@@ -128,8 +128,8 @@ def test_split_by_quality(units):
     "config_dict",
     [
         {"equipment_id": 0},
-        {"equipment_id": 0, "exclude": [0], "keep_quality": True},
-        {"equipment_id": 0, "include": [0, 1], "offer_id": 0},
+        {"equipment_id": 0, "units_exclude": [0], "keep_quality": True},
+        {"equipment_id": 0, "units_only": [0, 1], "offer_id": 0},
     ],
 )
 def test_repair_config(config_dict):
