@@ -41,6 +41,10 @@ def dispatch(action_name: str, action_options: str):
 
     if action_name == "repair":
         from autovirt.equipment.action import RepairAction, RepairInputDTO
+        from autovirt.equipment.action.repair_with_offer import (
+            RepairWithOfferAction,
+            RepairWithOfferInputDTO,
+        )
         from autovirt.equipment.adapter.api_equipment import ApiEquipmentAdapter
         from autovirt.gateway_options import GatewayOptions
 
@@ -52,9 +56,17 @@ def dispatch(action_name: str, action_options: str):
                 raise AutovirtError(f"configuration '{config_section}' not found!")
             return repair_options
 
-        input_dto = RepairInputDTO(**get_repair_config(action_options))
-        params = [input_dto]
-        action = RepairAction(ApiEquipmentAdapter(session, GatewayOptions(**config)))
+        repair_options_ = get_repair_config(action_options)
+
+        adapter = ApiEquipmentAdapter(session, GatewayOptions(**config))
+        if "offer_id" in repair_options_:
+            input_dto = RepairWithOfferInputDTO(**repair_options_)
+            params = [input_dto]
+            action = RepairWithOfferAction(adapter)
+        else:
+            input_dto = RepairInputDTO(**repair_options_)  # type: ignore
+            params = [input_dto]
+            action = RepairAction(adapter)  # type: ignore
 
     if action_name == "employee":
         from autovirt.employee.action import SetDemandedSalaryAction

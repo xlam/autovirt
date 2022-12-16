@@ -23,7 +23,6 @@ class RepairInputDTO(BaseModel):
     equipment_id: int
     units_only: Optional[list[int]] = None
     units_exclude: Optional[list[int]] = None
-    offer_id: Optional[int] = None
     keep_quality: Optional[bool] = None
     dry_run: bool = False
 
@@ -83,22 +82,6 @@ class RepairAction:
             total_cost += repair_cost
         logger.info(f"total repair cost: {total_cost:.0f}")
 
-    def repair_with_offer(
-        self, units: list[UnitEquipment], offer_id: int, dry_run: bool = False
-    ) -> float:
-        quantity = quantity_to_repair(units)
-        offers = self.equipment_adapter.get_offers(units[0].id, quantity)
-        offer = [o for o in offers if o.id == offer_id][0]
-        total_cost = quantity * offer.cost
-        logger.info(f"repairing {quantity} pieces on {len(units)} units")
-        logger.info(
-            f"using offer {offer.id} with quality {offer.quality} "
-            f"and price {offer.cost} (repair cost: {total_cost:.0f})"
-        )
-        if not dry_run:
-            self.equipment_adapter.repair(units, offer)
-        return total_cost
-
     def run(self, input_dto: RepairInputDTO):
         logger.info(f"starting repair equipment id {input_dto.equipment_id}")
         units = self.equipment_adapter.get_units_to_repair(
@@ -111,14 +94,9 @@ class RepairAction:
             logger.info("nothing to repair, exiting")
             return
 
-        if input_dto.offer_id:
-            self.repair_with_offer(units, input_dto.offer_id, input_dto.dry_run)
-        else:
-            quality_type = (
-                QualityType.INSTALLED
-                if input_dto.keep_quality
-                else QualityType.REQUIRED
-            )
-            self.repair_by_quality(units, quality_type, input_dto.dry_run)
+        quality_type = (
+            QualityType.INSTALLED if input_dto.keep_quality else QualityType.REQUIRED
+        )
+        self.repair_by_quality(units, quality_type, input_dto.dry_run)
 
         logger.info("repairing finished")

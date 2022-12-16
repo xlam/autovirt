@@ -61,3 +61,16 @@ def test_get_offers_returns_valid_list():
     offers = adapter.get_offers(unit_id=1)
     assert len(offers) > 0
     assert isinstance(offers[0], RepairOffer)
+
+
+def test_get_offer_by_id_returns_valid_offer_or_none():
+    adapter = ApiEquipmentAdapter(Mock(), gateway_options())
+    adapter.s.get = Mock(return_value=Response("tests/data/unit-offers.json"))
+
+    offer = adapter.get_offer_by_id(unit_id=1, offer_id=10177670)
+    assert isinstance(offer, RepairOffer)
+    assert offer.company_id == 5849249
+
+    # not exists in test data
+    offer = adapter.get_offer_by_id(unit_id=1, offer_id=777)
+    assert offer is None

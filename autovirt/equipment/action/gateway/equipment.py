@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, Optional
 
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
@@ -12,6 +12,9 @@ class EquipmentGateway(Protocol):
         ...
 
     def get_offers(self, unit_id: int, quantity_from: int = 0) -> list[RepairOffer]:
+        ...
+
+    def get_offer_by_id(self, unit_id: int, offer_id: int) -> Optional[RepairOffer]:
         ...
 
     def repair(self, units: list[UnitEquipment], offer: RepairOffer):

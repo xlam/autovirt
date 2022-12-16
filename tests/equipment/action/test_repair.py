@@ -29,13 +29,6 @@ def offers_for_installed():
 
 
 @pytest.fixture
-def mock_equipment(offers):
-    mock = Mock(spec=EquipmentGateway)
-    mock.get_offers.return_value = offers
-    return mock
-
-
-@pytest.fixture
 def mock_equipment_for_installed(offers_for_installed):
     mock = Mock(spec=EquipmentGateway)
     mock.get_offers.side_effect = offers_for_installed
@@ -47,7 +40,7 @@ def mock_equipment_for_installed(offers_for_installed):
     [
         {"equipment_id": 0},
         {"equipment_id": 0, "units_exclude": [0], "keep_quality": True},
-        {"equipment_id": 0, "units_only": [0, 1], "offer_id": 0},
+        {"equipment_id": 0, "units_only": [0, 1]},
     ],
 )
 def test_repair_config(config_dict):

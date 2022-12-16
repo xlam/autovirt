@@ -1,3 +1,5 @@
+from typing import Optional
+
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
@@ -86,6 +88,13 @@ class ApiEquipmentAdapter(EquipmentGateway):
                 )
             )
         return offers
+
+    def get_offer_by_id(self, unit_id, offer_id) -> Optional[RepairOffer]:
+        offers = self.get_offers(unit_id, quantity_from=1)
+        for offer in offers:
+            if offer.id == offer_id:
+                return offer
+        return None
 
     def repair(self, units: list[UnitEquipment], offer: RepairOffer):
         """Do repair of units equpment with offer provided"""

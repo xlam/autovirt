@@ -1,5 +1,8 @@
+from unittest.mock import Mock
+
 import pytest
 
+from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.repair_offer import RepairOffer
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
@@ -33,3 +36,10 @@ def offers():
         RepairOffer(5, 106, "Offer 6", 250, 33, 10000),
         RepairOffer(6, 107, "Offer 7", 400, 35, 10000),
     ]
+
+
+@pytest.fixture
+def mock_equipment(offers):
+    mock = Mock(spec=EquipmentGateway)
+    mock.get_offers.return_value = offers
+    return mock
