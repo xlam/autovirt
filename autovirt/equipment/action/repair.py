@@ -16,8 +16,6 @@ from autovirt.equipment.domain.equipment import (
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
-logger = utils.get_logger()
-
 
 class RepairInputDTO(BaseModel):
     equipment_id: int
@@ -27,9 +25,35 @@ class RepairInputDTO(BaseModel):
     dry_run: bool = False
 
 
+class RepairInstrumentation:
+    def __init__(self):
+        self.logger = utils.get_logger()
+
+    def no_units_to_repair(self, equipment_id):
+        self.logger.info(f"Nothing to repair {equipment_id}, exiting")
+
+    def quality_groups_prepared(self, groups):
+        self.logger.info(
+            f"Prepared {len(groups)} unit groups with qualities {list(groups.keys())}"
+        )
+
+    def no_offers_found(self, equipment_id):
+        self.logger.warning(f"No offers found to repair equipment {equipment_id}")
+
+    def ready_to_repair(self, units, units_mismatch, quantity, quality):
+        self.logger.info(
+            f"Repairing {quantity} pieces of quality {quality} "
+            f"on {len(units)} units (mismatched units: {len(units_mismatch)})"
+        )
+
+    def repair_finished(self, total_cost):
+        self.logger.info(f"Total repair cost: {total_cost:.0f}")
+
+
 class RepairAction:
     def __init__(self, equipment_adapter: EquipmentGateway):
         self.equipment_adapter = equipment_adapter
+        self.instrumentation = RepairInstrumentation()
 
     def fix_units_quality(
         self, units: list[UnitEquipment], margin: float = 0, dry_run: bool = False
@@ -52,38 +76,25 @@ class RepairAction:
             self.fix_units_quality(units_mismatch, dry_run=dry_run)
         if not units_normal:
             sys.exit(0)
+
         quantity = quantity_to_repair(units_normal)
         offers = self.equipment_adapter.get_offers(units_normal[0].id, quantity)
         offers = filter_offers(offers, quality, quantity)
         offer = select_offer(offers, units_normal, quality)
+
         if not offer:
+            self.instrumentation.no_offers_found(units_normal[0].equipment_id)
             return 0.0
         repair_cost = quantity * offer.cost
-        logger.info(
-            f"repairing {quantity} pieces of quality {quality} on {len(units)} units"
+
+        self.instrumentation.ready_to_repair(
+            units_normal, units_mismatch, quantity, quality
         )
         if not dry_run:
             self.equipment_adapter.repair(units_normal, offer)
         return repair_cost
 
-    def repair_by_quality(
-        self,
-        units: list[UnitEquipment],
-        quality_type: QualityType,
-        dry_run: bool = False,
-    ):
-        quality_groups = split_by_quality(units, quality_type=quality_type)
-        logger.info(
-            f"prepared {len(quality_groups)} unit groups with qualities {list(quality_groups.keys())}"
-        )
-        total_cost = 0.0
-        for quality, units in quality_groups.items():
-            repair_cost = self.repair_with_quality(units, quality, dry_run)
-            total_cost += repair_cost
-        logger.info(f"total repair cost: {total_cost:.0f}")
-
     def run(self, input_dto: RepairInputDTO):
-        logger.info(f"starting repair equipment id {input_dto.equipment_id}")
         units = self.equipment_adapter.get_units_to_repair(
             equipment_id=input_dto.equipment_id,
             units_only=input_dto.units_only,
@@ -91,12 +102,16 @@ class RepairAction:
         )
 
         if not units:
-            logger.info("nothing to repair, exiting")
+            self.instrumentation.no_units_to_repair(input_dto.equipment_id)
             return
 
         quality_type = (
             QualityType.INSTALLED if input_dto.keep_quality else QualityType.REQUIRED
         )
-        self.repair_by_quality(units, quality_type, input_dto.dry_run)
-
-        logger.info("repairing finished")
+        quality_groups = split_by_quality(units, quality_type=quality_type)
+        self.instrumentation.quality_groups_prepared(quality_groups)
+        total_cost = 0.0
+        for quality, units in quality_groups.items():
+            repair_cost = self.repair_with_quality(units, quality, input_dto.dry_run)
+            total_cost += repair_cost
+        self.instrumentation.repair_finished(total_cost)

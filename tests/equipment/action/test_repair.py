@@ -58,19 +58,17 @@ def test_fix_mismatch_units(mock_equipment, units_mismatch, offers):
     mock_equipment.buy.assert_called_with(units_mismatch[0], offers[6], 167)
 
 
-def test_repair_with_quality(mock_equipment, units, offers):
+def test_repair_by_required_quality(mock_equipment, units):
     action = RepairAction(mock_equipment)
-    action.repair_with_quality(units[:1], units[0].quality_required)
-    mock_equipment.repair.assert_called_with(units[:1], offers[3])
+    mock_equipment.get_units_to_repair.return_value = units
+    input_dto = RepairInputDTO(equipment_id=units[0].equipment_id, keep_quality=True)
+    action.run(input_dto)
+    assert mock_equipment.repair.call_count == len(units)
 
 
-def test_repair_by_required_quality(mock_equipment, units, offers):
-    action = RepairAction(mock_equipment)
-    action.repair_by_quality(units, QualityType.REQUIRED)
-    mock_equipment.repair.assert_called_once()
-
-
-def test_repair_by_installed_quality(mock_equipment_for_installed, units, offers):
+def test_repair_by_installed_quality(mock_equipment_for_installed, units):
     action = RepairAction(mock_equipment_for_installed)
-    action.repair_by_quality(units, QualityType.INSTALLED)
-    assert mock_equipment_for_installed.repair.call_count == 2
+    mock_equipment_for_installed.get_units_to_repair.return_value = units
+    input_dto = RepairInputDTO(equipment_id=units[0].equipment_id, keep_quality=False)
+    action.run(input_dto)
+    assert mock_equipment_for_installed.repair.call_count == 1
