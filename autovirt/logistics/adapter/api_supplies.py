@@ -23,6 +23,7 @@ class ApiSuppliesGateway(SuppliesGateway):
                 item["contracts"] = {}
             supply = Supply(
                 int(item["product_id"]),
+                item["product_name"],
                 int(item["quantity"]),
                 int(item["required"]),
                 [
@@ -49,8 +50,5 @@ class ApiSuppliesGateway(SuppliesGateway):
                     "qty": contract.party_quantity,
                     "token": self.s.token,
                 }
-                logger.info(
-                    f"ordering {contract.party_quantity} pieces of {supply.product_id} to unit {contract.consumer_id}"
-                )
                 r = self.s.post(url, params)
                 logger.info(f"response: {r}")

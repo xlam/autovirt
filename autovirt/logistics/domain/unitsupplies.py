@@ -13,6 +13,7 @@ class SupplyContract:
 @dataclass
 class Supply:
     product_id: int
+    product_name: str
     quantity: int
     required: int
     contracts: list[SupplyContract] = field(default_factory=list)
