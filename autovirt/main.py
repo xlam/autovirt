@@ -242,10 +242,10 @@ def run_logistics_optimize_shops_supplies(session, args):
 def run_sales_manage_retail_prices(session, args):
     from autovirt.sales.action.manage_retail_prices import ManageRetailPricesAction
     from autovirt.sales.adapter.api_sales import ApiSalesAdapter
-    from autovirt.sales.domain import by_mid_values
+    from autovirt.sales.domain import ByMiddleValue
 
     action = ManageRetailPricesAction(ApiSalesAdapter(session))
-    action.run(args.shop_id, by_mid_values, dry_run=args.dry_run)
+    action.run(args.shop_id, method=ByMiddleValue(), dry_run=args.dry_run)
 
 
 modules: dict = {

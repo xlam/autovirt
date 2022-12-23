@@ -1,7 +1,5 @@
-from typing import Callable
-
 from autovirt.sales.action.gateway.sales import SalesGateway
-from autovirt.sales.domain import Product
+from autovirt.sales.domain import Product, RetailPriceCalculator
 from autovirt.utils import get_logger
 
 
@@ -22,7 +20,7 @@ class ManageRetailPricesAction:
         self.instrumentation = ManageRetailPricesInstrumentation()
 
     def run(
-        self, shop_id: int, method: Callable, dry_run: bool = False
+        self, shop_id: int, method: RetailPriceCalculator, dry_run: bool = False
     ) -> list[Product]:
         calculate_price = method
         updated_products: list[Product] = []
