@@ -12,6 +12,7 @@ def make_unit_supplies(consumer_id) -> UnitSupplies:
     return UnitSupplies(
         [
             Supply(
+                unit_id=1,
                 product_id=1,
                 product_name="Product1",
                 quantity=100,
@@ -26,12 +27,19 @@ def make_unit_supplies(consumer_id) -> UnitSupplies:
                     )
                 ],
             ),
-            Supply(2, "Product2", 5, 10, [SupplyContract(consumer_id, 2, 12, 100, 10)]),
             Supply(
-                3, "Product3", 200, 100, [SupplyContract(consumer_id, 3, 13, 100, 200)]
+                1, 2, "Product2", 5, 10, [SupplyContract(consumer_id, 2, 12, 100, 10)]
             ),
             Supply(
-                4, "Product4", 200, 10, [SupplyContract(consumer_id, 4, 14, 100, 0)]
+                1,
+                3,
+                "Product3",
+                200,
+                100,
+                [SupplyContract(consumer_id, 3, 13, 100, 200)],
+            ),
+            Supply(
+                1, 4, "Product4", 200, 10, [SupplyContract(consumer_id, 4, 14, 100, 0)]
             ),
         ]
     )

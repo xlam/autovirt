@@ -22,6 +22,7 @@ class ApiSuppliesGateway(SuppliesGateway):
             if "contracts" not in item.keys():
                 item["contracts"] = {}
             supply = Supply(
+                unit_id,
                 int(item["product_id"]),
                 item["product_name"],
                 int(item["quantity"]),

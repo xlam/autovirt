@@ -12,6 +12,7 @@ class SupplyContract:
 
 @dataclass
 class Supply:
+    unit_id: int
     product_id: int
     product_name: str
     quantity: int

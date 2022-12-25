@@ -10,8 +10,8 @@ class OptimizeUnitSuppliesInstrumentation:
     def setting_supplies(self, supply: Supply, old_ordered: int):
         for contract in supply.contracts:
             self.logger.info(
-                f"Updating ordered quantity of '{supply.product_name}' {supply.product_id} "
-                f"from {old_ordered} to {supply.ordered} at unit {supply.contracts[0].consumer_id}:"
+                f"Updating ordered quantity of '{supply.product_name}' ({supply.product_id}) "
+                f"from {old_ordered} to {supply.ordered} at unit {supply.unit_id}:"
             )
             self.logger.info(
                 f"Ordering {contract.party_quantity} pieces from offer {contract.offer_id}"
