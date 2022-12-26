@@ -1,7 +1,7 @@
 import pytest
 
-from autovirt.exception import AutovirtError
 from autovirt.logistics.domain.unitsupplies import (
+    SupplyNotFound,
     UnitSupplies,
     SupplyContract,
     Supply,
@@ -61,7 +61,7 @@ def supplies_list(contracts):
 
 @pytest.fixture
 def supplies(supplies_list):
-    return UnitSupplies(supplies_list)
+    return UnitSupplies(1, supplies_list)
 
 
 def test_get_supply_by_product_id(supplies, supplies_list):
@@ -70,7 +70,7 @@ def test_get_supply_by_product_id(supplies, supplies_list):
 
 def test_get_supply_by_product_id_exception(supplies):
     index = len(supplies)
-    with pytest.raises(AutovirtError):
+    with pytest.raises(SupplyNotFound):
         supplies.get_supply_by_product_id(product_id=index)
 
 
@@ -127,3 +127,9 @@ def test_set_order_quantity_by_target_share(quantity, required, contracts, expec
     supply = Supply(1, 1, "product1", quantity, required, contracts)
     supply.set_order_quantity_by_target_quantity(target_quantity=500)
     assert supply.ordered == expected
+
+
+def test_unit_supplies_checks_supply_for_valid_unit_id():
+    us = UnitSupplies(1)
+    us.append(Supply(2, 1, "product", 100, 100, []))
+    assert len(us) == 0

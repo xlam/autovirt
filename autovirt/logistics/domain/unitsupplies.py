@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from autovirt.exception import AutovirtError
 
 
+class SupplyNotFound(AutovirtError):
+    pass
+
+
 @dataclass
 class SupplyContract:
     consumer_id: int
@@ -48,15 +52,20 @@ class Supply:
 
 
 class UnitSupplies(list):
-    def __init__(self, items: list[Supply] = None):
+    def __init__(self, unit_id: int, items: list[Supply] = None):
+        self.unit_id = unit_id
         items = items if items else []
         list.__init__(self, items)
+
+    def append(self, supply: Supply) -> None:
+        if self.unit_id == supply.unit_id:
+            super(UnitSupplies, self).append(supply)
 
     def get_supply_by_product_id(self, product_id: int) -> Supply:
         for item in self:
             if item.product_id == product_id:
                 return item
-        raise AutovirtError(f"Supply for product_id={product_id} is not found")
+        raise SupplyNotFound(f"Supply for product_id={product_id} is not found")
 
     def get_contracts_by_product_id(self, product_id: int) -> list[SupplyContract]:
         return self.get_supply_by_product_id(product_id).contracts

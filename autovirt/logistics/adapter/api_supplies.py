@@ -39,7 +39,7 @@ class ApiSuppliesGateway(SuppliesGateway):
                 ],
             )
             supplies.append(supply)
-        return UnitSupplies(supplies)
+        return UnitSupplies(unit_id, supplies)
 
     def set_supplies(self, supplies: UnitSupplies):
         url = "https://virtonomica.ru/api/vera/main/unit/supply/set"

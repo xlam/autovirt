@@ -8,18 +8,19 @@ from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies, SupplyC
 COPIES = 3
 
 
-def make_unit_supplies(consumer_id) -> UnitSupplies:
+def make_unit_supplies(unit_id) -> UnitSupplies:
     return UnitSupplies(
+        unit_id,
         [
             Supply(
-                unit_id=1,
+                unit_id=unit_id,
                 product_id=1,
                 product_name="Product1",
                 quantity=100,
                 required=5,
                 contracts=[
                     SupplyContract(
-                        consumer_id=consumer_id,
+                        consumer_id=unit_id,
                         offer_id=1,
                         supplier_id=11,
                         free_for_buy=100,
@@ -28,25 +29,35 @@ def make_unit_supplies(consumer_id) -> UnitSupplies:
                 ],
             ),
             Supply(
-                1, 2, "Product2", 5, 10, [SupplyContract(consumer_id, 2, 12, 100, 10)]
+                unit_id,
+                2,
+                "Product2",
+                5,
+                10,
+                [SupplyContract(unit_id, 2, 12, 100, 10)],
             ),
             Supply(
-                1,
+                unit_id,
                 3,
                 "Product3",
                 200,
                 100,
-                [SupplyContract(consumer_id, 3, 13, 100, 200)],
+                [SupplyContract(unit_id, 3, 13, 100, 200)],
             ),
             Supply(
-                1, 4, "Product4", 200, 10, [SupplyContract(consumer_id, 4, 14, 100, 0)]
+                unit_id,
+                4,
+                "Product4",
+                200,
+                10,
+                [SupplyContract(unit_id, 4, 14, 100, 0)],
             ),
-        ]
+        ],
     )
 
 
 def more_supplies() -> list[UnitSupplies]:
-    return [make_unit_supplies(consumer_id) for consumer_id in range(COPIES)]
+    return [make_unit_supplies(unit_id) for unit_id in range(COPIES)]
 
 
 class FakeSuppliesGateway(SuppliesGateway):

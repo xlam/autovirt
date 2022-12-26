@@ -27,7 +27,7 @@ class OptimizeUnitSuppliesAction:
         self, unit_id: int, factor: int = 1, dry_run: bool = False
     ) -> UnitSupplies:
         supplies = self.supplies_gateway.get(unit_id)
-        changed_supplies = UnitSupplies()
+        changed_supplies = UnitSupplies(unit_id)
         for supply in supplies:
             ordered = supply.ordered
             supply.set_order_quantity_by_factor_of_required(factor)
