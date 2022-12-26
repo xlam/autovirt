@@ -1,5 +1,6 @@
 import pytest
 
+from autovirt.exception import AutovirtError
 from autovirt.logistics.domain.unitsupplies import (
     UnitSupplies,
     SupplyContract,
@@ -69,7 +70,7 @@ def test_get_supply_by_product_id(supplies, supplies_list):
 
 def test_get_supply_by_product_id_exception(supplies):
     index = len(supplies)
-    with pytest.raises(IndexError):
+    with pytest.raises(AutovirtError):
         supplies.get_supply_by_product_id(product_id=index)
 
 

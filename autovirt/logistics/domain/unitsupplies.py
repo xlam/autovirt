@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from autovirt.exception import AutovirtError
 
 
 @dataclass
@@ -55,7 +56,7 @@ class UnitSupplies(list):
         for item in self:
             if item.product_id == product_id:
                 return item
-        raise IndexError(f"Supply for product_id={product_id} is not found")
+        raise AutovirtError(f"Supply for product_id={product_id} is not found")
 
     def get_contracts_by_product_id(self, product_id: int) -> list[SupplyContract]:
         return self.get_supply_by_product_id(product_id).contracts
