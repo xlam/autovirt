@@ -3,7 +3,9 @@ from autovirt.logistics.action import (
     OptimizeShopsSuppliesAction,
 )
 from autovirt.logistics.action.gateway import SuppliesGateway, UnitsGateway
-from autovirt.logistics.domain.unit_supplies import Supply, UnitSupplies, SupplyContract
+from autovirt.logistics.domain.unit_supplies import UnitSupplies
+from autovirt.logistics.domain.supply import Supply
+from autovirt.logistics.domain.contract import Contract
 
 COPIES = 3
 
@@ -19,7 +21,7 @@ def make_unit_supplies(unit_id) -> UnitSupplies:
                 quantity=100,
                 required=5,
                 contracts=[
-                    SupplyContract(
+                    Contract(
                         consumer_id=unit_id,
                         offer_id=1,
                         supplier_id=11,
@@ -34,7 +36,7 @@ def make_unit_supplies(unit_id) -> UnitSupplies:
                 "Product2",
                 5,
                 10,
-                [SupplyContract(unit_id, 2, 12, 100, 10)],
+                [Contract(unit_id, 2, 12, 100, 10)],
             ),
             Supply(
                 unit_id,
@@ -42,7 +44,7 @@ def make_unit_supplies(unit_id) -> UnitSupplies:
                 "Product3",
                 200,
                 100,
-                [SupplyContract(unit_id, 3, 13, 100, 200)],
+                [Contract(unit_id, 3, 13, 100, 200)],
             ),
             Supply(
                 unit_id,
@@ -50,7 +52,7 @@ def make_unit_supplies(unit_id) -> UnitSupplies:
                 "Product4",
                 200,
                 10,
-                [SupplyContract(unit_id, 4, 14, 100, 0)],
+                [Contract(unit_id, 4, 14, 100, 0)],
             ),
         ],
     )

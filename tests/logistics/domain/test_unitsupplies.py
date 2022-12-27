@@ -3,27 +3,27 @@ import pytest
 from autovirt.logistics.domain.unit_supplies import (
     SupplyNotFound,
     UnitSupplies,
-    SupplyContract,
-    Supply,
 )
+from autovirt.logistics.domain.supply import Supply
+from autovirt.logistics.domain.contract import Contract
 
 
 @pytest.fixture
 def contracts():
     return [
-        SupplyContract(
+        Contract(
             consumer_id=1, offer_id=1, supplier_id=1, free_for_buy=100, party_quantity=5
         ),
-        SupplyContract(
+        Contract(
             consumer_id=1, offer_id=2, supplier_id=2, free_for_buy=200, party_quantity=2
         ),
-        SupplyContract(
+        Contract(
             consumer_id=1, offer_id=3, supplier_id=3, free_for_buy=200, party_quantity=3
         ),
-        SupplyContract(
+        Contract(
             consumer_id=1, offer_id=4, supplier_id=4, free_for_buy=10, party_quantity=2
         ),
-        SupplyContract(
+        Contract(
             consumer_id=1, offer_id=5, supplier_id=5, free_for_buy=0, party_quantity=5
         ),
     ]
@@ -112,13 +112,13 @@ def test_no_free_for_buy_and_zero_required(contracts):
 @pytest.mark.parametrize(
     "quantity, required, contracts, expected",
     [
-        (100, 500, [SupplyContract(1, 2, 3, 1000, 0)], 500),
-        (600, 100, [SupplyContract(1, 2, 3, 1000, 0)], 0),
-        (0, 100, [SupplyContract(1, 2, 3, 1000, 0)], 500),
+        (100, 500, [Contract(1, 2, 3, 1000, 0)], 500),
+        (600, 100, [Contract(1, 2, 3, 1000, 0)], 0),
+        (0, 100, [Contract(1, 2, 3, 1000, 0)], 500),
         (
             0,
             100,
-            [SupplyContract(1, 1, 1, 1000, 0), SupplyContract(1, 2, 2, 1000, 0)],
+            [Contract(1, 1, 1, 1000, 0), Contract(1, 2, 2, 1000, 0)],
             500,
         ),
     ],

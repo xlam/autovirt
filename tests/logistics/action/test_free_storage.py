@@ -4,7 +4,7 @@ from autovirt.exception import AutovirtError
 from autovirt.logistics.action.free_shop_storage import FreeShopStorageAction
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.unit_product import UnitProduct
+from autovirt.logistics.domain.product import Product
 from autovirt.logistics.domain.warehouse import Warehouse
 
 
@@ -12,14 +12,14 @@ class FakeShopAdapter(ShopGateway):
     def __init__(self):
         self.delivered = []
 
-    def get_shop_products(self, unit_id) -> list[UnitProduct]:
+    def get_shop_products(self, unit_id) -> list[Product]:
         return [
-            UnitProduct(1, "Product1", unit_id, 1000, 100),
-            UnitProduct(2, "Product2", unit_id, 1000, 1000),
-            UnitProduct(3, "Product3", unit_id, 100, 1000),
+            Product(1, "Product1", unit_id, 1000, 100),
+            Product(2, "Product2", unit_id, 1000, 1000),
+            Product(3, "Product3", unit_id, 100, 1000),
         ]
 
-    def get_warehouses_for(self, product: UnitProduct) -> list[Warehouse]:
+    def get_warehouses_for(self, product: Product) -> list[Warehouse]:
         return [
             Warehouse(1, 1000, 5.0),
             Warehouse(2, 5000, 10.0),

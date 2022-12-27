@@ -1,6 +1,8 @@
 from autovirt import utils
 from autovirt.logistics.action.gateway import SuppliesGateway
-from autovirt.logistics.domain.unit_supplies import Supply, SupplyContract, UnitSupplies
+from autovirt.logistics.domain.unit_supplies import UnitSupplies
+from autovirt.logistics.domain.supply import Supply
+from autovirt.logistics.domain.contract import Contract
 from autovirt.session import VirtSession
 
 
@@ -28,7 +30,7 @@ class ApiSuppliesGateway(SuppliesGateway):
                 int(item["quantity"]),
                 int(item["required"]),
                 [
-                    SupplyContract(
+                    Contract(
                         consumer_id=int(contract["consumer_id"]),
                         offer_id=int(offer_id),
                         supplier_id=int(contract["supplier_id"]),

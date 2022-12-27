@@ -1,6 +1,6 @@
 from autovirt.exception import AutovirtError
 from autovirt.logistics.action.gateway.shop import ShopGateway
-from autovirt.logistics.domain import choose_warehouse, get_extra_quantity
+from autovirt.logistics.domain import choose_warehouse
 from autovirt.logistics.domain.delivery import Delivery
 from autovirt.utils import get_logger
 
@@ -26,8 +26,7 @@ class FreeShopStorageAction:
         deliveries = []
         produts = self.shop_gateway.get_shop_products(unit_id)
         for product in produts:
-            extra_quantity = get_extra_quantity(product)
-            if extra_quantity > 0:
+            if product.extra_quantity > 0:
                 available_warehouses = self.shop_gateway.get_warehouses_for(product)
                 if not available_warehouses:
                     raise AutovirtError(
@@ -40,7 +39,7 @@ class FreeShopStorageAction:
                         product.name,
                         product.unit_id,
                         warehouse.id,
-                        extra_quantity,
+                        product.extra_quantity,
                         warehouse.delivery_cost,
                     )
                     self.instrumentation.ready_to_deliver(delivery)

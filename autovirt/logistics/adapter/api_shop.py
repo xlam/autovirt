@@ -3,7 +3,7 @@ from autovirt import utils
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain import Warehouse
 from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.unit_product import UnitProduct
+from autovirt.logistics.domain.product import Product
 from autovirt.session import VirtSession
 
 
@@ -14,7 +14,7 @@ class ApiShopGateway(ShopGateway):
     def __init__(self, session: VirtSession):
         self.s = session
 
-    def get_shop_products(self, unit_id: int) -> list[UnitProduct]:
+    def get_shop_products(self, unit_id: int) -> list[Product]:
         r = self.s.get(
             "https://virtonomica.ru/api/vera/main/unit/shopboard/browse",
             params={"id": unit_id},
@@ -22,7 +22,7 @@ class ApiShopGateway(ShopGateway):
         products = []
         for product in r.json():
             products.append(
-                UnitProduct(
+                Product(
                     int(product["product_id"]),
                     product["product_name"],
                     int(product["shop_unit_id"]),
@@ -32,7 +32,7 @@ class ApiShopGateway(ShopGateway):
             )
         return products
 
-    def get_warehouses_for(self, product: UnitProduct) -> list[Warehouse]:
+    def get_warehouses_for(self, product: Product) -> list[Warehouse]:
         r = self.s.get(
             "https://virtonomica.ru/api/vera/main/unit/storage/delivery/units",
             params={"id": product.unit_id, "product_id": product.id},
