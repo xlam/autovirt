@@ -1,7 +1,6 @@
-import abc
+from typing import Protocol
 
 
-class UnitsGateway(abc.ABC):
-    @abc.abstractmethod
+class UnitsGateway(Protocol):
     def get_shops_ids(self) -> list[int]:
-        pass
+        ...
