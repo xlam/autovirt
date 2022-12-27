@@ -3,7 +3,7 @@ from autovirt.logistics.action import (
     OptimizeShopsSuppliesAction,
 )
 from autovirt.logistics.action.gateway import SuppliesGateway, UnitsGateway
-from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies, SupplyContract
+from autovirt.logistics.domain.unit_supplies import Supply, UnitSupplies, SupplyContract
 
 COPIES = 3
 

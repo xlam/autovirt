@@ -1,6 +1,6 @@
 from autovirt.logistics.action import OptimizeUnitSuppliesAction
 from autovirt.logistics.action.gateway import UnitsGateway, SuppliesGateway
-from autovirt.logistics.domain.unitsupplies import UnitSupplies
+from autovirt.logistics.domain.unit_supplies import UnitSupplies
 
 
 class OptimizeShopsSuppliesAction:

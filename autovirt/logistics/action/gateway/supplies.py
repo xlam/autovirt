@@ -1,6 +1,6 @@
 import abc
 
-from autovirt.logistics.domain.unitsupplies import Supply, UnitSupplies
+from autovirt.logistics.domain.unit_supplies import Supply, UnitSupplies
 
 
 class SuppliesGateway(abc.ABC):

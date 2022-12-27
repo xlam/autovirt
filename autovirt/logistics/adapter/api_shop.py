@@ -3,7 +3,7 @@ from autovirt import utils
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain import Warehouse
 from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.unitproduct import UnitProduct
+from autovirt.logistics.domain.unit_product import UnitProduct
 from autovirt.session import VirtSession
 
 

@@ -1,6 +1,6 @@
 from autovirt import utils
 from autovirt.logistics.action.gateway import SuppliesGateway
-from autovirt.logistics.domain.unitsupplies import Supply, SupplyContract, UnitSupplies
+from autovirt.logistics.domain.unit_supplies import Supply, SupplyContract, UnitSupplies
 from autovirt.session import VirtSession
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from autovirt.logistics.domain.unitsupplies import (
+from autovirt.logistics.domain.unit_supplies import (
     SupplyNotFound,
     UnitSupplies,
     SupplyContract,

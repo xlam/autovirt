@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.unitproduct import UnitProduct
+from autovirt.logistics.domain.unit_product import UnitProduct
 from autovirt.logistics.domain.warehouse import Warehouse
 
 

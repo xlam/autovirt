@@ -4,7 +4,7 @@ from autovirt.exception import AutovirtError
 from autovirt.logistics.action.free_shop_storage import FreeShopStorageAction
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.unitproduct import UnitProduct
+from autovirt.logistics.domain.unit_product import UnitProduct
 from autovirt.logistics.domain.warehouse import Warehouse
 
 
