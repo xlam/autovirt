@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 
 @dataclass
-class BaseUnitSalary:
+class Unit:
     SALARY_MARGIN = 5.0
 
-    unit_id: int
+    id: int
     name: str
     city_name: str
     labor_max: int

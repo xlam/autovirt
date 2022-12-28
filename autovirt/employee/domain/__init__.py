@@ -1,2 +1,0 @@
-from .demanding_unit_salary import DemandingUnitSalary
-from .requiring_unit_salary import RequiringUnitSalary

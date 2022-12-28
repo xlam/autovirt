@@ -1,5 +1,5 @@
 from autovirt.employee.action.gateway import EmployeeGateway
-from autovirt.employee.domain.requiring_unit_salary import RequiringUnitSalary
+from autovirt.employee.domain.requiring_unit import RequiringUnit
 from autovirt.utils import get_logger
 
 
@@ -10,9 +10,9 @@ class SetRequiredSalaryInstrumentation:
     def no_units_to_set_salary(self):
         self.logger.info("No units to set required level salary, exiting.")
 
-    def setting_salary(self, unit: RequiringUnitSalary):
+    def setting_salary(self, unit: RequiringUnit):
         self.logger.info(
-            f"raising salary at {unit.name} ({unit.unit_id}), {unit.city_name} "
+            f"Raising salary at {unit.name} ({unit.id}), {unit.city_name} "
             f"from {unit.initial_salary} to {unit.salary}"
         )
 
@@ -31,6 +31,4 @@ class SetRequiredSalaryAction:
             unit.set_required_salary()
             self.instrumentation.setting_salary(unit)
             if not dry_run:
-                self.employee_gateway.set_salary(
-                    unit.unit_id, unit.labor_max, unit.salary
-                )
+                self.employee_gateway.set_salary(unit)

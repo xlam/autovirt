@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from .base_unit_salary import BaseUnitSalary
+from .unit import Unit
 
 
 @dataclass
-class RequiringUnitSalary(BaseUnitSalary):
+class RequiringUnit(Unit):
     salary_required: float
 
     def set_required_salary(self):
