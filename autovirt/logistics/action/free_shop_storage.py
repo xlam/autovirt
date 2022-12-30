@@ -27,9 +27,9 @@ class FreeShopStorageAction:
         self.shop_gateway = shop_gateway
         self.instrumentation = FreeShopStorageInstrumentation()
 
-    def run(self, unit_id: int, dry_run: bool = False) -> list[Delivery]:
+    def run(self, shop_id: int, dry_run: bool = False) -> list[Delivery]:
         deliveries = []
-        produts = self.shop_gateway.get_shop_products(unit_id)
+        produts = self.shop_gateway.get_shop_products(shop_id)
         produts = filter_extra_quantity(produts)
         for product in produts:
             available_warehouses = self.shop_gateway.get_warehouses_for(product)

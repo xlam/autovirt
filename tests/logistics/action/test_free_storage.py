@@ -30,7 +30,7 @@ class FakeShopAdapter(ShopGateway):
 def test_free_storage_action():
     shop_gateway = FakeShopAdapter()
     action = FreeShopStorageAction(shop_gateway)
-    deliveries = action.run(unit_id=1)
+    deliveries = action.run(shop_id=1)
     assert len(deliveries) == 1
     assert deliveries[0].product_id == 1
     assert deliveries[0].to_unit_id == 2
@@ -41,5 +41,5 @@ def test_no_delivery_if_no_suitable_warehouses_found():
     shop_gateway = FakeShopAdapter()
     shop_gateway.get_warehouses_for = lambda x: []  # mock to return empty list
     action = FreeShopStorageAction(shop_gateway)
-    deliveries = action.run(unit_id=1)
+    deliveries = action.run(shop_id=1)
     assert len(deliveries) == 0
