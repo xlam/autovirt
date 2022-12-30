@@ -1,6 +1,3 @@
-import pytest
-
-from autovirt.exception import AutovirtError
 from autovirt.logistics.action.free_shop_storage import FreeShopStorageAction
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain.delivery import Delivery
@@ -40,9 +37,9 @@ def test_free_storage_action():
     assert deliveries[0].quantity == 800
 
 
-def test_exception_if_there_are_no_suitable_warehouses_for_product_delivery():
+def test_no_delivery_if_no_suitable_warehouses_found():
     shop_gateway = FakeShopAdapter()
     shop_gateway.get_warehouses_for = lambda x: []  # mock to return empty list
     action = FreeShopStorageAction(shop_gateway)
-    with pytest.raises(AutovirtError):
-        action.run(unit_id=1)
+    deliveries = action.run(unit_id=1)
+    assert len(deliveries) == 0
