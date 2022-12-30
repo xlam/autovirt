@@ -1,8 +1,8 @@
 import json
 
 from autovirt.logistics.adapter.api_shop import ApiShopGateway
-from autovirt.logistics.domain.product import Product
-from autovirt.logistics.domain.warehouse import Warehouse
+from autovirt.logistics.domain.storage.product import Product
+from autovirt.logistics.domain.storage.warehouse import Warehouse
 
 
 class Response:

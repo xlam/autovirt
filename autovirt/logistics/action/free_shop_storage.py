@@ -1,6 +1,10 @@
 from autovirt.logistics.action.gateway.shop import ShopGateway
-from autovirt.logistics.domain import choose_warehouse, filter_extra_quantity, Product
-from autovirt.logistics.domain.delivery import Delivery
+from autovirt.logistics.domain.storage import (
+    choose_warehouse,
+    filter_extra_quantity,
+    Product,
+)
+from autovirt.logistics.domain.storage.delivery import Delivery
 from autovirt.utils import get_logger
 
 

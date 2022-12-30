@@ -1,8 +1,8 @@
 from autovirt.logistics.action.free_shop_storage import FreeShopStorageAction
 from autovirt.logistics.action.gateway.shop import ShopGateway
-from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.product import Product
-from autovirt.logistics.domain.warehouse import Warehouse
+from autovirt.logistics.domain.storage.delivery import Delivery
+from autovirt.logistics.domain.storage.product import Product
+from autovirt.logistics.domain.storage.warehouse import Warehouse
 
 
 class FakeShopAdapter(ShopGateway):

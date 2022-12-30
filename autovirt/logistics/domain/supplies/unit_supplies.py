@@ -1,6 +1,6 @@
 from autovirt.exception import AutovirtError
-from autovirt.logistics.domain.contract import Contract
-from autovirt.logistics.domain.supply import Supply
+from autovirt.logistics.domain.supplies.contract import Contract
+from autovirt.logistics.domain.supplies.supply import Supply
 
 
 class SupplyNotFound(AutovirtError):

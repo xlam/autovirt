@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from autovirt.logistics.domain.unit_supplies import UnitSupplies
+from autovirt.logistics.domain.supplies.unit_supplies import UnitSupplies
 
 
 class SuppliesGateway(Protocol):

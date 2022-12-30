@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from autovirt.logistics.domain.contract import Contract
+from autovirt.logistics.domain.supplies.contract import Contract
 
 
 @dataclass

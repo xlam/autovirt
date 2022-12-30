@@ -1,6 +1,6 @@
 from autovirt.logistics.action.gateway import SuppliesGateway
-from autovirt.logistics.domain.unit_supplies import UnitSupplies
-from autovirt.logistics.domain.supply import Supply
+from autovirt.logistics.domain.supplies.unit_supplies import UnitSupplies
+from autovirt.logistics.domain.supplies.supply import Supply
 from autovirt.utils import get_logger
 
 

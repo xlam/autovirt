@@ -1,8 +1,8 @@
 from typing import Protocol
 
-from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.product import Product
-from autovirt.logistics.domain.warehouse import Warehouse
+from autovirt.logistics.domain.storage.delivery import Delivery
+from autovirt.logistics.domain.storage.product import Product
+from autovirt.logistics.domain.storage.warehouse import Warehouse
 
 
 class ShopGateway(Protocol):

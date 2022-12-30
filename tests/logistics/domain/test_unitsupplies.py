@@ -1,11 +1,11 @@
 import pytest
 
-from autovirt.logistics.domain.unit_supplies import (
+from autovirt.logistics.domain.supplies.unit_supplies import (
     SupplyNotFound,
     UnitSupplies,
 )
-from autovirt.logistics.domain.supply import Supply
-from autovirt.logistics.domain.contract import Contract
+from autovirt.logistics.domain.supplies.supply import Supply
+from autovirt.logistics.domain.supplies.contract import Contract
 
 
 @pytest.fixture

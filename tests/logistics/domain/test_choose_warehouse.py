@@ -1,5 +1,5 @@
-from autovirt.logistics.domain.warehouse import Warehouse
-from autovirt.logistics.domain import choose_warehouse
+from autovirt.logistics.domain.storage.warehouse import Warehouse
+from autovirt.logistics.domain.storage import choose_warehouse
 
 
 def test_choose_warehouse():

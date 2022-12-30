@@ -1,9 +1,9 @@
 from autovirt import utils
 
 from autovirt.logistics.action.gateway.shop import ShopGateway
-from autovirt.logistics.domain import Warehouse
-from autovirt.logistics.domain.delivery import Delivery
-from autovirt.logistics.domain.product import Product
+from autovirt.logistics.domain.storage import Warehouse
+from autovirt.logistics.domain.storage.delivery import Delivery
+from autovirt.logistics.domain.storage.product import Product
 from autovirt.session import VirtSession
 
 
