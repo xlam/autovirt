@@ -29,6 +29,23 @@ def parse_args(args=None):
         dest="service", required=True, help="Autovirt services"
     )
 
+    # Analytics
+
+    analytics_service = services.add_parser("analytics", help="Various analytics tools")
+    analytics_actions = analytics_service.add_subparsers(
+        dest="action", required=True, help="Analytics actions"
+    )
+    daily_changes = analytics_actions.add_parser(
+        "daily-changes", help="View daily income changes sorted in descending order"
+    )
+    daily_changes.add_argument(
+        "-l",
+        "--limit",
+        type=int,
+        default=10,
+        help="Limit output to specified number of top units",
+    )
+
     # Artefact
 
     artefact_service = services.add_parser("artefact", help="Manage units innovations")
@@ -248,7 +265,20 @@ def run_sales_manage_retail_prices(session, args):
     action.run(args.shop_id, method=ByMiddleValue(), dry_run=args.dry_run)
 
 
+def run_daily_changes(session, args):
+    from autovirt.analytics.action.daily_changes import DailyChangesAction
+    from autovirt.analytics.daily_changes.adapter.api_history import ApiHistoryGateway
+    from autovirt.gateway_options import GatewayOptions
+
+    gateway_options = GatewayOptions(**config)
+    action = DailyChangesAction(ApiHistoryGateway(session, gateway_options))
+    action.run(args.limit)
+
+
 modules: dict = {
+    "analytics": {
+        "daily-changes": run_daily_changes,
+    },
     "artefact": {
         "renew": run_artefact_renew,
     },
