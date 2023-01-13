@@ -61,3 +61,8 @@ class ByMiddleValue(RetailPriceCalculator):
             return int(mid_price - mid_price * (1 - quality_coeff))
         else:
             return int(mid_price * 0.9)
+
+
+class ByLocalPrice(RetailPriceCalculator):
+    def __call__(self, product: Product) -> float:
+        return int(product.quality / product.locals_quality * product.locals_price)

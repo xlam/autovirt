@@ -143,15 +143,31 @@ def parse_args(args=None):
         "-f", "--factor", type=int, default=1, help="Factor of required"
     )
 
+    # Sales
+
     sales = services.add_parser("sales", help="Sales management")
     sales_actions = sales.add_subparsers(
         dest="action", required=True, help="Sales actions"
     )
     manage_prices = sales_actions.add_parser(
         "manage-retail-prices",
-        help="Manage shop retail prices by using some tricky formula",
+        help="Manage shop retail prices using specified calculation method",
     )
     manage_prices.add_argument("shop_id", type=int, help="ID of shop")
+    manage_prices.add_argument(
+        "-m",
+        "--method",
+        type=str,
+        choices=[
+            "middle-value",
+            "twice-of-local",
+            "price-and-quality",
+            "complex-factors",
+            "local-price",
+        ],
+        default="middle-value",
+        help="Price calculation method",
+    )
 
     return parser.parse_args(args)
 
@@ -259,10 +275,18 @@ def run_logistics_optimize_shops_supplies(session, args):
 def run_sales_manage_retail_prices(session, args):
     from autovirt.sales.action.manage_retail_prices import ManageRetailPricesAction
     from autovirt.sales.adapter.api_sales import ApiSalesAdapter
-    from autovirt.sales.domain import ByMiddleValue
+    import autovirt.sales.domain as d
+
+    methods = {
+        "middle-value": d.ByMiddleValue,
+        "twice-of-local": d.TwiceOfLocalPrice,
+        "price-and-quality": d.ByShopsPriceAndQuality,
+        "complex-factors": d.ByComplexFactors,
+        "local-price": d.ByLocalPrice,
+    }
 
     action = ManageRetailPricesAction(ApiSalesAdapter(session))
-    action.run(args.shop_id, method=ByMiddleValue(), dry_run=args.dry_run)
+    action.run(args.shop_id, method=methods[args.method](), dry_run=args.dry_run)
 
 
 def run_daily_changes(session, args):
