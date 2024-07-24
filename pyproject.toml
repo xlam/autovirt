@@ -10,6 +10,7 @@ python = "^3.9"
 requests = "^2.26.0"
 tomli = "^2.0.1"
 pydantic = "^1.8.2"
+pip = "^24.1.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.8.0"
