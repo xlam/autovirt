@@ -14,11 +14,11 @@ It uses the game API to communicate with the server. There is no any web-scrapin
 
 ## Requirements
 
-- [Python 3.9](https://www.python.org/downloads/release/python-398/) or later
+- [Python 3.13](https://www.python.org/downloads/release/python-3132/) or later
 
-Autovirt is being developed and tested with Python 3.9. Lower versions are not compatible due to lacking built-in collections type-hinting.
+Autovirt developing had been started with Python 3.9 but now Python 3.13 is used. Versions lower than 3.9 are not compatible due to lacking built-in collections type-hinting.
 
-- [Poetry](https://python-poetry.org/) dependency manager
+- [uv](https://docs.astral.sh/uv/) dependency manager
 
 ## Installation
 
@@ -29,9 +29,9 @@ Autovirt is being developed and tested with Python 3.9. Lower versions are not c
 $ git clone https://github.com/xlam/autovirt
 $ cd autovirt
 ```
-2. Install Autovirt into virtual environment with Poetry. For the first run it will create a new virtual environment and install needed dependencies and Autovirt into it. Provide ``--no-dev`` option to tell poetry not to insall development dependencies:
+2. Install Autovirt into virtual environment with uv. For the first run it will create a new virtual environment and install needed dependencies and Autovirt into it. Provide ``--no-dev`` option to tell poetry not to insall development dependencies:
 ```
-$ poetry install --no-dev
+$ uv sync --no-dev
 ```
 
 ### Using wheel
