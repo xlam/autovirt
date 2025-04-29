@@ -4,10 +4,9 @@ import pytest
 
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.action.repair import (
-    RepairInputDTO,
     RepairAction,
+    RepairInputDTO,
 )
-from autovirt.equipment.domain.equipment import QualityType
 from autovirt.equipment.domain.repair_offer import RepairOffer
 
 
@@ -45,7 +44,7 @@ def mock_equipment_for_installed(offers_for_installed):
 )
 def test_repair_config(config_dict):
     config = RepairInputDTO(**config_dict)
-    c = config.dict()
+    c = config.model_dump()
     for key, value in config_dict.items():
         assert key in c.keys()
         assert isinstance(config_dict[key], type(c[key]))

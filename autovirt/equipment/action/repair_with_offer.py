@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel
 
@@ -11,7 +11,7 @@ logger = utils.get_logger()
 
 class RepairWithOfferInputDTO(BaseModel):
     equipment_id: int
-    units_only: Optional[list[int]] = None
+    units_only: Union[list[int], None] = None
     units_exclude: Optional[list[int]] = None
     offer_id: int
     dry_run: bool = False

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.repair_offer import RepairOffer
@@ -42,8 +42,8 @@ class ApiEquipmentAdapter(EquipmentGateway):
     def get_units_to_repair(
         self,
         equipment_id: int,
-        units_only: list[int] = None,
-        units_exclude: list[int] = None,
+        units_only: Union[list[int], None] = None,
+        units_exclude: Union[list[int], None] = None,
     ) -> list[UnitEquipment]:
         """Get units to repair by equipment.
         Only units whose equipment wear in greater than 0% will be returned

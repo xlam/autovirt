@@ -1,5 +1,5 @@
 import time
-from typing import Optional
+from typing import Union
 
 from autovirt import utils
 from autovirt.mail.domain.message import Message
@@ -10,7 +10,6 @@ logger = utils.get_logger()
 
 
 class ApiMailAdapter(MailGateway):
-
     default_box = "system"
 
     def __init__(self, session: VirtSession):
@@ -23,8 +22,8 @@ class ApiMailAdapter(MailGateway):
         data = r.json()["data"]
         return data
 
-    def get_messages_by_subject(
-        self, subject: str = None, box: Optional[str] = None
+    def get_messages(
+        self, subject: Union[str, None] = None, box: Union[str, None] = None
     ) -> list[Message]:
         box = box if box else self.default_box
         data = self._fetch_messages(box)
@@ -51,7 +50,7 @@ class ApiMailAdapter(MailGateway):
             )
         return res
 
-    def delete_messages(self, messages: list[Message], box: Optional[str] = None):
+    def delete_messages(self, messages: list[Message], box: Union[str, None] = None):
         for message in messages:
             box = box if box else self.default_box
             url = (

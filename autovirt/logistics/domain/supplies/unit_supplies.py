@@ -1,3 +1,5 @@
+from typing import Union
+
 from autovirt.exception import AutovirtError
 from autovirt.logistics.domain.supplies.contract import Contract
 from autovirt.logistics.domain.supplies.supply import Supply
@@ -8,7 +10,7 @@ class SupplyNotFound(AutovirtError):
 
 
 class UnitSupplies(list):
-    def __init__(self, unit_id: int, items: list[Supply] = None):
+    def __init__(self, unit_id: int, items: Union[list[Supply], None] = None):
         self.unit_id = unit_id
         items = items if items else []
         list.__init__(self, items)

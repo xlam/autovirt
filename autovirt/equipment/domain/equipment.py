@@ -46,7 +46,7 @@ class SelectOfferInstrumentation(EquipmentInstrumentation):
     def found_offer_to_repair(self, offer: RepairOffer, quantity: int):
         self.logger.info(
             f"Found offer {offer.id} with quality {offer.quality:.2f} "
-            f"and price {offer.cost:.2f} (repair cost: {offer.cost*quantity:.2f})"
+            f"and price {offer.cost:.2f} (repair cost: {offer.cost * quantity:.2f})"
         )
 
 
@@ -114,9 +114,10 @@ def expected_quality(
 
 
 def select_offer(
-    offers: list[RepairOffer], units: list[UnitEquipment], quality: float = None
+    offers: list[RepairOffer],
+    units: list[UnitEquipment],
+    quality: Union[float, None] = None,
 ) -> Union[RepairOffer, None]:
-
     instrumentation = SelectOfferInstrumentation()
 
     if not offers:
@@ -159,7 +160,6 @@ def select_offer(
 def select_offer_to_raise_quality(
     unit: UnitEquipment, offers: list[RepairOffer], margin: float = 0
 ) -> Tuple[Optional[RepairOffer], Optional[int]]:
-
     instrumentation = SelectOfferToRaiseQualityInstrumentation()
 
     quality_required = unit.quality_required + margin

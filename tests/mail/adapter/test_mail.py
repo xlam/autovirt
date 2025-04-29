@@ -2,8 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from autovirt.mail.domain.message import Message
 from autovirt.mail.adapter.api_mail import ApiMailAdapter
+from autovirt.mail.domain.message import Message
 
 
 @pytest.fixture
@@ -49,6 +49,6 @@ def messages_dict() -> dict:
 def test_get_messages(messages_dict):
     mail = ApiMailAdapter(Mock())
     mail._fetch_messages = Mock(return_value=messages_dict)
-    messages = mail.get_messages_by_subject()
+    messages = mail.get_messages()
     assert len(messages) == len(messages_dict)
     assert isinstance(messages[0], Message)
