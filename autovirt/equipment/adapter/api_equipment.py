@@ -26,6 +26,8 @@ class ApiEquipmentAdapter(EquipmentGateway):
                 "pagesize": self.options.pagesize,
             },
         )
+        if not r.json()["data"]:
+            return []
         return r.json()["data"].values()
 
     def _fetch_offers(self, unit_id: int, quantity_from: int = 0) -> list[dict]:
@@ -37,6 +39,8 @@ class ApiEquipmentAdapter(EquipmentGateway):
                 "pagesize": self.options.pagesize,
             },
         )
+        if not r.json()["data"]:
+            return []
         return r.json()["data"].values()
 
     def get_units_to_repair(

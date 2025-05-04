@@ -1,0 +1,12 @@
+{
+  "info": {
+    "count": 4,
+    "page": 1,
+    "page_size": 50,
+    "sort": [
+      "id desc"
+    ]
+  },
+  "data": [],
+  "preferences": {}
+}

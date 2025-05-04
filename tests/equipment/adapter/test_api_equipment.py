@@ -55,12 +55,27 @@ def test_get_units_returns_all_but_specified_units():
         assert unit_id not in ids
 
 
+def test_get_units_returns_empty_list_on_empty_json():
+    equipment_id = 1528
+    adapter = ApiEquipmentAdapter(Mock(), gateway_options())
+    adapter.s.get = Mock(return_value=Response("tests/data/units-to-repair-empty.json"))
+    units = adapter.get_units_to_repair(equipment_id)
+    assert len(units) == 0
+
+
 def test_get_offers_returns_valid_list():
     adapter = ApiEquipmentAdapter(Mock(), gateway_options())
     adapter.s.get = Mock(return_value=Response("tests/data/unit-offers.json"))
     offers = adapter.get_offers(unit_id=1)
     assert len(offers) > 0
     assert isinstance(offers[0], RepairOffer)
+
+
+def test_get_offers_empty_json_returns_empty_list():
+    adapter = ApiEquipmentAdapter(Mock(), gateway_options())
+    adapter.s.get = Mock(return_value=Response("tests/data/unit-offers-empty.json"))
+    offers = adapter.get_offers(unit_id=1)
+    assert len(offers) == 0
 
 
 def test_get_offer_by_id_returns_valid_offer_or_none():
