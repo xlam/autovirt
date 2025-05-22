@@ -4,16 +4,16 @@ from typing import Optional
 from pydantic import BaseModel
 
 from autovirt import utils
+from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.equipment import (
     QualityType,
-    quantity_to_repair,
     filter_offers,
+    quantity_to_repair,
     select_offer,
     select_offer_to_raise_quality,
     split_by_quality,
     split_mismatch_required_quality_units,
 )
-from autovirt.equipment.action.gateway import EquipmentGateway
 from autovirt.equipment.domain.unit_equipment import UnitEquipment
 
 
@@ -22,7 +22,6 @@ class RepairInputDTO(BaseModel):
     units_only: Optional[list[int]] = None
     units_exclude: Optional[list[int]] = None
     keep_quality: Optional[bool] = None
-    dry_run: bool = False
 
 
 class RepairInstrumentation:
@@ -51,29 +50,26 @@ class RepairInstrumentation:
 
 
 class RepairAction:
-    def __init__(self, equipment_adapter: EquipmentGateway):
+    def __init__(self, equipment_adapter: EquipmentGateway, dry_run: bool = False):
         self.equipment_adapter = equipment_adapter
         self.instrumentation = RepairInstrumentation()
+        self.dry_run = dry_run
 
-    def fix_units_quality(
-        self, units: list[UnitEquipment], margin: float = 0, dry_run: bool = False
-    ):
+    def fix_units_quality(self, units: list[UnitEquipment], margin: float = 0):
         for unit in units:
             # need to update offers before each operation
             offers = self.equipment_adapter.get_offers(unit.id)
             offer, quantity = select_offer_to_raise_quality(unit, offers, margin)
             if not offer:
                 continue
-            if not dry_run:
+            if not self.dry_run:
                 self.equipment_adapter.terminate(unit, quantity)  # type: ignore
                 self.equipment_adapter.buy(unit, offer, quantity)  # type: ignore
 
-    def repair_with_quality(
-        self, units: list[UnitEquipment], quality: float, dry_run: bool = False
-    ) -> float:
+    def repair_with_quality(self, units: list[UnitEquipment], quality: float) -> float:
         units_normal, units_mismatch = split_mismatch_required_quality_units(units)
         if units_mismatch:
-            self.fix_units_quality(units_mismatch, dry_run=dry_run)
+            self.fix_units_quality(units_mismatch)
         if not units_normal:
             sys.exit(0)
 
@@ -90,7 +86,7 @@ class RepairAction:
         self.instrumentation.ready_to_repair(
             units_normal, units_mismatch, quantity, quality
         )
-        if not dry_run:
+        if not self.dry_run:
             self.equipment_adapter.repair(units_normal, offer)
         return repair_cost
 
@@ -112,6 +108,6 @@ class RepairAction:
         self.instrumentation.quality_groups_prepared(quality_groups)
         total_cost = 0.0
         for quality, units in quality_groups.items():
-            repair_cost = self.repair_with_quality(units, quality, input_dto.dry_run)
+            repair_cost = self.repair_with_quality(units, quality)
             total_cost += repair_cost
         self.instrumentation.repair_finished(total_cost)

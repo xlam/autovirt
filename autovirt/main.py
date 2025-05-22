@@ -4,8 +4,8 @@ import sys
 from autovirt import __version__ as version
 from autovirt import utils
 from autovirt.exception import AutovirtError
-from autovirt.session import VirtSession
 from autovirt.gateway_options import GatewayOptions
+from autovirt.session import VirtSession
 
 config = utils.get_config("autovirt")
 
@@ -177,8 +177,10 @@ def run_artefact_renew(session, args):
     from autovirt.artefact.adapter.api_artefact import ApiArtefactAdapter
     from autovirt.gateway_options import GatewayOptions
 
-    action = RenewAction(ApiArtefactAdapter(session, GatewayOptions(**config)))
-    action.run(args.dry_run)
+    action = RenewAction(
+        ApiArtefactAdapter(session, GatewayOptions(**config)), args.dry_run
+    )
+    action.run()
 
 
 def run_employee_set_demanded_salary(session, args):
@@ -187,9 +189,9 @@ def run_employee_set_demanded_salary(session, args):
     from autovirt.gateway_options import GatewayOptions
 
     action = SetDemandedSalaryAction(
-        ApiEmployeeAdapter(session, GatewayOptions(**config))
+        ApiEmployeeAdapter(session, GatewayOptions(**config)), args.dry_run
     )
-    action.run(args.dry_run)
+    action.run()
 
 
 def run_employee_set_required_salary(session, args):
@@ -198,9 +200,9 @@ def run_employee_set_required_salary(session, args):
     from autovirt.gateway_options import GatewayOptions
 
     action = SetRequiredSalaryAction(
-        ApiEmployeeAdapter(session, GatewayOptions(**config))
+        ApiEmployeeAdapter(session, GatewayOptions(**config)), args.dry_run
     )
-    action.run(args.dry_run)
+    action.run()
 
 
 def run_equipment_repair(session, args):
@@ -212,9 +214,10 @@ def run_equipment_repair(session, args):
         units_only=args.units_only,
         units_exclude=args.units_exclude,
         keep_quality=args.keep_quality,
-        dry_run=args.dry_run,
     )
-    action = RepairAction(ApiEquipmentAdapter(session, GatewayOptions(**config)))
+    action = RepairAction(
+        ApiEquipmentAdapter(session, GatewayOptions(**config)), args.dry_run
+    )
     action.run(input_dto)
 
 
@@ -230,10 +233,9 @@ def run_equipment_repair_with_offer(session, args):
         units_only=args.units_only,
         units_exclude=args.units_exclude,
         offer_id=args.offer,
-        dry_run=args.dry_run,
     )
     action = RepairWithOfferAction(
-        ApiEquipmentAdapter(session, GatewayOptions(**config))
+        ApiEquipmentAdapter(session, GatewayOptions(**config)), args.dry_run
     )
     action.run(input_dto)
 
@@ -242,8 +244,8 @@ def run_logistics_free_shop_storage(session, args):
     from autovirt.logistics.action.free_shop_storage import FreeShopStorageAction
     from autovirt.logistics.adapter.api_shop import ApiShopGateway
 
-    action = FreeShopStorageAction(ApiShopGateway(session))
-    action.run(args.shop_id, dry_run=args.dry_run)
+    action = FreeShopStorageAction(ApiShopGateway(session), args.dry_run)
+    action.run(args.shop_id)
 
 
 def run_logistics_optimize_unit_supplies(session, args):
@@ -252,30 +254,31 @@ def run_logistics_optimize_unit_supplies(session, args):
     )
     from autovirt.logistics.adapter.api_supplies import ApiSuppliesGateway
 
-    action = OptimizeUnitSuppliesAction(ApiSuppliesGateway(session))
-    action.execute(args.unit_id, factor=args.factor, dry_run=args.dry_run)
+    action = OptimizeUnitSuppliesAction(ApiSuppliesGateway(session), args.dry_run)
+    action.execute(args.unit_id, factor=args.factor)
 
 
 def run_logistics_optimize_shops_supplies(session, args):
+    from autovirt.gateway_options import GatewayOptions
     from autovirt.logistics.action.optimize_shops_supplies import (
         OptimizeShopsSuppliesAction,
     )
     from autovirt.logistics.adapter.api_supplies import ApiSuppliesGateway
     from autovirt.logistics.adapter.api_units import ApiUnitsGateway
-    from autovirt.gateway_options import GatewayOptions
 
     gateway_options = GatewayOptions(**config)
     action = OptimizeShopsSuppliesAction(
         ApiUnitsGateway(session, gateway_options),
         ApiSuppliesGateway(session),
+        args.dry_run,
     )
-    action.execute(factor=args.factor, dry_run=args.dry_run)
+    action.execute(factor=args.factor)
 
 
 def run_sales_manage_retail_prices(session, args):
+    import autovirt.sales.domain as d
     from autovirt.sales.action.manage_retail_prices import ManageRetailPricesAction
     from autovirt.sales.adapter.api_sales import ApiSalesAdapter
-    import autovirt.sales.domain as d
 
     methods = {
         "middle-value": d.ByMiddleValue,
@@ -285,8 +288,8 @@ def run_sales_manage_retail_prices(session, args):
         "local-price": d.ByLocalPrice,
     }
 
-    action = ManageRetailPricesAction(ApiSalesAdapter(session))
-    action.run(args.shop_id, method=methods[args.method](), dry_run=args.dry_run)
+    action = ManageRetailPricesAction(ApiSalesAdapter(session), args.dry_run)
+    action.run(args.shop_id, method=methods[args.method]())
 
 
 def run_daily_changes(session, args):

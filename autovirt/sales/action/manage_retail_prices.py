@@ -15,13 +15,12 @@ class ManageRetailPricesInstrumentation:
 
 
 class ManageRetailPricesAction:
-    def __init__(self, sales_gateway: SalesGateway):
+    def __init__(self, sales_gateway: SalesGateway, dry_run: bool = False):
         self.sales_gateway = sales_gateway
         self.instrumentation = ManageRetailPricesInstrumentation()
+        self.dry_run = dry_run
 
-    def run(
-        self, shop_id: int, method: RetailPriceCalculator, dry_run: bool = False
-    ) -> list[Product]:
+    def run(self, shop_id: int, method: RetailPriceCalculator) -> list[Product]:
         calculate_price = method
         updated_products: list[Product] = []
         products = self.sales_gateway.get_shop_products(shop_id)
@@ -29,7 +28,7 @@ class ManageRetailPricesAction:
             old_price = product.price
             product.price = calculate_price(product)
             self.instrumentation.price_calculated(product, old_price)
-            if not dry_run:
+            if not self.dry_run:
                 self.sales_gateway.update_price_for(product)
             updated_products.append(product)
         return updated_products

@@ -1,8 +1,8 @@
 from autovirt.logistics.action.gateway.shop import ShopGateway
 from autovirt.logistics.domain.storage import (
+    Product,
     choose_warehouse,
     filter_extra_quantity,
-    Product,
 )
 from autovirt.logistics.domain.storage.delivery import Delivery
 from autovirt.utils import get_logger
@@ -27,11 +27,12 @@ class FreeShopStorageInstrumentation:
 
 
 class FreeShopStorageAction:
-    def __init__(self, shop_gateway: ShopGateway):
+    def __init__(self, shop_gateway: ShopGateway, dry_run: bool = False):
         self.shop_gateway = shop_gateway
         self.instrumentation = FreeShopStorageInstrumentation()
+        self.dry_run = dry_run
 
-    def run(self, shop_id: int, dry_run: bool = False) -> list[Delivery]:
+    def run(self, shop_id: int) -> list[Delivery]:
         deliveries = []
         produts = self.shop_gateway.get_shop_products(shop_id)
         produts = filter_extra_quantity(produts)
@@ -51,7 +52,7 @@ class FreeShopStorageAction:
                     warehouse.delivery_cost,
                 )
                 self.instrumentation.ready_to_deliver(delivery)
-                if not dry_run:
+                if not self.dry_run:
                     self.shop_gateway.set_delivery(delivery)
                 deliveries.append(delivery)
         return deliveries

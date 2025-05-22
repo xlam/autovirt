@@ -1,6 +1,6 @@
 from autovirt.logistics.action.gateway import SuppliesGateway
-from autovirt.logistics.domain.supplies.unit_supplies import UnitSupplies
 from autovirt.logistics.domain.supplies.supply import Supply
+from autovirt.logistics.domain.supplies.unit_supplies import UnitSupplies
 from autovirt.utils import get_logger
 
 
@@ -20,13 +20,12 @@ class OptimizeUnitSuppliesInstrumentation:
 
 
 class OptimizeUnitSuppliesAction:
-    def __init__(self, supplies_gateway: SuppliesGateway):
+    def __init__(self, supplies_gateway: SuppliesGateway, dry_run: bool = False):
         self.supplies_gateway = supplies_gateway
         self.instrumentation = OptimizeUnitSuppliesInstrumentation()
+        self.dry_run = dry_run
 
-    def execute(
-        self, unit_id: int, factor: int = 1, dry_run: bool = False
-    ) -> UnitSupplies:
+    def execute(self, unit_id: int, factor: int = 1) -> UnitSupplies:
         supplies = self.supplies_gateway.get(unit_id)
         changed_supplies = UnitSupplies(unit_id)
         for supply in supplies:
@@ -35,6 +34,6 @@ class OptimizeUnitSuppliesAction:
             if ordered != supply.ordered:
                 changed_supplies.append(supply)
                 self.instrumentation.setting_supplies(supply, old_ordered=ordered)
-        if not dry_run:
+        if not self.dry_run:
             self.supplies_gateway.set_supplies(changed_supplies)
         return changed_supplies

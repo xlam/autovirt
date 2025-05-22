@@ -6,10 +6,11 @@ logger = utils.get_logger()
 
 
 class RenewAction:
-    def __init__(self, artefact_gateway: ArtefactGateway):
+    def __init__(self, artefact_gateway: ArtefactGateway, dry_run: bool = False):
         self.artfact_gateway = artefact_gateway
+        self.dry_run = dry_run
 
-    def run(self, dry_run: bool = False):
+    def run(self):
         artefacts = self.artfact_gateway.get_artefacts()
         artefacts_to_renew = filter_artefacts_to_renew(artefacts)
         if not artefacts_to_renew:
@@ -20,6 +21,6 @@ class RenewAction:
             logger.info(
                 f"renewing {artefact.name} at unit {artefact.unit_id} ({artefact.unit_name}, {artefact.city_name})"
             )
-            if not dry_run:
+            if not self.dry_run:
                 self.artfact_gateway.remove(artefact)
                 self.artfact_gateway.attach(artefact)

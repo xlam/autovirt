@@ -14,7 +14,6 @@ class RepairWithOfferInputDTO(BaseModel):
     units_only: Union[list[int], None] = None
     units_exclude: Optional[list[int]] = None
     offer_id: int
-    dry_run: bool = False
 
 
 class RepairWithOfferInstrumentation:
@@ -40,9 +39,10 @@ class RepairWithOfferInstrumentation:
 
 
 class RepairWithOfferAction:
-    def __init__(self, equipment_adapter: EquipmentGateway):
+    def __init__(self, equipment_adapter: EquipmentGateway, dry_run: bool = False):
         self.equipment_adapter = equipment_adapter
         self.instrumentation = RepairWithOfferInstrumentation()
+        self.dry_run = dry_run
 
     def run(self, input_dto: RepairWithOfferInputDTO):
         units = self.equipment_adapter.get_units_to_repair(
@@ -62,5 +62,5 @@ class RepairWithOfferAction:
             return
 
         self.instrumentation.ready_to_repair(units, offer)
-        if not input_dto.dry_run:
+        if not self.dry_run:
             self.equipment_adapter.repair(units, offer)
