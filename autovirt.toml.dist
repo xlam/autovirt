@@ -7,3 +7,5 @@ password = ""                   # Virtonomica user password
 company_id = -1                 # user company id
 log_dir = "logs"                # logs directory name
 pagesize = 1000                 # number of entries to return in server response
+_mm_key_ = ""                   # Critical cookie for API access
+_mm_user_ = ""                  # Critical cookie for API access

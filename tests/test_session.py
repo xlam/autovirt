@@ -1,5 +1,6 @@
 import os
 from unittest.mock import patch
+
 import pytest
 import requests
 
@@ -51,8 +52,8 @@ def test_login_response_ok(
     post_mock.return_value = response_ok
     session.login(requests.Session())
     post_mock.assert_called_with(
-        f"{options.base_url}/user/login",
-        {"email": options.login, "password": options.password},
+        f"{options.base_url}/main/user/login",
+        data={"email": options.login, "password": options.password},
     )
 
 

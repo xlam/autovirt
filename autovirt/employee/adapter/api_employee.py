@@ -2,8 +2,8 @@ from autovirt.employee.action.gateway import EmployeeGateway
 from autovirt.employee.domain.demanding_unit import DemandingUnit
 from autovirt.employee.domain.requiring_unit import RequiringUnit
 from autovirt.employee.domain.unit import Unit
-from autovirt.session import VirtSession
 from autovirt.gateway_options import GatewayOptions
+from autovirt.session import VirtSession
 
 
 class ApiEmployeeAdapter(EmployeeGateway):
@@ -23,7 +23,23 @@ class ApiEmployeeAdapter(EmployeeGateway):
             "https://virtonomica.ru/api/vera/main/company/employee/recruiting",
             params={"id": self.options.company_id, "pagesize": self.options.pagesize},
         )
-        return list(r.json()["data"].values())
+
+        # Check if response contains an error code inside JSON
+        try:
+            json_response = r.json()
+            if "code" in json_response and json_response["code"] != 200:
+                raise Exception(
+                    f"API returned error: {json_response.get('message', 'Unknown error')}"
+                )
+
+            if "data" not in json_response:
+                raise Exception(
+                    f"Response does not contain 'data' field: {json_response}"
+                )
+
+            return list(json_response["data"].values())
+        except ValueError:
+            raise Exception(f"Could not parse JSON response: {r.text}")
 
     def get_unit_info(self, unit_id: int) -> dict:
         r = self.s.get(
@@ -68,7 +84,7 @@ class ApiEmployeeAdapter(EmployeeGateway):
 
     def set_salary(self, unit_salary: Unit):
         self.s.post(
-            f"https://virtonomica.ru/api/vera/main/unit/employee/update",
+            "https://virtonomica.ru/api/vera/main/unit/employee/update",
             {
                 "id": unit_salary.id,
                 "employee_count": unit_salary.labor_max,
