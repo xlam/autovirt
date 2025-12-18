@@ -83,18 +83,7 @@ class VirtSession:
         if "Referer" not in kwargs["headers"]:
             kwargs["headers"]["Referer"] = f"{self.options.base_url}/main"
 
-        # Log request details for debugging
-        self.logger.info(
-            f"GET request to: {args[0] if args else kwargs.get('url', 'unknown')}"
-        )
-        self.logger.info(f"Headers: {kwargs['headers']}")
-        self.logger.info(f"Params: {kwargs.get('params', {})}")
-        self.logger.info(f"Cookies: {dict(s.cookies)}")
-
         res = s.get(*args, **kwargs)
-
-        self.logger.info(f"Response status: {res.status_code}")
-        self.logger.info(f"Response headers: {dict(res.headers)}")
 
         self.warn_status_not_ok(res)
         self.save_session()
@@ -102,24 +91,13 @@ class VirtSession:
 
     def post(self, *args, **kwargs) -> requests.Response:
         s = self.get_logged_session()
-        # # Add referer header for API calls to match expected browser behavior
+        # Add referer header for API calls to match expected browser behavior
         if "headers" not in kwargs:
             kwargs["headers"] = {}
         if "Referer" not in kwargs["headers"]:
             kwargs["headers"]["Referer"] = f"{self.options.base_url}/main"
 
-        # Log request details for debugging
-        self.logger.info(
-            f"POST request to: {args[0] if args else kwargs.get('url', 'unknown')}"
-        )
-        self.logger.info(f"Headers: {kwargs['headers']}")
-        self.logger.info(f"Data/Params: {kwargs.get('data', kwargs.get('params', {}))}")
-        self.logger.info(f"Cookies: {dict(s.cookies)}")
-
         res = s.post(*args, **kwargs)
-
-        self.logger.info(f"Response status: {res.status_code}")
-        self.logger.info(f"Response headers: {dict(res.headers)}")
 
         self.warn_status_not_ok(res)
         self.save_session()
