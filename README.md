@@ -102,3 +102,43 @@ Crontab configuration is dependent on the operating system being used. The follo
 
 11 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run autovirt sales manage-retail-prices [shop_id]
 ```
+
+## Shell Autocompletion
+
+To enable autocompletion for autovirt commands, you can use the provided completion scripts for both bash and zsh.
+
+### For Bash
+
+1. Source the completion script in your shell:
+```bash
+source /path/to/autovirt-completion.bash
+```
+
+2. Or copy the completion script to the system-wide bash completion directory:
+```bash
+sudo cp autovirt-completion.bash /etc/bash_completion.d/
+```
+
+3. Or add the following line to your `~/.bashrc` to load it automatically:
+```bash
+source /path/to/autovirt-completion.bash
+```
+
+### For Zsh
+
+1. Place the zsh completion file in your zsh completion directory:
+```bash
+# Usually located at ~/.zsh/completion/ or /usr/local/share/zsh/site-functions/
+mkdir -p ~/.zsh/completion/
+cp _autovirt ~/.zsh/completion/
+# Or
+sudo cp _autovirt /usr/local/share/zsh/site-functions/
+```
+
+2. Make sure your `~/.zshrc` includes the completion path:
+```bash
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit
+```
+
+After setup, you will be able to use tab completion for autovirt commands, services, and actions.

@@ -1,0 +1,155 @@
+#compdef autovirt
+
+# Zsh completion script for autovirt
+
+local -a services
+local -a actions
+local -a methods
+
+services=(
+    "analytics:Various analytics tools"
+    "artefact:Manage units innovations"
+    "employee:Manage employee"
+    "equipment:Manage equipment"
+    "logistics:Manage storages and supplies"
+    "sales:Sales management"
+)
+
+_actions_analytics=(
+    "daily-changes:View daily income changes sorted in descending order"
+)
+
+_actions_artefact=(
+    "renew:Renew all expiring innovations"
+)
+
+_actions_employee=(
+    "set-required-salary:Set salary to required level"
+    "set-demanded-salary:Set salary to demanded by labor union"
+)
+
+_actions_equipment=(
+    "repair:Repair equipment"
+    "repair-with-offer:Repair equipment with specified offer"
+)
+
+_actions_logistics=(
+    "free-shop-storage:Free shop storage by delivering extra products to suitable warehouses"
+    "optimize-unit-supplies:Optimize supplies of unit"
+    "optimize-shops-supplies:Optimize supplies of all shops"
+)
+
+_actions_sales=(
+    "manage-retail-prices:Manage shop retail prices using specified calculation method"
+)
+
+_sales_methods=(
+    "middle-value:Middle value method"
+    "twice-of-local:Twice of local method" 
+    "price-and-quality:Price and quality method"
+    "complex-factors:Complex factors method"
+    "local-price:Local price method"
+)
+
+_arguments -C \
+    '--version[show version]: : ->version' \
+    '--dry-run[Do not apply changes, just show]' \
+    '--help[show help]' \
+    '1:service:->services' \
+    '*:action:->actions'
+
+case $state in
+    version)
+        # Just show version, no completion needed
+        _message "version info"
+        ;;
+    services)
+        _describe 'autovirt service' services
+        ;;
+    actions)
+        case $words[2] in
+            analytics)
+                _describe 'analytics action' _actions_analytics
+                ;;
+            artefact)
+                _describe 'artefact action' _actions_artefact
+                ;;
+            employee)
+                _describe 'employee action' _actions_employee
+                ;;
+            equipment)
+                case $words[3] in
+                    "repair")
+                        _arguments \
+                            ':equipment id: ' \
+                            '(- *)--units-only[units to repair and no more]:unit id list: ' \
+                            '(- *)--units-exclude[units to exclude from repair]:unit id list: ' \
+                            '(- *)-u[units to repair and no more]:unit id list: ' \
+                            '(- *)-e[units to exclude from repair]:unit id list: ' \
+                            '--keep_quality[Repair by installed equipment quality instead of required]' \
+                            '-k[Repair by installed equipment quality instead of required]'
+                        ;;
+                    "repair-with-offer")
+                        _arguments \
+                            ':equipment id: ' \
+                            '(- *)--offer[Offer ID to repair with]:offer id: ' \
+                            '(- *)-o[Offer ID to repair with]:offer id: ' \
+                            '(- *)--units-only[units to repair and no more]:unit id list: ' \
+                            '(- *)--units-exclude[units to exclude from repair]:unit id list: ' \
+                            '(- *)-u[units to repair and no more]:unit id list: ' \
+                            '(- *)-e[units to exclude from repair]:unit id list: ' \
+                            '--keep_quality[Repair by installed equipment quality instead of required]' \
+                            '-k[Repair by installed equipment quality instead of required]'
+                        ;;
+                    *)
+                        # If no specific action is selected yet, show available actions for equipment
+                        _describe 'equipment action' _actions_equipment
+                        ;;
+                esac
+                ;;
+            logistics)
+                case $words[3] in
+                    "free-shop-storage")
+                        _message "shop id required"
+                        ;;
+                    "optimize-unit-supplies")
+                        _arguments \
+                            ':unit id: ' \
+                            '(- *)--factor[factor of required]:factor:(1 2 3 4 5)' \
+                            '(- *)-f[factor of required]:factor:(1 2 3 4 5)'
+                        ;;
+                    "optimize-shops-supplies")
+                        _arguments \
+                            '(- *)--factor[factor of required]:factor:(1 2 3 4 5)' \
+                            '(- *)-f[factor of required]:factor:(1 2 3 4 5)'
+                        ;;
+                    *)
+                        _describe 'logistics action' _actions_logistics
+                        ;;
+                esac
+                ;;
+            sales)
+                case $words[3] in
+                    "manage-retail-prices")
+                        _arguments \
+                            ':shop id: ' \
+                            '--method[Price calculation method]:method:->sales_methods' \
+                            '-m[Price calculation method]:method:->sales_methods'
+                        case $state in
+                            sales_methods)
+                                _describe 'sales method' _sales_methods
+                                ;;
+                        esac
+                        ;;
+                    *)
+                        _describe 'sales action' _actions_sales
+                        ;;
+                esac
+                ;;
+            *)
+                # If service is not recognized, show all actions
+                _message "action required"
+                ;;
+        esac
+        ;;
+esac
