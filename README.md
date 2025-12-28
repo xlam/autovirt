@@ -11,6 +11,7 @@ It uses the game API to communicate with the server. There is no any web-scrapin
 - automatic salary raise for units on which labor union requires raise
 - automatic units artefacts renewal
 - configurable with simple [toml](https://toml.io/en/) configuration file
+- bash and zsh autocompletion support
 
 ## Requirements
 
@@ -22,14 +23,14 @@ Autovirt developing had been started with Python 3.9 but now Python 3.13 is used
 
 ## Installation
 
-### Using git and poetry
+### Using git and uv
 
 1. Clone the repository and step into its directory:
 ```
 $ git clone https://github.com/xlam/autovirt
 $ cd autovirt
 ```
-2. Install Autovirt into virtual environment with uv. For the first run it will create a new virtual environment and install needed dependencies and Autovirt into it. Provide ``--no-dev`` option to tell poetry not to insall development dependencies:
+2. Install Autovirt into virtual environment with uv. For the first run it will create a new virtual environment and install needed dependencies and Autovirt into it. Provide ``--no-dev`` option to tell uv not to install development dependencies:
 ```
 $ uv sync --no-dev
 ```
@@ -51,17 +52,17 @@ $ autovirt --help
 ```
 
 
-In case you installed autovirt via poetry you should start poetry shell:
+In case you installed autovirt via uv you should activate the virtual environment:
 ```
-$ poetry shell
+$ source .venv/bin/activate
 ```
-It is also possible to run single command without invoking the shell:
+It is also possible to run single command without activating the environment:
 ```
-$ poetry run autovirt --help
+$ uv run autovirt --help
 ```
-To exit poetry shell type ``exit`` in terminal.
+To exit the activated environment type ``deactivate`` in terminal.
 
-After the poetry shell has started, python interpreter and installed ``autovirt`` command will be invoked from newly created virtual environment, so we should be able now to run autovirt the same way as with pip installation.
+After the virtual environment has been activated, python interpreter and installed ``autovirt`` command will be invoked from the virtual environment, so we should be able now to run autovirt the same way as with pip installation.
 
 See ``autovirt --help`` to figure out available actions.
 
@@ -77,31 +78,38 @@ autovirt.toml example (fill empty values with your data):
 [autovirt]
 session_file = "session.dat"
 session_timeout = 1800          # 30 minutes
+base_url = "https://virtonomica.ru/api/vera"
 login = ""                      # Virtonomica user login
 password = ""                   # Virtonomica user password
 company_id =                    # user company id
 log_dir = "logs"                # logs directory name
 pagesize = 1000                 # number of entries to return in server response
+_mm_key_ = ""                   # Critical cookie for API access (optional, required for some endpoints)
+_mm_user_ = ""                  # Critical cookie for API access (optional, required for some endpoints)
 ```
+
+**Note**: The critical cookies (`_mm_key_` and `_mm_user_`) need to be obtained by the user, for example through browser developer tools after web login to Virtonomica. These cookies are required for accessing certain API endpoints.
 
 ## Using Autovirt with crontab
 
-Crontab configuration is dependent on the operating system being used. The following configuration is an example for debian/ubuntu servers (need ``. ~/.profile`` to have poetry on system $PATH for crontab):
+Crontab configuration is dependent on the operating system being used. The following configuration is an example for debian/ubuntu servers (need to activate uv environment for crontab):
 
 ```
-0 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt equipment repair-with-offer 1515 -o [offer_id] -e [units_ids_to_exclude] 
-1 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt equipment repair 1515 -u [units_ids_to_repair_only] -k 
-2 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt equipment repair 1529
+0 9 * * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt equipment repair-with-offer 1515 -o [offer_id] -e [units_ids_to_exclude]
+1 9 * * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt equipment repair 1515 -u [units_ids_to_repair_only] -k
+2 9 * * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt equipment repair 1529
 
-5 9 * * * . ~/.profile && cd ~/autovirt && poetry run autovirt artefact renew
+5 9 * * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt artefact renew
 
-10 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run autovirt employee set-required-salary
-15 9 */4 * * . ~/.profile && cd ~/autovirt && poetry run autovirt employee set-demanded-salary
+10 9 */2 * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt employee set-required-salary
+15 9 */4 * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt employee set-demanded-salary
 
-11 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run autovirt logistics optimize-shops-supplies
+11 9 */2 * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt logistics optimize-shops-supplies
 
-11 9 */2 * * . ~/.profile && cd ~/autovirt && poetry run autovirt sales manage-retail-prices [shop_id]
+11 9 */2 * * . ~/.profile && cd ~/autovirt && /path/to/uv run autovirt sales manage-retail-prices [shop_id]
 ```
+
+Note: Replace `/path/to/uv` with the actual path to your uv executable.
 
 ## Shell Autocompletion
 
